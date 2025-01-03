@@ -77,12 +77,12 @@ void ReadTrackerSensors()
 
 float checkdistance()
 {
-  digitalWrite(12, LOW);
+  digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
   delayMicroseconds(2);
-  digitalWrite(12, HIGH);
+  digitalWrite(PIN_ULTRASOIC_TRIG, HIGH);
   delayMicroseconds(10);
-  digitalWrite(12, LOW);
-  float distance = pulseIn(13, HIGH) / 58.00;
+  digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
+  float distance = pulseIn(PIN_ULTRASOIC_ECHO, HIGH) / 58.00;
   delay(10);
   return distance;
 }
