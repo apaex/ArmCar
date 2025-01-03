@@ -2,21 +2,22 @@
 #include "keymap.h"
 #include "settings.h"
 #include "hand.h"
+#include "chassis.h"
 
 IRremote ir(PIN_IR);
 
 #define SPEED_LOW 60
 #define SPEED_MEDIUM 120
 #define SPEED_HIGH 160
-#define BLACK 1
 
 Hand hand;
+Chassis chassis;
 
 bool trackingSensorLeft = 0;
 bool trackingSensorCenter = 0;
 bool trackingSensorRight = 0;
 
-int speed_car = SPEED_LOW;
+int speed = SPEED_LOW;
 int nActions = 0;
 
 enum State
@@ -41,21 +42,6 @@ enum State
 
 HandPosition mem[20];
 
-
-void SetMotors(bool l, bool r, int speed)
-{
-  digitalWrite(PIN_MOTOR_LEFT_DIRECTION, l);
-  analogWrite(PIN_MOTOR_LEFT_PWM, speed);
-  digitalWrite(PIN_MOTOR_RIGHT_DIRECTION, !r);
-  analogWrite(PIN_MOTOR_RIGHT_PWM, speed);
-}
-
-void Move_Backward(int speed) { SetMotors(0, 0, speed); }
-void Rotate_Left(int speed)   { SetMotors(0, 1, speed); }
-void Rotate_Right(int speed)  { SetMotors(1, 0, speed); }
-void Move_Forward(int speed)  { SetMotors(1, 1, speed); }
-void Stop()                   { SetMotors(0, 0, 0); }
-
 void ReadTrackerSensors()
 {
   trackingSensorLeft = digitalRead(PIN_TRACKER_LEFT);
@@ -77,39 +63,39 @@ float checkdistance()
 
 void Move_backward_Function()
 {
-  Move_Backward(speed_car);
+  chassis.Move_Backward(speed);
 }
 
 void Move_forward_Function()
 {
-  Move_Forward(speed_car);
+  chassis.Move_Forward(speed);
 }
 
 void Turn_right_Function()
 {
-  Rotate_Right(speed_car);
+  chassis.Rotate_Right(speed);
 }
 
 void Turn_left_Function()
 {
-  Rotate_Left(speed_car);
+  chassis.Rotate_Left(speed);
 }
 
 
 void Line_tracking_Function()
 {
   if (!trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
-    Move_Forward(120);
+    chassis.Move_Forward(120);
   else if (trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
-    Rotate_Left(80);
+    chassis.Rotate_Left(80);
   else if (trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
-    Rotate_Left(120);
+    chassis.Rotate_Left(120);
   else if (!trackingSensorLeft && !trackingSensorCenter && trackingSensorRight)
-    Rotate_Right(120);
+    chassis.Rotate_Right(120);
   else if (!trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
-    Rotate_Right(80);
+    chassis.Rotate_Right(80);
   else if (trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
-    Stop();
+    chassis.Stop();
 }
 
 void Following_Function()
@@ -117,26 +103,26 @@ void Following_Function()
   int Following_distance = checkdistance();
 
   if (Following_distance < 15)
-    Move_Backward(80);
+    chassis.Move_Backward(80);
   else if (Following_distance <= 20)
-    Stop();
+    chassis.Stop();
   else if (Following_distance <= 25)
-    Move_Forward(80);
+    chassis.Move_Forward(80);
   else if (Following_distance <= 30)
-    Move_Forward(100);
+    chassis.Move_Forward(100);
   else
-    Stop();
+    chassis.Stop();
 }
 
 void Anti_drop_Function()
 {
   if (!trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
-    Move_Forward(60);
+    chassis.Move_Forward(60);
   else
   {
-    Move_Backward(60);
+    chassis.Move_Backward(60);
     delay(600);
-    Rotate_Left(60);
+    chassis.Rotate_Left(60);
     delay(500);
   }
 }
@@ -149,21 +135,21 @@ void Avoidance_Function()
   {
     if (Avoidance_distance <= 15)
     {
-      Stop();
+      chassis.Stop();
       delay(100);
-      Move_Backward(100);
+      chassis.Move_Backward(100);
       delay(600);
     }
     else
     {
-      Stop();
+      chassis.Stop();
       delay(100);
-      Rotate_Left(100);
+      chassis.Rotate_Left(100);
       delay(600);
     }
   }
   else
-    Move_Forward(70);
+    chassis.Move_Forward(70);
 }
 
 void auto_do()
@@ -206,31 +192,31 @@ void IR_control_Function()
 {
   if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_UP)
   {
-    Move_Forward(100);
+    chassis.Move_Forward(100);
     delay(300);
-    Stop();
+    chassis.Stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_DOWN)
   {
-    Move_Backward(100);
+    chassis.Move_Backward(100);
     delay(300);
-    Stop();
+    chassis.Stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_LEFT)
   {
-    Rotate_Left(70);
+    chassis.Rotate_Left(70);
     delay(300);
-    Stop();
+    chassis.Stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_RIGHT)
   {
-    Rotate_Right(70);
+    chassis.Rotate_Right(70);
     delay(300);
-    Stop();
+    chassis.Stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_OK)
   {
-    Stop();
+    chassis.Stop();
   }
   else if (false)
   {
@@ -281,7 +267,7 @@ void UART_Control()
       case 'L': state = STATE_TURNING_LEFT;      break;
       case 'R': state = STATE_TURNING_RIGHT;      break;
       case 'G':
-      case 'S': state = NONE; Stop();      break;
+      case 'S': state = NONE; chassis.Stop();      break;
       case 'm': 
         if (nActions < ACTIONS_COUNT)
           mem[nActions++] = hand.position;
@@ -290,9 +276,9 @@ void UART_Control()
         if (nActions) 
           state = MEMORY_ACTION;
         break;
-      case 'X': speed_car = SPEED_LOW;      break;
-      case 'Y': speed_car = SPEED_MEDIUM;      break;
-      case 'Z': speed_car = SPEED_HIGH;      break;
+      case 'X': speed = SPEED_LOW;      break;
+      case 'Y': speed = SPEED_MEDIUM;      break;
+      case 'Z': speed = SPEED_HIGH;      break;
       case 'A': state = PROGRAM_AVOIDANCE;      break;
       case 'D': state = PROGRAM_ANTIDROP;      break;
       case 'W': state = PROGRAM_FOLLOWING;      break;
@@ -325,7 +311,7 @@ void setup()
   hand.setBase(90);
   delay(500);
   
-  Stop();
+  chassis.Stop();
 }
 
 void loop()
