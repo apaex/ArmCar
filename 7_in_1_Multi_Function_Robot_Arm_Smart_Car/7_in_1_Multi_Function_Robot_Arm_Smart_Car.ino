@@ -17,7 +17,7 @@ int Left_Tra_Value = 1;
 int Center_Tra_Value = 1;
 int Right_Tra_Value = 1;
 
-const int Black_Line = 1;
+const int BLACK = 1;
 
 int distance = 0;
 int actions_count = 0;
@@ -106,7 +106,7 @@ void read_degress()
 
 void claw_close()
 {
-  claw_degrees = claw_degrees + 1;
+  ++claw_degrees;
 
   servo_claw.write(claw_degrees);
   delay(10);
@@ -115,14 +115,11 @@ void claw_close()
 
   if (claw_degrees >= 180)
     claw_degrees = 180;
-
-  if (Serial.read() == 's')
-    state = NONE;
 }
 
 void claw_open()
 {
-  claw_degrees = claw_degrees - 1;
+  --claw_degrees;
 
   servo_claw.write(claw_degrees);
   delay(10);
@@ -131,144 +128,122 @@ void claw_open()
 
   if (claw_degrees <= 50)
     claw_degrees = 50;
-
-  if (Serial.read() == 's')
-    state = NONE;
 }
 
 void arm_up()
 {
-  arm_degrees = arm_degrees + 1;
+  ++arm_degrees;
+
   servo_arm.write(arm_degrees);
   delay(10);
+  
   Serial.println(arm_degrees);
+  
   if (arm_degrees >= 180)
-  {
     arm_degrees = 180;
-  }
-
-  if (Serial.read() == 's')
-    state = NONE;
 }
 
 void arm_down()
 {
-  arm_degrees = arm_degrees - 1;
-  servo_arm.write(arm_degrees);
-  Serial.println(arm_degrees);
-  delay(10);
-  if (arm_degrees <= 0)
-  {
-    arm_degrees = 0;
-  }
+  --arm_degrees;
 
-  if (Serial.read() == 's')
-    state = NONE;
+  servo_arm.write(arm_degrees);
+  delay(10);
+
+  Serial.println(arm_degrees);
+
+  if (arm_degrees <= 0)
+    arm_degrees = 0;
 }
 
 
 void arm_base_anticlockwise()
 {
-  base_degrees = base_degrees + 1;
-  servo_base.write(base_degrees);
-  Serial.println(base_degrees);
-  delay(10);
-  if (base_degrees >= 180)
-  {
-    base_degrees = 180;
-  }
+  ++base_degrees;
 
-  if (Serial.read() == 's')
-    state = NONE;
+  servo_base.write(base_degrees);
+  delay(10);
+
+  Serial.println(base_degrees);
+
+  if (base_degrees >= 180)
+    base_degrees = 180;
 }
 
 void arm_base_clockwise()
 {
-  base_degrees = base_degrees - 1;
-  servo_base.write(base_degrees);
-  Serial.println(base_degrees);
-  delay(10);
-  if (base_degrees <= 0)
-  {
-    base_degrees = 0;
-  }
+  --base_degrees;
 
-  if (Serial.read() == 's')
-    state = NONE;
+  servo_base.write(base_degrees);
+  delay(10);
+
+  Serial.println(base_degrees);
+
+  if (base_degrees <= 0)
+    base_degrees = 0;
 }
+
+void Move_backward_Function()
+{
+  Move_Backward(speed_car);
+}
+
+void Move_forward_Function()
+{
+  Move_Forward(speed_car);
+}
+
+void Turn_right_Function()
+{
+  Rotate_Right(speed_car);
+}
+
+void Turn_left_Function()
+{
+  Rotate_Left(speed_car);
+}
+
 
 void Line_tracking_Function()
 {
   ReadTrackerSensors();
 
-  if (Left_Tra_Value != Black_Line && (Center_Tra_Value == Black_Line && Right_Tra_Value != Black_Line))
-  {
+  if (Left_Tra_Value != BLACK && Center_Tra_Value == BLACK && Right_Tra_Value != BLACK)
     Move_Forward(120);
-  }
-  else if (Left_Tra_Value == Black_Line && (Center_Tra_Value == Black_Line && Right_Tra_Value != Black_Line))
-  {
+  else if (Left_Tra_Value == BLACK && Center_Tra_Value == BLACK && Right_Tra_Value != BLACK)
     Rotate_Left(80);
-  }
-  else if (Left_Tra_Value == Black_Line && (Center_Tra_Value != Black_Line && Right_Tra_Value != Black_Line))
-  {
+  else if (Left_Tra_Value == BLACK && Center_Tra_Value != BLACK && Right_Tra_Value != BLACK)
     Rotate_Left(120);
-  }
-  else if (Left_Tra_Value != Black_Line && (Center_Tra_Value != Black_Line && Right_Tra_Value == Black_Line))
-  {
+  else if (Left_Tra_Value != BLACK && Center_Tra_Value != BLACK && Right_Tra_Value == BLACK)
     Rotate_Right(120);
-  }
-  else if (Left_Tra_Value != Black_Line && (Center_Tra_Value == Black_Line && Right_Tra_Value == Black_Line))
-  {
+  else if (Left_Tra_Value != BLACK && Center_Tra_Value == BLACK && Right_Tra_Value == BLACK)
     Rotate_Right(80);
-  }
-  else if (Left_Tra_Value == Black_Line && (Center_Tra_Value == Black_Line && Right_Tra_Value == Black_Line))
-  {
+  else if (Left_Tra_Value == BLACK && Center_Tra_Value == BLACK && Right_Tra_Value == BLACK)
     Stop();
-  }
-
-  if (Serial.read() == 's')
-    state = NONE;
 }
-
 
 void Following_Function()
 {
-  int Following_distance = 0;
+  int Following_distance = checkdistance();
 
-  Following_distance = checkdistance();
   if (Following_distance < 15)
-  {
     Move_Backward(80);
-  }
-  else if (15 <= Following_distance && Following_distance <= 20)
-  {
+  else if (Following_distance <= 20)
     Stop();
-  }
-  else if (20 <= Following_distance && Following_distance <= 25)
-  {
+  else if (Following_distance <= 25)
     Move_Forward(80);
-  }
-  else if (25 <= Following_distance && Following_distance <= 30)
-  {
+  else if (Following_distance <= 30)
     Move_Forward(100);
-  }
   else
-  {
     Stop();
-  }
-
-  if (Serial.read() == 's')
-    state = NONE;
 }
 
 void Anti_drop_Function()
 {
   ReadTrackerSensors();
 
-  if (Left_Tra_Value != Black_Line && (Center_Tra_Value != Black_Line && Right_Tra_Value != Black_Line))
-  {
+  if (Left_Tra_Value != BLACK && Center_Tra_Value != BLACK && Right_Tra_Value != BLACK)
     Move_Forward(60);
-  }
   else
   {
     Move_Backward(60);
@@ -276,32 +251,12 @@ void Anti_drop_Function()
     Rotate_Left(60);
     delay(500);
   }
-
-  if (Serial.read() == 's')
-    state = NONE;
-}
-
-void Move_backward_Function()
-{
-  Move_Backward(speed_car);
-
-  if (Serial.read() == 's')
-    state = NONE;
-}
-
-void Move_forward_Function()
-{
-  Move_Forward(speed_car);
-
-  if (Serial.read() == 's')
-    state = NONE;
 }
 
 void Avoidance_Function()
 {
-  int Avoidance_distance = 0;
+  int Avoidance_distance = checkdistance();
 
-  Avoidance_distance = checkdistance();
   if (Avoidance_distance <= 25)
   {
     if (Avoidance_distance <= 15)
@@ -320,27 +275,9 @@ void Avoidance_Function()
     }
   }
   else
-  {
     Move_Forward(70);
-  }
-
-  if (Serial.read() == 's')
-    state = NONE;
 }
 
-void Turn_right_Function()
-{
-  Rotate_Right(speed_car);
-  if (Serial.read() == 's')
-    state = NONE;
-}
-
-void Turn_left_Function()
-{
-  Rotate_Left(speed_car);
-  if (Serial.read() == 's')
-    state = NONE;
-}
 
 
 void Gravity_sensor_Function()
@@ -555,43 +492,9 @@ void auto_do()
 }
 
 
-
-
-void setup()
+void UART_Control()
 {
-  Serial.begin(9600);
-
-  IRremote ir(PIN_IR);
-
-  servo_claw.attach(PIN_SERVO_CLAW);
-  servo_arm.attach(PIN_SERVO_ARM);
-  servo_base.attach(PIN_SERVO_BASE);
-
-  pinMode(PIN_MOTOR_LEFT_DIRECTION, OUTPUT);
-  pinMode(PIN_MOTOR_LEFT_PWM, OUTPUT);
-  pinMode(PIN_MOTOR_RIGHT_DIRECTION, OUTPUT);
-  pinMode(PIN_MOTOR_RIGHT_PWM, OUTPUT);
-
-  pinMode(PIN_TRACKER_LEFT, INPUT);
-  pinMode(PIN_TRACKER_CENTER, INPUT);
-  pinMode(PIN_TRACKER_RIGHT, INPUT);
-
-  pinMode(12, OUTPUT);
-  pinMode(13, INPUT);
-
-  servo_claw.write(claw_degrees);
-  delay(500);
-  servo_arm.write(arm_degrees);
-  delay(500);
-  servo_base.write(base_degrees);
-  delay(500);
-
-  Stop();
-}
-
-void loop()
-{
-  String BLE_val = "";
+    String BLE_val = "";
 
   while (Serial.available() > 0)
   {
@@ -638,10 +541,43 @@ void loop()
       case 'T': state = PROGRAM_LINE_TRACKING;      break;
       case 'G': state = PROGRAM_GRAVITY_SENSOR;      break;
     }
-  }
- 
-  IR_control_Function();
+  } 
+}
 
+void setup()
+{
+  Serial.begin(9600);
+
+  IRremote ir(PIN_IR);
+
+  servo_claw.attach(PIN_SERVO_CLAW);
+  servo_arm.attach(PIN_SERVO_ARM);
+  servo_base.attach(PIN_SERVO_BASE);
+
+  pinMode(PIN_MOTOR_LEFT_DIRECTION, OUTPUT);
+  pinMode(PIN_MOTOR_LEFT_PWM, OUTPUT);
+  pinMode(PIN_MOTOR_RIGHT_DIRECTION, OUTPUT);
+  pinMode(PIN_MOTOR_RIGHT_PWM, OUTPUT);
+
+  pinMode(PIN_TRACKER_LEFT, INPUT);
+  pinMode(PIN_TRACKER_CENTER, INPUT);
+  pinMode(PIN_TRACKER_RIGHT, INPUT);
+
+  pinMode(12, OUTPUT);
+  pinMode(13, INPUT);
+
+  servo_claw.write(claw_degrees);
+  delay(500);
+  servo_arm.write(arm_degrees);
+  delay(500);
+  servo_base.write(base_degrees);
+  delay(500);
+
+  Stop();
+}
+
+void loop()
+{
   switch (state)
   {
     case STATE_CLAW_OPENING: claw_open();      break;    
@@ -660,5 +596,11 @@ void loop()
     case PROGRAM_FOLLOWING: Following_Function();      break;
     case PROGRAM_LINE_TRACKING: Line_tracking_Function();      break;
     case PROGRAM_GRAVITY_SENSOR: Gravity_sensor_Function();      break;
+    case NONE:   
+      IR_control_Function();
+      UART_Control();
   }
+
+  if (Serial.read() == 's')
+    state = NONE;
 }
