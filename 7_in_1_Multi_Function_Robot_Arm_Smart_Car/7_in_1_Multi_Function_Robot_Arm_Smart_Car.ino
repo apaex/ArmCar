@@ -18,7 +18,6 @@ bool trackingSensorCenter = 0;
 bool trackingSensorRight = 0;
 
 int speed = SPEED_LOW;
-int nActions = 0;
 
 enum State
 {
@@ -41,6 +40,8 @@ enum State
 } state;
 
 HandPosition mem[20];
+int nActions = 0;
+
 
 void ReadTrackerSensors()
 {
@@ -56,6 +57,7 @@ float checkdistance()
   digitalWrite(PIN_ULTRASOIC_TRIG, HIGH);
   delayMicroseconds(10);
   digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
+
   float distance = pulseIn(PIN_ULTRASOIC_ECHO, HIGH) / 58.00;
   delay(10);
   return distance;
@@ -63,39 +65,42 @@ float checkdistance()
 
 void Move_backward_Function()
 {
-  chassis.Move_Backward(speed);
+  chassis.moveBackward(speed);
 }
 
 void Move_forward_Function()
 {
-  chassis.Move_Forward(speed);
+  chassis.moveForward(speed);
 }
 
 void Turn_right_Function()
 {
-  chassis.Rotate_Right(speed);
+  chassis.rotateRight(speed);
 }
 
 void Turn_left_Function()
 {
-  chassis.Rotate_Left(speed);
+  chassis.rotateLeft(speed);
 }
 
 
 void Line_tracking_Function()
 {
   if (!trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
-    chassis.Move_Forward(120);
+    chassis.moveForward(120);
+
   else if (trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
-    chassis.Rotate_Left(80);
+    chassis.rotateLeft(80);
   else if (trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
-    chassis.Rotate_Left(120);
-  else if (!trackingSensorLeft && !trackingSensorCenter && trackingSensorRight)
-    chassis.Rotate_Right(120);
+    chassis.rotateLeft(120);
+
   else if (!trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
-    chassis.Rotate_Right(80);
+    chassis.rotateRight(80);
+  else if (!trackingSensorLeft && !trackingSensorCenter && trackingSensorRight)
+    chassis.rotateRight(120);
+
   else if (trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
-    chassis.Stop();
+    chassis.stop();
 }
 
 void Following_Function()
@@ -103,26 +108,26 @@ void Following_Function()
   int Following_distance = checkdistance();
 
   if (Following_distance < 15)
-    chassis.Move_Backward(80);
+    chassis.moveBackward(80);
   else if (Following_distance <= 20)
-    chassis.Stop();
+    chassis.stop();
   else if (Following_distance <= 25)
-    chassis.Move_Forward(80);
+    chassis.moveForward(80);
   else if (Following_distance <= 30)
-    chassis.Move_Forward(100);
+    chassis.moveForward(100);
   else
-    chassis.Stop();
+    chassis.stop();
 }
 
 void Anti_drop_Function()
 {
   if (!trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
-    chassis.Move_Forward(60);
+    chassis.moveForward(60);
   else
   {
-    chassis.Move_Backward(60);
+    chassis.moveBackward(60);
     delay(600);
-    chassis.Rotate_Left(60);
+    chassis.rotateLeft(60);
     delay(500);
   }
 }
@@ -135,21 +140,21 @@ void Avoidance_Function()
   {
     if (Avoidance_distance <= 15)
     {
-      chassis.Stop();
+      chassis.stop();
       delay(100);
-      chassis.Move_Backward(100);
+      chassis.moveBackward(100);
       delay(600);
     }
     else
     {
-      chassis.Stop();
+      chassis.stop();
       delay(100);
-      chassis.Rotate_Left(100);
+      chassis.rotateLeft(100);
       delay(600);
     }
   }
   else
-    chassis.Move_Forward(70);
+    chassis.moveForward(70);
 }
 
 void auto_do()
@@ -192,31 +197,31 @@ void IR_control_Function()
 {
   if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_UP)
   {
-    chassis.Move_Forward(100);
+    chassis.moveForward(100);
     delay(300);
-    chassis.Stop();
+    chassis.stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_DOWN)
   {
-    chassis.Move_Backward(100);
+    chassis.moveBackward(100);
     delay(300);
-    chassis.Stop();
+    chassis.stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_LEFT)
   {
-    chassis.Rotate_Left(70);
+    chassis.rotateLeft(70);
     delay(300);
-    chassis.Stop();
+    chassis.stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_RIGHT)
   {
-    chassis.Rotate_Right(70);
+    chassis.rotateRight(70);
     delay(300);
-    chassis.Stop();
+    chassis.stop();
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_OK)
   {
-    chassis.Stop();
+    chassis.stop();
   }
   else if (false)
   {
@@ -267,7 +272,7 @@ void UART_Control()
       case 'L': state = STATE_TURNING_LEFT;      break;
       case 'R': state = STATE_TURNING_RIGHT;      break;
       case 'G':
-      case 'S': state = NONE; chassis.Stop();      break;
+      case 'S': state = NONE; chassis.stop();      break;
       case 'm': 
         if (nActions < ACTIONS_COUNT)
           mem[nActions++] = hand.position;
@@ -311,7 +316,7 @@ void setup()
   hand.setBase(90);
   delay(500);
   
-  chassis.Stop();
+  chassis.stop();
 }
 
 void loop()

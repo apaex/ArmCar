@@ -15,9 +15,9 @@ class Chassis
 public:
     void init();
 
-    void Move_Backward(int speed) { SetMotors(0, 0, speed); }
-    void Rotate_Left(int speed)   { SetMotors(0, 1, speed); }
-    void Rotate_Right(int speed)  { SetMotors(1, 0, speed); }
-    void Move_Forward(int speed)  { SetMotors(1, 1, speed); }
-    void Stop()                   { SetMotors(0, 0, 0); }
+    void moveForward(int speed)  { SetMotors(1, 1, speed); }
+    void moveBackward(int speed) { SetMotors(0, 0, speed); }
+    void rotateLeft(int speed)   { SetMotors(0, 1, speed); }
+    void rotateRight(int speed)  { SetMotors(1, 0, speed); }
+    void stop()                  { SetMotors(0, 0, 0); }
 };
