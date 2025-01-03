@@ -15,3 +15,7 @@
 
 #define PIN_ULTRASOIC_TRIG 12
 #define PIN_ULTRASOIC_ECHO 13
+
+
+
+#define ACTIONS_COUNT 20

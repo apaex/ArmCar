@@ -1,28 +1,23 @@
-#include <Servo.h>
 #include "IR_remote.h"
 #include "keymap.h"
 #include "settings.h"
+#include "hand.h"
 
-IRremote ir(3);
+IRremote ir(PIN_IR);
 
-#define SPEED_LOW 60;
-#define SPEED_MEDIUM 120;
-#define SPEED_HIGH 160;
+#define SPEED_LOW 60
+#define SPEED_MEDIUM 120
+#define SPEED_HIGH 160
+#define BLACK 1
 
-int base_degrees = 90;
-int arm_degrees = 90;
-int claw_degrees = 90;
+Hand hand(90, 90, 90);
 
 int Left_Tra_Value = 1;
 int Center_Tra_Value = 1;
 int Right_Tra_Value = 1;
 
-const int BLACK = 1;
-
-int distance = 0;
-int actions_count = 0;
-int auto_count = 0;
 int speed_car = 60;
+int nActions = 0;
 
 enum State
 {
@@ -44,15 +39,8 @@ enum State
   PROGRAM_LINE_TRACKING,
 } state;
 
-int claw_read_degress[20] = {0, 0, 0};
+HandPosition mem[20];
 
-int arm_read_degress[20] = {0, 0, 0};
-
-int base_read_degress[20] = {0, 0, 0};
-
-Servo servo_claw;
-Servo servo_arm;
-Servo servo_base;
 
 void SetMotors(bool l, bool r, int speed)
 {
@@ -85,101 +73,6 @@ float checkdistance()
   float distance = pulseIn(PIN_ULTRASOIC_ECHO, HIGH) / 58.00;
   delay(10);
   return distance;
-}
-
-void read_degress()
-{
-  if (actions_count <= 19)
-  {
-    claw_read_degress[(int)((actions_count + 1) - 1)] = servo_claw.read();
-    delay(50);
-    arm_read_degress[(int)((actions_count + 1) - 1)] = servo_arm.read();
-    delay(50);
-    base_read_degress[(int)((actions_count + 1) - 1)] = servo_base.read();
-    delay(50);
-    actions_count = actions_count + 1;
-    auto_count = actions_count;
-    Serial.println(auto_count);
-  }
-}
-
-void claw_close()
-{
-  ++claw_degrees;
-
-  servo_claw.write(claw_degrees);
-  delay(10);
-
-  Serial.println(claw_degrees);
-
-  if (claw_degrees >= 180)
-    claw_degrees = 180;
-}
-
-void claw_open()
-{
-  --claw_degrees;
-
-  servo_claw.write(claw_degrees);
-  delay(10);
-
-  Serial.println(claw_degrees);
-
-  if (claw_degrees <= 50)
-    claw_degrees = 50;
-}
-
-void arm_up()
-{
-  ++arm_degrees;
-
-  servo_arm.write(arm_degrees);
-  delay(10);
-  
-  Serial.println(arm_degrees);
-  
-  if (arm_degrees >= 180)
-    arm_degrees = 180;
-}
-
-void arm_down()
-{
-  --arm_degrees;
-
-  servo_arm.write(arm_degrees);
-  delay(10);
-
-  Serial.println(arm_degrees);
-
-  if (arm_degrees <= 0)
-    arm_degrees = 0;
-}
-
-
-void arm_base_anticlockwise()
-{
-  ++base_degrees;
-
-  servo_base.write(base_degrees);
-  delay(10);
-
-  Serial.println(base_degrees);
-
-  if (base_degrees >= 180)
-    base_degrees = 180;
-}
-
-void arm_base_clockwise()
-{
-  --base_degrees;
-
-  servo_base.write(base_degrees);
-  delay(10);
-
-  Serial.println(base_degrees);
-
-  if (base_degrees <= 0)
-    base_degrees = 0;
 }
 
 void Move_backward_Function()
@@ -277,6 +170,40 @@ void Avoidance_Function()
     Move_Forward(70);
 }
 
+void auto_do()
+{
+  for (int i = 0; i < nActions; ++i)
+  {
+    if (Serial.read() == 's')
+    {
+      state = NONE;
+      break;
+    }
+
+    while (hand.position.claw != mem[i].claw)
+      hand.incClaw(hand.position.claw < mem[i].claw ? 1 : -1);
+
+    if (Serial.read() == 's')
+    {
+      state = NONE;
+      break;
+    }
+
+    while (hand.position.arm != mem[i].arm)
+      hand.incArm(hand.position.arm < mem[i].arm ? 1 : -1);
+
+    if (Serial.read() == 's')
+    {
+      state = NONE;
+      break;
+    }
+
+    while (hand.position.base != mem[i].base)
+      hand.incBase(hand.position.base < mem[i].base ? 1 : -1);
+  }
+  nActions = 0;
+}
+
 
 
 void IR_control_Function()
@@ -316,153 +243,23 @@ void IR_control_Function()
   {
   }
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_7)
-  {
-    claw_degrees = claw_degrees + 5;
-    if (claw_degrees >= 180)
-    {
-      claw_degrees = 180;
-    }
-    servo_claw.write(claw_degrees);
-    delay(2);
-  }
+    hand.incClaw(5);
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_9)
-  {
-    claw_degrees = claw_degrees - 5;
-    if (claw_degrees <= 50)
-    {
-      claw_degrees = 50;
-    }
-    servo_claw.write(claw_degrees);
-    delay(2);
-  }
+    hand.incClaw(-5);
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_2)
-  {
-    arm_degrees = arm_degrees + 5;
-    if (arm_degrees >= 180)
-    {
-      arm_degrees = 180;
-    }
-    servo_arm.write(arm_degrees);
-    delay(2);
-  }
+    hand.incArm(5);
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_8)
-  {
-    arm_degrees = arm_degrees - 5;
-    if (arm_degrees <= 0)
-    {
-      arm_degrees = 0;
-    }
-    servo_arm.write(arm_degrees);
-    delay(2);
-  }
+    hand.incArm(-5);
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_4)
-  {
-    base_degrees = base_degrees + 5;
-    if (base_degrees >= 180)
-    {
-      base_degrees = 180;
-    }
-    servo_base.write(base_degrees);
-    delay(2);
-  }
+    hand.incBase(5);
   else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_6)
-  {
-    base_degrees = base_degrees - 5;
-    if (base_degrees <= 0)
-    {
-      base_degrees = 0;
-    }
-    servo_base.write(base_degrees);
-    delay(2);
-  }
-}
-
-void auto_do()
-{
-  for (int i = (1); i <= (auto_count); i = i + (1))
-  {
-    if (Serial.read() == 's')
-    {
-      state = NONE;
-      break;
-    }
-    if (claw_degrees < claw_read_degress[(int)(i - 1)])
-    {
-      while (claw_degrees < claw_read_degress[(int)(i - 1)])
-      {
-        claw_degrees = claw_degrees + 1;
-        servo_claw.write(claw_degrees);
-        delay(15);
-      }
-    }
-    else
-    {
-      while (claw_degrees > claw_read_degress[(int)(i - 1)])
-      {
-        claw_degrees = claw_degrees - 1;
-        servo_claw.write(claw_degrees);
-        delay(15);
-      }
-    }
-    if (Serial.read() == 's')
-    {
-      state = NONE;
-      break;
-    }
-    if (arm_degrees < arm_read_degress[(int)(i - 1)])
-    {
-      while (arm_degrees < arm_read_degress[(int)(i - 1)])
-      {
-        arm_degrees = arm_degrees + 1;
-        servo_arm.write(arm_degrees);
-        delay(15);
-      }
-    }
-    else
-    {
-      while (arm_degrees > arm_read_degress[(int)(i - 1)])
-      {
-        arm_degrees = arm_degrees - 1;
-        servo_arm.write(arm_degrees);
-        delay(15);
-      }
-    }
-    if (Serial.read() == 's')
-    {
-      state = NONE;
-      break;
-    }
-    if (base_degrees < base_read_degress[(int)(i - 1)])
-    {
-      while (base_degrees < base_read_degress[(int)(i - 1)])
-      {
-        base_degrees = base_degrees + 1;
-        servo_base.write(base_degrees);
-        delay(15);
-      }
-    }
-    else
-    {
-      while (base_degrees > base_read_degress[(int)(i - 1)])
-      {
-        base_degrees = base_degrees - 1;
-        servo_base.write(base_degrees);
-        delay(15);
-      }
-    }
-    if (Serial.read() == 's')
-    {
-      state = NONE;
-      break;
-    }
-  }
-  
+    hand.incBase(-5);
 }
 
 
 void UART_Control()
 {
-    String BLE_val = "";
+String BLE_val = "";
 
   while (Serial.available() > 0)
   {
@@ -489,17 +286,13 @@ void UART_Control()
       case 'R': state = STATE_TURNING_RIGHT;      break;
       case 'G':
       case 'S': state = NONE; Stop();      break;
-      case 'm': Serial.println(actions_count);      read_degress();      break;    
+      case 'm': 
+        if (nActions < ACTIONS_COUNT)
+          mem[nActions++] = hand.position;
+        break;    
       case 'a': 
-        Serial.println(auto_count);
-        if (auto_count) 
-        {
+        if (nActions) 
           state = MEMORY_ACTION;
-          actions_count = 0;
-          claw_degrees = servo_claw.read();
-          arm_degrees = servo_arm.read();
-          base_degrees = servo_base.read();
-        }
         break;
       case 'X': speed_car = SPEED_LOW;      break;
       case 'Y': speed_car = SPEED_MEDIUM;      break;
@@ -516,12 +309,6 @@ void setup()
 {
   Serial.begin(9600);
 
-  IRremote ir(PIN_IR);
-
-  servo_claw.attach(PIN_SERVO_CLAW);
-  servo_arm.attach(PIN_SERVO_ARM);
-  servo_base.attach(PIN_SERVO_BASE);
-
   pinMode(PIN_MOTOR_LEFT_DIRECTION, OUTPUT);
   pinMode(PIN_MOTOR_LEFT_PWM, OUTPUT);
   pinMode(PIN_MOTOR_RIGHT_DIRECTION, OUTPUT);
@@ -531,16 +318,16 @@ void setup()
   pinMode(PIN_TRACKER_CENTER, INPUT);
   pinMode(PIN_TRACKER_RIGHT, INPUT);
 
-  pinMode(12, OUTPUT);
-  pinMode(13, INPUT);
+  pinMode(PIN_ULTRASOIC_TRIG, OUTPUT);
+  pinMode(PIN_ULTRASOIC_ECHO, INPUT);
 
-  servo_claw.write(claw_degrees);
+  hand.setClaw(90);
   delay(500);
-  servo_arm.write(arm_degrees);
+  hand.setArm(90);
   delay(500);
-  servo_base.write(base_degrees);
+  hand.setBase(90);
   delay(500);
-
+  
   Stop();
 }
 
@@ -548,12 +335,12 @@ void loop()
 {
   switch (state)
   {
-    case STATE_CLAW_OPENING: claw_open();      break;    
-    case STATE_CLAW_CLOSING: claw_close();      break;
-    case STATE_ARM_RISING: arm_up();      break;
-    case STATE_ARM_DESCENDING: arm_down();      break;
-    case STATE_BASE_TURNING_LEFT: arm_base_anticlockwise();      break;
-    case STATE_BASE_TURNING_RIGHT: arm_base_clockwise();      break;
+    case STATE_CLAW_OPENING: hand.incClaw(1);      break;    
+    case STATE_CLAW_CLOSING: hand.incClaw(-1);      break;
+    case STATE_ARM_RISING: hand.incArm(1);      break;
+    case STATE_ARM_DESCENDING: hand.incArm(-1);      break;
+    case STATE_BASE_TURNING_LEFT: hand.incBase(1);      break;
+    case STATE_BASE_TURNING_RIGHT: hand.incBase(-1);      break;
     case STATE_MOVING_FORWARD: Move_forward_Function();      break;
     case STATE_MOVING_BACKWARD: Move_backward_Function();      break;
     case STATE_TURNING_LEFT: Turn_left_Function();      break;
