@@ -138,6 +138,7 @@ void claw_open()
 
 void arm_up()
 {
+  arm_degrees = arm_degrees + 1;
   servo_arm.write(arm_degrees);
   delay(10);
   Serial.println(arm_degrees);
