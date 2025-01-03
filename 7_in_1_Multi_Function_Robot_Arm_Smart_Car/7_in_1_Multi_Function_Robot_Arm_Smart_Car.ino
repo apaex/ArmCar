@@ -43,7 +43,7 @@ HandPosition mem[20];
 int nActions = 0;
 
 
-void ReadTrackerSensors()
+void readTrackerSensors()
 {
   trackingSensorLeft = digitalRead(PIN_TRACKER_LEFT);
   trackingSensorCenter = digitalRead(PIN_TRACKER_CENTER);
@@ -89,15 +89,11 @@ void Line_tracking_Function()
   if (!trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
     chassis.moveForward(120);
 
-  else if (trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
-    chassis.rotateLeft(80);
-  else if (trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
-    chassis.rotateLeft(120);
+  else if (trackingSensorLeft && !trackingSensorRight)
+    chassis.rotateLeft(trackingSensorCenter ? 80 : 120);
 
-  else if (!trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
-    chassis.rotateRight(80);
-  else if (!trackingSensorLeft && !trackingSensorCenter && trackingSensorRight)
-    chassis.rotateRight(120);
+  else if (!trackingSensorLeft && trackingSensorRight)
+    chassis.rotateRight(trackingSensorCenter ? 80 : 120);
 
   else if (trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
     chassis.stop();
@@ -105,15 +101,15 @@ void Line_tracking_Function()
 
 void Following_Function()
 {
-  int Following_distance = checkdistance();
+  int dist = checkdistance();
 
-  if (Following_distance < 15)
+  if (dist < 15)
     chassis.moveBackward(80);
-  else if (Following_distance <= 20)
+  else if (dist <= 20)
     chassis.stop();
-  else if (Following_distance <= 25)
+  else if (dist <= 25)
     chassis.moveForward(80);
-  else if (Following_distance <= 30)
+  else if (dist <= 30)
     chassis.moveForward(100);
   else
     chassis.stop();
@@ -134,24 +130,17 @@ void Anti_drop_Function()
 
 void Avoidance_Function()
 {
-  int Avoidance_distance = checkdistance();
+  int dist = checkdistance();
 
-  if (Avoidance_distance <= 25)
+  if (dist <= 25)
   {
-    if (Avoidance_distance <= 15)
-    {
-      chassis.stop();
-      delay(100);
+    chassis.stop();
+    delay(100);
+    if (dist <= 15)
       chassis.moveBackward(100);
-      delay(600);
-    }
     else
-    {
-      chassis.stop();
-      delay(100);
       chassis.rotateLeft(100);
-      delay(600);
-    }
+    delay(600);
   }
   else
     chassis.moveForward(70);
@@ -193,58 +182,51 @@ void auto_do()
 
 
 
-void IR_control_Function()
+void IR_control()
 {
-  if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_UP)
+  byte code = ir.getIrKey(ir.getCode(), 1);
+
+  switch (code)
   {
-    chassis.moveForward(100);
-    delay(300);
-    chassis.stop();
+    case IR_KEYCODE_UP:
+      chassis.moveForward(100);
+      delay(300);
+      chassis.stop();
+      break;
+
+    case IR_KEYCODE_DOWN:
+      chassis.moveBackward(100);
+      delay(300);
+      chassis.stop();
+      break;
+
+    case IR_KEYCODE_LEFT:
+      chassis.rotateLeft(70);
+      delay(300);
+      chassis.stop();
+      break;
+
+    case IR_KEYCODE_RIGHT:
+      chassis.rotateRight(70);
+      delay(300);
+      chassis.stop();
+      break;
+
+    case IR_KEYCODE_OK:
+      chassis.stop();
+      break;
+
+    case IR_KEYCODE_7:      hand.incClaw(5);      break;
+    case IR_KEYCODE_9:      hand.incClaw(-5);     break;
+    case IR_KEYCODE_2:      hand.incArm(5);       break;
+    case IR_KEYCODE_8:      hand.incArm(-5);      break;
+    case IR_KEYCODE_4:      hand.incBase(5);      break;
+    case IR_KEYCODE_6:      hand.incBase(-5);     break;
   }
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_DOWN)
-  {
-    chassis.moveBackward(100);
-    delay(300);
-    chassis.stop();
-  }
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_LEFT)
-  {
-    chassis.rotateLeft(70);
-    delay(300);
-    chassis.stop();
-  }
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_RIGHT)
-  {
-    chassis.rotateRight(70);
-    delay(300);
-    chassis.stop();
-  }
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_OK)
-  {
-    chassis.stop();
-  }
-  else if (false)
-  {
-  }
-  else if (false)
-  {
-  }
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_7)
-    hand.incClaw(5);
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_9)
-    hand.incClaw(-5);
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_2)
-    hand.incArm(5);
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_8)
-    hand.incArm(-5);
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_4)
-    hand.incBase(5);
-  else if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_6)
-    hand.incBase(-5);
 }
 
 
-void UART_Control()
+void UART_control()
 {
   String BLE_val = "";
 
@@ -309,22 +291,15 @@ void setup()
   pinMode(PIN_ULTRASOIC_ECHO, INPUT);
 
   hand.init();
-  hand.setClaw(90);
-  delay(500);
-  hand.setArm(90);
-  delay(500);
-  hand.setBase(90);
-  delay(500);
-  
-  chassis.stop();
+  chassis.init();  
 }
 
 void loop()
 {
-  IR_control_Function();
-  UART_Control();
+  IR_control();
+  UART_control();
 
-  ReadTrackerSensors();
+  readTrackerSensors();
 
   switch (state)
   {
@@ -343,6 +318,5 @@ void loop()
     case PROGRAM_ANTIDROP: Anti_drop_Function();      break;
     case PROGRAM_FOLLOWING: Following_Function();      break;
     case PROGRAM_LINE_TRACKING: Line_tracking_Function();      break;
-    case NONE:   ;
   }
 }

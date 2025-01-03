@@ -5,9 +5,9 @@
 
 struct HandPosition
 {
-  int claw = 90;
-  int arm = 90;
-  int base = 90;
+  int claw;
+  int arm;
+  int base;
 
   void setClaw(int v) {    claw = constrain(v, 50, 180);  }
   void setArm(int v)  {    arm = constrain(v, 0, 180);  }
@@ -34,6 +34,13 @@ public:
         servo_claw.attach(PIN_SERVO_CLAW);
         servo_arm.attach(PIN_SERVO_ARM);
         servo_base.attach(PIN_SERVO_BASE);
+
+        setClaw(90);
+        delay(500);
+        setArm(90);
+        delay(500);
+        setBase(90);
+        delay(500);
     }
 
     HandPosition position;
