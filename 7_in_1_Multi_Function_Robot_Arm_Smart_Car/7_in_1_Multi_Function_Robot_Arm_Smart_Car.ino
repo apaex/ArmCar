@@ -42,7 +42,6 @@ enum State
   PROGRAM_FOLLOWING,
   PROGRAM_ANTIDROP,
   PROGRAM_LINE_TRACKING,
-  PROGRAM_GRAVITY_SENSOR
 } state;
 
 int claw_read_degress[20] = {0, 0, 0};
@@ -280,37 +279,6 @@ void Avoidance_Function()
 
 
 
-void Gravity_sensor_Function()
-{
-  char bluetooth_val;
-
-  if (Serial.available())
-  {
-    bluetooth_val = Serial.read();
-    Serial.println(bluetooth_val);
-
-    switch (bluetooth_val)
-    {
-      case 'F': Move_Forward(speed_car); break;
-      case 'B': Move_Backward(speed_car); break;
-      case 'L': Rotate_Left(speed_car); break;
-      case 'R': Rotate_Right(speed_car); break;
-      case 'p': Stop(); break;
-      case 'X': speed_car = SPEED_LOW; break;
-      case 'Y': speed_car = SPEED_MEDIUM; break;
-      case 'Z': speed_car = SPEED_HIGH; break;
-    }
-
-
-    if (bluetooth_val == 'S')
-    {
-      state = NONE;
-      Stop();
-    }
-  } 
-}
-
-
 void IR_control_Function()
 {
   if (ir.getIrKey(ir.getCode(), 1) == IR_KEYCODE_UP)
@@ -519,6 +487,7 @@ void UART_Control()
       case 'B': state = STATE_MOVING_BACKWARD;      break;
       case 'L': state = STATE_TURNING_LEFT;      break;
       case 'R': state = STATE_TURNING_RIGHT;      break;
+      case 'G':
       case 'S': state = NONE; Stop();      break;
       case 'm': Serial.println(actions_count);      read_degress();      break;    
       case 'a': 
@@ -539,7 +508,6 @@ void UART_Control()
       case 'D': state = PROGRAM_ANTIDROP;      break;
       case 'W': state = PROGRAM_FOLLOWING;      break;
       case 'T': state = PROGRAM_LINE_TRACKING;      break;
-      case 'G': state = PROGRAM_GRAVITY_SENSOR;      break;
     }
   } 
 }
@@ -595,7 +563,6 @@ void loop()
     case PROGRAM_ANTIDROP: Anti_drop_Function();      break;
     case PROGRAM_FOLLOWING: Following_Function();      break;
     case PROGRAM_LINE_TRACKING: Line_tracking_Function();      break;
-    case PROGRAM_GRAVITY_SENSOR: Gravity_sensor_Function();      break;
     case NONE:   
       IR_control_Function();
       UART_Control();
