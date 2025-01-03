@@ -10,13 +10,13 @@ IRremote ir(PIN_IR);
 #define SPEED_HIGH 160
 #define BLACK 1
 
-Hand hand(90, 90, 90);
+Hand hand;
 
-int Left_Tra_Value = 1;
-int Center_Tra_Value = 1;
-int Right_Tra_Value = 1;
+bool trackingSensorLeft = 0;
+bool trackingSensorCenter = 0;
+bool trackingSensorRight = 0;
 
-int speed_car = 60;
+int speed_car = SPEED_LOW;
 int nActions = 0;
 
 enum State
@@ -58,9 +58,9 @@ void Stop()                   { SetMotors(0, 0, 0); }
 
 void ReadTrackerSensors()
 {
-    Left_Tra_Value = digitalRead(PIN_TRACKER_LEFT);
-    Center_Tra_Value = digitalRead(PIN_TRACKER_CENTER);
-    Right_Tra_Value = digitalRead(PIN_TRACKER_RIGHT);
+  trackingSensorLeft = digitalRead(PIN_TRACKER_LEFT);
+  trackingSensorCenter = digitalRead(PIN_TRACKER_CENTER);
+  trackingSensorRight = digitalRead(PIN_TRACKER_RIGHT);
 }
 
 float checkdistance()
@@ -98,19 +98,17 @@ void Turn_left_Function()
 
 void Line_tracking_Function()
 {
-  ReadTrackerSensors();
-
-  if (Left_Tra_Value != BLACK && Center_Tra_Value == BLACK && Right_Tra_Value != BLACK)
+  if (!trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
     Move_Forward(120);
-  else if (Left_Tra_Value == BLACK && Center_Tra_Value == BLACK && Right_Tra_Value != BLACK)
+  else if (trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
     Rotate_Left(80);
-  else if (Left_Tra_Value == BLACK && Center_Tra_Value != BLACK && Right_Tra_Value != BLACK)
+  else if (trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
     Rotate_Left(120);
-  else if (Left_Tra_Value != BLACK && Center_Tra_Value != BLACK && Right_Tra_Value == BLACK)
+  else if (!trackingSensorLeft && !trackingSensorCenter && trackingSensorRight)
     Rotate_Right(120);
-  else if (Left_Tra_Value != BLACK && Center_Tra_Value == BLACK && Right_Tra_Value == BLACK)
+  else if (!trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
     Rotate_Right(80);
-  else if (Left_Tra_Value == BLACK && Center_Tra_Value == BLACK && Right_Tra_Value == BLACK)
+  else if (trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
     Stop();
 }
 
@@ -132,9 +130,7 @@ void Following_Function()
 
 void Anti_drop_Function()
 {
-  ReadTrackerSensors();
-
-  if (Left_Tra_Value != BLACK && Center_Tra_Value != BLACK && Right_Tra_Value != BLACK)
+  if (!trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
     Move_Forward(60);
   else
   {
@@ -259,7 +255,7 @@ void IR_control_Function()
 
 void UART_Control()
 {
-String BLE_val = "";
+  String BLE_val = "";
 
   while (Serial.available() > 0)
   {
@@ -321,6 +317,7 @@ void setup()
   pinMode(PIN_ULTRASOIC_TRIG, OUTPUT);
   pinMode(PIN_ULTRASOIC_ECHO, INPUT);
 
+  hand.init();
   hand.setClaw(90);
   delay(500);
   hand.setArm(90);
@@ -333,6 +330,11 @@ void setup()
 
 void loop()
 {
+  IR_control_Function();
+  UART_Control();
+
+  ReadTrackerSensors();
+
   switch (state)
   {
     case STATE_CLAW_OPENING: hand.incClaw(1);      break;    
@@ -350,11 +352,6 @@ void loop()
     case PROGRAM_ANTIDROP: Anti_drop_Function();      break;
     case PROGRAM_FOLLOWING: Following_Function();      break;
     case PROGRAM_LINE_TRACKING: Line_tracking_Function();      break;
-    case NONE:   
-      IR_control_Function();
-      UART_Control();
+    case NONE:   ;
   }
-
-  if (Serial.read() == 's')
-    state = NONE;
 }

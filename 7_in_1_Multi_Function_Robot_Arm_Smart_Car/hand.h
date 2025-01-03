@@ -29,7 +29,7 @@ class Hand
     Servo servo_base;
 
 public:
-    Hand(int claw, int arm, int base) : position(claw, arm, base)    
+    void init()
     {    
         servo_claw.attach(PIN_SERVO_CLAW);
         servo_arm.attach(PIN_SERVO_ARM);
