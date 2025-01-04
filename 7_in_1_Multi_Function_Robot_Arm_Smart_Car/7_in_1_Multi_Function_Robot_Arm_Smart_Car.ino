@@ -71,9 +71,7 @@ void storePosition()
 
 void setState(State _state)
 {
-  static State oldstate = NONE;
-
-  if (_state != oldstate)
+  if (_state != state)
     DebugWrite(debugState(_state));
 
   state = _state;
