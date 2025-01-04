@@ -22,18 +22,18 @@ int speed = SPEED_LOW;
 
 enum Program
 {
-  NONE,
-  STATE_TURNING_LEFT,
-  STATE_TURNING_RIGHT,
-  STATE_MOVING_FORWARD,
-  STATE_MOVING_BACKWARD,
-  STATE_CLAW_CLOSING,
-  STATE_CLAW_OPENING,
-  STATE_ARM_RISING,
-  STATE_ARM_DESCENDING,
-  STATE_BASE_TURNING_LEFT,
-  STATE_BASE_TURNING_RIGHT,
-  MEMORY_ACTION,
+  PROGRAM_NONE,
+  PROGRAM_TURNING_LEFT,
+  PROGRAM_TURNING_RIGHT,
+  PROGRAM_MOVING_FORWARD,
+  PROGRAM_MOVING_BACKWARD,
+  PROGRAM_CLAW_CLOSING,
+  PROGRAM_CLAW_OPENING,
+  PROGRAM_ARM_RISING,
+  PROGRAM_ARM_DESCENDING,
+  PROGRAM_BASE_TURNING_LEFT,
+  PROGRAM_BASE_TURNING_RIGHT,
+  PROGRAM_MEMORY_ACTION,
   PROGRAM_AVOIDANCE,
   PROGRAM_FOLLOWING,
   PROGRAM_ANTIDROP,
@@ -77,7 +77,7 @@ void setProgram(Program _program)
   program = _program;
   DebugWrite(debugState(program));
 
-  if (program == NONE)
+  if (program == PROGRAM_NONE)
   {
     chassis.stop();
     hand.stop();
@@ -175,7 +175,7 @@ void auto_do()
   {
     if (Serial.read() == 's')
     {
-      program = NONE;
+      program = PROGRAM_NONE;
       break;
     }
 
@@ -184,7 +184,7 @@ void auto_do()
 
     if (Serial.read() == 's')
     {
-      program = NONE;
+      program = PROGRAM_NONE;
       break;
     }
 
@@ -193,7 +193,7 @@ void auto_do()
 
     if (Serial.read() == 's')
     {
-      program = NONE;
+      program = PROGRAM_NONE;
       break;
     }
 
@@ -209,23 +209,23 @@ void commandInterpretator(const char* cmd)
 
     switch (cmd[0])
     {
-      case 'o': setProgram(STATE_CLAW_OPENING);         break;
-      case 'c': setProgram(STATE_CLAW_CLOSING);         break;
-      case 'u': setProgram(STATE_ARM_RISING);           break;
-      case 'd': setProgram(STATE_ARM_DESCENDING);       break;
-      case 'l': setProgram(STATE_BASE_TURNING_LEFT);    break;
-      case 'r': setProgram(STATE_BASE_TURNING_RIGHT);   break;
-      case 'F': setProgram(STATE_MOVING_FORWARD);       break;
-      case 'B': setProgram(STATE_MOVING_BACKWARD);      break;
-      case 'L': setProgram(STATE_TURNING_LEFT);         break;
-      case 'R': setProgram(STATE_TURNING_RIGHT);        break;
+      case 'o': setProgram(PROGRAM_CLAW_OPENING);         break;
+      case 'c': setProgram(PROGRAM_CLAW_CLOSING);         break;
+      case 'u': setProgram(PROGRAM_ARM_RISING);           break;
+      case 'd': setProgram(PROGRAM_ARM_DESCENDING);       break;
+      case 'l': setProgram(PROGRAM_BASE_TURNING_LEFT);    break;
+      case 'r': setProgram(PROGRAM_BASE_TURNING_RIGHT);   break;
+      case 'F': setProgram(PROGRAM_MOVING_FORWARD);       break;
+      case 'B': setProgram(PROGRAM_MOVING_BACKWARD);      break;
+      case 'L': setProgram(PROGRAM_TURNING_LEFT);         break;
+      case 'R': setProgram(PROGRAM_TURNING_RIGHT);        break;
       case 'G':
-      case 'S': setProgram(NONE);                       break;
+      case 'S': setProgram(PROGRAM_NONE);                       break;
 
       case 'm': storePosition(); break;
       case 'a':
         if (nActions)
-          setProgram(MEMORY_ACTION);
+          setProgram(PROGRAM_MEMORY_ACTION);
         break;
       case 'X': speed = SPEED_LOW;      break;
       case 'Y': speed = SPEED_MEDIUM;   break;
@@ -309,17 +309,17 @@ void loop()
 
   switch (program)
   {
-    case STATE_CLAW_OPENING: hand.incClaw(1);      break;
-    case STATE_CLAW_CLOSING: hand.incClaw(-1);      break;
-    case STATE_ARM_RISING: hand.incArm(1);      break;
-    case STATE_ARM_DESCENDING: hand.incArm(-1);      break;
-    case STATE_BASE_TURNING_LEFT: hand.incBase(1);      break;
-    case STATE_BASE_TURNING_RIGHT: hand.incBase(-1);      break;
-    case STATE_MOVING_FORWARD: Move_forward_Function();      break;
-    case STATE_MOVING_BACKWARD: Move_backward_Function();      break;
-    case STATE_TURNING_LEFT: Turn_left_Function();      break;
-    case STATE_TURNING_RIGHT: Turn_right_Function();      break;
-    case MEMORY_ACTION: auto_do(); break;
+    case PROGRAM_CLAW_OPENING: hand.incClaw(1);      break;
+    case PROGRAM_CLAW_CLOSING: hand.incClaw(-1);      break;
+    case PROGRAM_ARM_RISING: hand.incArm(1);      break;
+    case PROGRAM_ARM_DESCENDING: hand.incArm(-1);      break;
+    case PROGRAM_BASE_TURNING_LEFT: hand.incBase(1);      break;
+    case PROGRAM_BASE_TURNING_RIGHT: hand.incBase(-1);      break;
+    case PROGRAM_MOVING_FORWARD: Move_forward_Function();      break;
+    case PROGRAM_MOVING_BACKWARD: Move_backward_Function();      break;
+    case PROGRAM_TURNING_LEFT: Turn_left_Function();      break;
+    case PROGRAM_TURNING_RIGHT: Turn_right_Function();      break;
+    case PROGRAM_MEMORY_ACTION: auto_do(); break;
     case PROGRAM_AVOIDANCE: Avoidance_Function();      break;
     case PROGRAM_ANTIDROP: Anti_drop_Function();      break;
     case PROGRAM_FOLLOWING: Following_Function();      break;
