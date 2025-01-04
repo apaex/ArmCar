@@ -52,4 +52,6 @@ public:
     void incClaw(int v) {    setClaw(position.claw + v); }
     void incArm(int v)  {    setArm(position.arm + v); }
     void incBase(int v) {    setBase(position.base + v); }
+
+    void stop() {}
 };
