@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "hand.h"
 #include "chassis.h"
+#include "debug.h"
 
 IRremote ir(PIN_IR);
 
@@ -41,7 +42,6 @@ enum State
 
 HandPosition mem[ACTIONS_COUNT];
 int nActions = 0;
-
 
 void readTrackerSensors()
 {
@@ -193,6 +193,8 @@ void auto_do()
 void IR_control()
 {
   byte code = ir.getIrKey(ir.getCode(), 1);
+  if (code != 17)
+    DebugWrite("IR", code);
 
   switch (code)
   {
@@ -233,6 +235,16 @@ void IR_control()
   }
 }
 
+void setState(State _state)
+{
+  static State oldstate = NONE;
+
+  if (_state != oldstate)
+    DebugWrite(_state);
+
+  state = _state;
+}
+
 
 void UART_control()
 {
@@ -246,8 +258,7 @@ void UART_control()
 
   if (0 < String(st).length() && 2 >= String(st).length())
   {
-    Serial.println(String(st).length());
-    Serial.println(st);
+    DebugWrite("UART", st);
 
     switch (String(st).charAt(0))
     {

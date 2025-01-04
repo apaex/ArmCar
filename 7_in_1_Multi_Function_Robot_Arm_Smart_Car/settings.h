@@ -1,3 +1,5 @@
+#define DEBUG 1
+
 #define PIN_SERVO_CLAW 9
 #define PIN_SERVO_ARM 10
 #define PIN_SERVO_BASE 11
