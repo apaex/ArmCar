@@ -39,7 +39,7 @@ enum State
   PROGRAM_LINE_TRACKING,
 } state;
 
-HandPosition mem[20];
+HandPosition mem[ACTIONS_COUNT];
 int nActions = 0;
 
 
@@ -50,7 +50,7 @@ void readTrackerSensors()
   trackingSensorRight = digitalRead(PIN_TRACKER_RIGHT);
 }
 
-float checkdistance()
+float measureDistance()
 {
   digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
   delayMicroseconds(2);
@@ -101,7 +101,7 @@ void Line_tracking_Function()
 
 void Following_Function()
 {
-  int dist = checkdistance();
+  int dist = measureDistance();
 
   if (dist < 15)
     chassis.moveBackward(80);
@@ -130,7 +130,7 @@ void Anti_drop_Function()
 
 void Avoidance_Function()
 {
-  int dist = checkdistance();
+  int dist = measureDistance();
 
   if (dist <= 25)
   {
