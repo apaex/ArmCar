@@ -59,8 +59,8 @@ public:
 
     void moveForward(int speed)  { setDirection(0, -speed); }
     void moveBackward(int speed) { setDirection(0, speed); }
-    void rotateLeft(int speed)   { setDirection(-speed, 0); }
-    void rotateRight(int speed)  { setDirection(speed, 0); }
+    void rotateLeft(int speed)   { setDirection(speed, 0); }
+    void rotateRight(int speed)  { setDirection(-speed, 0); }
     void stop()                  { setDirection(0, 0); }
 
     void tick()

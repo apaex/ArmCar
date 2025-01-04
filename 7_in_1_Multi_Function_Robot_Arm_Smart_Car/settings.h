@@ -26,7 +26,7 @@
 #define STICK_Y_MIN -512        //FORWARD-BACKWARD
 #define STICK_Y_MAX 512
         
-#define MOTOR_SMOOTH_SPEED 0      // плавность скорости моторов
+#define MOTOR_SMOOTH_SPEED 10      // плавность скорости моторов
 #define MOTOR_MIN_DUTY 0                // мин. сигнал, при котором мотор начинает вращение
 
 
