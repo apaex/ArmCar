@@ -30,6 +30,7 @@ const char* debugState(int state)
 #include <HardwareSerial.h>
 
 void TimePrint() {
+#if DEBUG_TIME_PRINT==1
   int time = millis() / 1000;
   if (time / 60 / 60 < 10) { Serial.print("0"); }
   Serial.print(time / 60 / 60);
@@ -40,6 +41,7 @@ void TimePrint() {
   if (time % 60 < 10) { Serial.print("0"); }
   Serial.print(time % 60);
   Serial.print(" ");
+#endif  
 }
 
 template<class T>

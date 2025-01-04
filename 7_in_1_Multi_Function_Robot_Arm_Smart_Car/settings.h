@@ -1,4 +1,5 @@
 #define DEBUG 1
+#define DEBUG_TIME_PRINT 0
 
 #define PIN_SERVO_CLAW 9
 #define PIN_SERVO_ARM 10
