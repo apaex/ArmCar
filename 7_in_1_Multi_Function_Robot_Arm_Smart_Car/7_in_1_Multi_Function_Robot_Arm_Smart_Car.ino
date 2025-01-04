@@ -22,22 +22,22 @@ int speed = SPEED_LOW;
 
 enum Program
 {
-  PROGRAM_NONE,
-  PROGRAM_TURNING_LEFT,
-  PROGRAM_TURNING_RIGHT,
-  PROGRAM_MOVING_FORWARD,
-  PROGRAM_MOVING_BACKWARD,
-  PROGRAM_CLAW_CLOSING,
-  PROGRAM_CLAW_OPENING,
-  PROGRAM_ARM_RISING,
-  PROGRAM_ARM_DESCENDING,
-  PROGRAM_BASE_TURNING_LEFT,
-  PROGRAM_BASE_TURNING_RIGHT,
-  PROGRAM_MEMORY_ACTION,
-  PROGRAM_AVOIDANCE,
-  PROGRAM_FOLLOWING,
-  PROGRAM_ANTIDROP,
-  PROGRAM_LINE_TRACKING,
+  PRG_NONE,
+  PRG_TURNING_LEFT,
+  PRG_TURNING_RIGHT,
+  PRG_MOVING_FORWARD,
+  PRG_MOVING_BACKWARD,
+  PRG_CLAW_CLOSING,
+  PRG_CLAW_OPENING,
+  PRG_ARM_RISING,
+  PRG_ARM_DESCENDING,
+  PRG_BASE_TURNING_LEFT,
+  PRG_BASE_TURNING_RIGHT,
+  PRG_MEMORY_ACTION,
+  PRG_AVOIDANCE,
+  PRG_FOLLOWING,
+  PRG_ANTIDROP,
+  PRG_LINE_TRACKING,
 } program;
 
 HandPosition mem[ACTIONS_COUNT];
@@ -77,7 +77,7 @@ void setProgram(Program _program)
   program = _program;
   DebugWrite(debugState(program));
 
-  if (program == PROGRAM_NONE)
+  if (program == PRG_NONE)
   {
     chassis.stop();
     hand.stop();
@@ -175,7 +175,7 @@ void auto_do()
   {
     if (Serial.read() == 's')
     {
-      program = PROGRAM_NONE;
+      program = PRG_NONE;
       break;
     }
 
@@ -184,7 +184,7 @@ void auto_do()
 
     if (Serial.read() == 's')
     {
-      program = PROGRAM_NONE;
+      program = PRG_NONE;
       break;
     }
 
@@ -193,7 +193,7 @@ void auto_do()
 
     if (Serial.read() == 's')
     {
-      program = PROGRAM_NONE;
+      program = PRG_NONE;
       break;
     }
 
@@ -209,31 +209,31 @@ void commandInterpretator(const char* cmd)
 
     switch (cmd[0])
     {
-      case 'o': setProgram(PROGRAM_CLAW_OPENING);         break;
-      case 'c': setProgram(PROGRAM_CLAW_CLOSING);         break;
-      case 'u': setProgram(PROGRAM_ARM_RISING);           break;
-      case 'd': setProgram(PROGRAM_ARM_DESCENDING);       break;
-      case 'l': setProgram(PROGRAM_BASE_TURNING_LEFT);    break;
-      case 'r': setProgram(PROGRAM_BASE_TURNING_RIGHT);   break;
-      case 'F': setProgram(PROGRAM_MOVING_FORWARD);       break;
-      case 'B': setProgram(PROGRAM_MOVING_BACKWARD);      break;
-      case 'L': setProgram(PROGRAM_TURNING_LEFT);         break;
-      case 'R': setProgram(PROGRAM_TURNING_RIGHT);        break;
+      case 'o': setProgram(PRG_CLAW_OPENING);         break;
+      case 'c': setProgram(PRG_CLAW_CLOSING);         break;
+      case 'u': setProgram(PRG_ARM_RISING);           break;
+      case 'd': setProgram(PRG_ARM_DESCENDING);       break;
+      case 'l': setProgram(PRG_BASE_TURNING_LEFT);    break;
+      case 'r': setProgram(PRG_BASE_TURNING_RIGHT);   break;
+      case 'F': setProgram(PRG_MOVING_FORWARD);       break;
+      case 'B': setProgram(PRG_MOVING_BACKWARD);      break;
+      case 'L': setProgram(PRG_TURNING_LEFT);         break;
+      case 'R': setProgram(PRG_TURNING_RIGHT);        break;
       case 'G':
-      case 'S': setProgram(PROGRAM_NONE);                       break;
+      case 'S': setProgram(PRG_NONE);                       break;
 
       case 'm': storePosition(); break;
       case 'a':
         if (nActions)
-          setProgram(PROGRAM_MEMORY_ACTION);
+          setProgram(PRG_MEMORY_ACTION);
         break;
       case 'X': speed = SPEED_LOW;      break;
       case 'Y': speed = SPEED_MEDIUM;   break;
       case 'Z': speed = SPEED_HIGH;     break;
-      case 'A': setProgram(PROGRAM_AVOIDANCE);      break;
-      case 'D': setProgram(PROGRAM_ANTIDROP);       break;
-      case 'W': setProgram(PROGRAM_FOLLOWING);      break;
-      case 'T': setProgram(PROGRAM_LINE_TRACKING);  break;
+      case 'A': setProgram(PRG_AVOIDANCE);      break;
+      case 'D': setProgram(PRG_ANTIDROP);       break;
+      case 'W': setProgram(PRG_FOLLOWING);      break;
+      case 'T': setProgram(PRG_LINE_TRACKING);  break;
     }
 }
 
@@ -309,20 +309,20 @@ void loop()
 
   switch (program)
   {
-    case PROGRAM_CLAW_OPENING: hand.incClaw(1);      break;
-    case PROGRAM_CLAW_CLOSING: hand.incClaw(-1);      break;
-    case PROGRAM_ARM_RISING: hand.incArm(1);      break;
-    case PROGRAM_ARM_DESCENDING: hand.incArm(-1);      break;
-    case PROGRAM_BASE_TURNING_LEFT: hand.incBase(1);      break;
-    case PROGRAM_BASE_TURNING_RIGHT: hand.incBase(-1);      break;
-    case PROGRAM_MOVING_FORWARD: Move_forward_Function();      break;
-    case PROGRAM_MOVING_BACKWARD: Move_backward_Function();      break;
-    case PROGRAM_TURNING_LEFT: Turn_left_Function();      break;
-    case PROGRAM_TURNING_RIGHT: Turn_right_Function();      break;
-    case PROGRAM_MEMORY_ACTION: auto_do(); break;
-    case PROGRAM_AVOIDANCE: Avoidance_Function();      break;
-    case PROGRAM_ANTIDROP: Anti_drop_Function();      break;
-    case PROGRAM_FOLLOWING: Following_Function();      break;
-    case PROGRAM_LINE_TRACKING: Line_tracking_Function();      break;
+    case PRG_CLAW_OPENING: hand.incClaw(1);      break;
+    case PRG_CLAW_CLOSING: hand.incClaw(-1);      break;
+    case PRG_ARM_RISING: hand.incArm(1);      break;
+    case PRG_ARM_DESCENDING: hand.incArm(-1);      break;
+    case PRG_BASE_TURNING_LEFT: hand.incBase(1);      break;
+    case PRG_BASE_TURNING_RIGHT: hand.incBase(-1);      break;
+    case PRG_MOVING_FORWARD: Move_forward_Function();      break;
+    case PRG_MOVING_BACKWARD: Move_backward_Function();      break;
+    case PRG_TURNING_LEFT: Turn_left_Function();      break;
+    case PRG_TURNING_RIGHT: Turn_right_Function();      break;
+    case PRG_MEMORY_ACTION: auto_do(); break;
+    case PRG_AVOIDANCE: Avoidance_Function();      break;
+    case PRG_ANTIDROP: Anti_drop_Function();      break;
+    case PRG_FOLLOWING: Following_Function();      break;
+    case PRG_LINE_TRACKING: Line_tracking_Function();      break;
   }
 }
