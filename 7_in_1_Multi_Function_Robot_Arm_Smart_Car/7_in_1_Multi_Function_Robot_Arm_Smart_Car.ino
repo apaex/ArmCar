@@ -63,6 +63,13 @@ float measureDistance()
   return distance;
 }
 
+void storePosition()
+{
+  if (nActions < ACTIONS_COUNT)
+    mem[nActions++] = hand.position;
+}
+
+
 void Move_backward_Function()
 {
   chassis.moveBackward(speed);
@@ -228,20 +235,20 @@ void IR_control()
 
 void UART_control()
 {
-  String BLE_val = "";
+  String st = "";
 
   while (Serial.available() > 0)
   {
-    BLE_val = BLE_val + ((char)(Serial.read()));
+    st = st + ((char)(Serial.read()));
     delay(2);
   }
 
-  if (0 < String(BLE_val).length() && 2 >= String(BLE_val).length())
+  if (0 < String(st).length() && 2 >= String(st).length())
   {
-    Serial.println(String(BLE_val).length());
-    Serial.println(BLE_val);
+    Serial.println(String(st).length());
+    Serial.println(st);
 
-    switch (String(BLE_val).charAt(0))
+    switch (String(st).charAt(0))
     {
       case 'o': state = STATE_CLAW_OPENING;      break;    
       case 'c': state = STATE_CLAW_CLOSING;      break;
@@ -255,10 +262,7 @@ void UART_control()
       case 'R': state = STATE_TURNING_RIGHT;      break;
       case 'G':
       case 'S': state = NONE; chassis.stop();      break;
-      case 'm': 
-        if (nActions < ACTIONS_COUNT)
-          mem[nActions++] = hand.position;
-        break;    
+      case 'm': storePosition(); break;
       case 'a': 
         if (nActions) 
           state = MEMORY_ACTION;
