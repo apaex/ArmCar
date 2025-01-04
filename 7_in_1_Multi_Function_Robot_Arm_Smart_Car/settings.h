@@ -21,4 +21,18 @@
 
 
 
+#define STICK_X_MIN -512        //LEFT-RIGHT
+#define STICK_X_MAX 512 //508
+#define STICK_Y_MIN -512        //FORWARD-BACKWARD
+#define STICK_Y_MAX 512
+        
+#define MOTOR_SMOOTH_SPEED 0      // плавность скорости моторов
+#define MOTOR_MIN_DUTY 0                // мин. сигнал, при котором мотор начинает вращение
+
+
+#define SPEED_LOW 60
+#define SPEED_MEDIUM 120
+#define SPEED_HIGH 160
+
+
 #define ACTIONS_COUNT 20

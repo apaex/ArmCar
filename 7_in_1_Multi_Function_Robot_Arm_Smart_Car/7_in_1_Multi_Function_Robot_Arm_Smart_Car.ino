@@ -7,10 +7,6 @@
 
 IRremote ir(PIN_IR);
 
-#define SPEED_LOW 60
-#define SPEED_MEDIUM 120
-#define SPEED_HIGH 160
-
 Hand hand;
 Chassis chassis;
 
@@ -68,43 +64,6 @@ void storePosition()
   if (nActions < ACTIONS_COUNT)
     mem[nActions++] = hand.position;
 }
-
-void setProgram(Program _program)
-{
-  if (_program == program)
-    return;
-
-  program = _program;
-  DebugWrite(debugState(program));
-
-  if (program == PRG_NONE)
-  {
-    chassis.stop();
-    hand.stop();
-  }
-}
-
-
-void Move_backward_Function()
-{
-  chassis.moveBackward(speed);
-}
-
-void Move_forward_Function()
-{
-  chassis.moveForward(speed);
-}
-
-void Turn_right_Function()
-{
-  chassis.rotateRight(speed);
-}
-
-void Turn_left_Function()
-{
-  chassis.rotateLeft(speed);
-}
-
 
 void Line_tracking_Function()
 {
@@ -209,31 +168,33 @@ void commandInterpretator(const char* cmd)
 
     switch (cmd[0])
     {
-      case 'o': setProgram(PRG_CLAW_OPENING);         break;
-      case 'c': setProgram(PRG_CLAW_CLOSING);         break;
-      case 'u': setProgram(PRG_ARM_RISING);           break;
-      case 'd': setProgram(PRG_ARM_DESCENDING);       break;
-      case 'l': setProgram(PRG_BASE_TURNING_LEFT);    break;
-      case 'r': setProgram(PRG_BASE_TURNING_RIGHT);   break;
-      case 'F': setProgram(PRG_MOVING_FORWARD);       break;
-      case 'B': setProgram(PRG_MOVING_BACKWARD);      break;
-      case 'L': setProgram(PRG_TURNING_LEFT);         break;
-      case 'R': setProgram(PRG_TURNING_RIGHT);        break;
+      case 'F': startProgram(PRG_MOVING_FORWARD);       break;
+      case 'B': startProgram(PRG_MOVING_BACKWARD);      break;
+      case 'L': startProgram(PRG_TURNING_LEFT);         break;
+      case 'R': startProgram(PRG_TURNING_RIGHT);        break;
+
+      case 'o': startProgram(PRG_CLAW_OPENING);         break;
+      case 'c': startProgram(PRG_CLAW_CLOSING);         break;
+      case 'u': startProgram(PRG_ARM_RISING);           break;
+      case 'd': startProgram(PRG_ARM_DESCENDING);       break;
+      case 'l': startProgram(PRG_BASE_TURNING_LEFT);    break;
+      case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   break;
+
       case 'G':
-      case 'S': setProgram(PRG_NONE);                       break;
+      case 'S': startProgram(PRG_NONE);                 break;
 
       case 'm': storePosition(); break;
       case 'a':
         if (nActions)
-          setProgram(PRG_MEMORY_ACTION);
+          startProgram(PRG_MEMORY_ACTION);
         break;
       case 'X': speed = SPEED_LOW;      break;
       case 'Y': speed = SPEED_MEDIUM;   break;
       case 'Z': speed = SPEED_HIGH;     break;
-      case 'A': setProgram(PRG_AVOIDANCE);      break;
-      case 'D': setProgram(PRG_ANTIDROP);       break;
-      case 'W': setProgram(PRG_FOLLOWING);      break;
-      case 'T': setProgram(PRG_LINE_TRACKING);  break;
+      case 'A': startProgram(PRG_AVOIDANCE);      break;
+      case 'D': startProgram(PRG_ANTIDROP);       break;
+      case 'W': startProgram(PRG_FOLLOWING);      break;
+      case 'T': startProgram(PRG_LINE_TRACKING);  break;
     }
 }
 
@@ -300,6 +261,24 @@ void setup()
   chassis.init();
 }
 
+void startProgram(Program _program)
+{
+  if (_program == program)
+    return;
+
+  program = _program;
+  DebugWrite(debugState(program));
+  
+  switch (program)
+  {
+    case PRG_MOVING_FORWARD:  chassis.moveForward(speed);  break;
+    case PRG_MOVING_BACKWARD: chassis.moveBackward(speed); break;
+    case PRG_TURNING_LEFT:    chassis.rotateRight(speed);  break;
+    case PRG_TURNING_RIGHT:   chassis.rotateLeft(speed);   break;
+    case PRG_NONE:            chassis.stop(); hand.stop(); break;
+  }
+}
+
 void loop()
 {
   IR_control();
@@ -315,14 +294,14 @@ void loop()
     case PRG_ARM_DESCENDING: hand.incArm(-1);      break;
     case PRG_BASE_TURNING_LEFT: hand.incBase(1);      break;
     case PRG_BASE_TURNING_RIGHT: hand.incBase(-1);      break;
-    case PRG_MOVING_FORWARD: Move_forward_Function();      break;
-    case PRG_MOVING_BACKWARD: Move_backward_Function();      break;
-    case PRG_TURNING_LEFT: Turn_left_Function();      break;
-    case PRG_TURNING_RIGHT: Turn_right_Function();      break;
     case PRG_MEMORY_ACTION: auto_do(); break;
     case PRG_AVOIDANCE: Avoidance_Function();      break;
     case PRG_ANTIDROP: Anti_drop_Function();      break;
     case PRG_FOLLOWING: Following_Function();      break;
     case PRG_LINE_TRACKING: Line_tracking_Function();      break;
   }
+
+  hand.tick();
+  chassis.tick();
+  delay(10);
 }

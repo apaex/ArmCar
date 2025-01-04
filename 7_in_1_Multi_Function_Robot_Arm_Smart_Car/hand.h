@@ -54,4 +54,5 @@ public:
     void incBase(int v) {    setBase(position.base + v); }
 
     void stop() {}
+    void tick() {}
 };
