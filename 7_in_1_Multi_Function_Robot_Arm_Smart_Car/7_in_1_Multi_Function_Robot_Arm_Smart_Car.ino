@@ -20,7 +20,7 @@ bool trackingSensorRight = 0;
 
 int speed = SPEED_LOW;
 
-enum State
+enum Program
 {
   NONE,
   STATE_TURNING_LEFT,
@@ -38,7 +38,7 @@ enum State
   PROGRAM_FOLLOWING,
   PROGRAM_ANTIDROP,
   PROGRAM_LINE_TRACKING,
-} state;
+} program;
 
 HandPosition mem[ACTIONS_COUNT];
 int nActions = 0;
@@ -69,15 +69,15 @@ void storePosition()
     mem[nActions++] = hand.position;
 }
 
-void setState(State _state)
+void setProgram(Program _program)
 {
-  if (_state == state)
+  if (_program == program)
     return;
-  
-  DebugWrite(debugState(_state));
-  state = _state;
 
-  if (state == NONE)
+  DebugWrite(debugState(_program));
+  program = _program;
+
+  if (program == NONE)
   {
     chassis.stop();
     hand.stop();
@@ -175,7 +175,7 @@ void auto_do()
   {
     if (Serial.read() == 's')
     {
-      state = NONE;
+      program = NONE;
       break;
     }
 
@@ -184,7 +184,7 @@ void auto_do()
 
     if (Serial.read() == 's')
     {
-      state = NONE;
+      program = NONE;
       break;
     }
 
@@ -193,7 +193,7 @@ void auto_do()
 
     if (Serial.read() == 's')
     {
-      state = NONE;
+      program = NONE;
       break;
     }
 
@@ -209,31 +209,31 @@ void commandInterpretator(const char* cmd)
 
     switch (cmd[0])
     {
-      case 'o': setState(STATE_CLAW_OPENING);         break;
-      case 'c': setState(STATE_CLAW_CLOSING);         break;
-      case 'u': setState(STATE_ARM_RISING);           break;
-      case 'd': setState(STATE_ARM_DESCENDING);       break;
-      case 'l': setState(STATE_BASE_TURNING_LEFT);    break;
-      case 'r': setState(STATE_BASE_TURNING_RIGHT);   break;
-      case 'F': setState(STATE_MOVING_FORWARD);       break;
-      case 'B': setState(STATE_MOVING_BACKWARD);      break;
-      case 'L': setState(STATE_TURNING_LEFT);         break;
-      case 'R': setState(STATE_TURNING_RIGHT);        break;
+      case 'o': setProgram(STATE_CLAW_OPENING);         break;
+      case 'c': setProgram(STATE_CLAW_CLOSING);         break;
+      case 'u': setProgram(STATE_ARM_RISING);           break;
+      case 'd': setProgram(STATE_ARM_DESCENDING);       break;
+      case 'l': setProgram(STATE_BASE_TURNING_LEFT);    break;
+      case 'r': setProgram(STATE_BASE_TURNING_RIGHT);   break;
+      case 'F': setProgram(STATE_MOVING_FORWARD);       break;
+      case 'B': setProgram(STATE_MOVING_BACKWARD);      break;
+      case 'L': setProgram(STATE_TURNING_LEFT);         break;
+      case 'R': setProgram(STATE_TURNING_RIGHT);        break;
       case 'G':
-      case 'S': setState(NONE);                       break;
+      case 'S': setProgram(NONE);                       break;
 
       case 'm': storePosition(); break;
       case 'a':
         if (nActions)
-          setState(MEMORY_ACTION);
+          setProgram(MEMORY_ACTION);
         break;
       case 'X': speed = SPEED_LOW;      break;
       case 'Y': speed = SPEED_MEDIUM;   break;
       case 'Z': speed = SPEED_HIGH;     break;
-      case 'A': setState(PROGRAM_AVOIDANCE);      break;
-      case 'D': setState(PROGRAM_ANTIDROP);       break;
-      case 'W': setState(PROGRAM_FOLLOWING);      break;
-      case 'T': setState(PROGRAM_LINE_TRACKING);  break;
+      case 'A': setProgram(PROGRAM_AVOIDANCE);      break;
+      case 'D': setProgram(PROGRAM_ANTIDROP);       break;
+      case 'W': setProgram(PROGRAM_FOLLOWING);      break;
+      case 'T': setProgram(PROGRAM_LINE_TRACKING);  break;
     }
 }
 
@@ -307,7 +307,7 @@ void loop()
 
   readTrackerSensors();
 
-  switch (state)
+  switch (program)
   {
     case STATE_CLAW_OPENING: hand.incClaw(1);      break;
     case STATE_CLAW_CLOSING: hand.incClaw(-1);      break;
