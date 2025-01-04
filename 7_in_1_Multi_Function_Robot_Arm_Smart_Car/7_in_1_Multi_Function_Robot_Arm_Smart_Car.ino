@@ -106,6 +106,19 @@ void Line_tracking_Function()
     chassis.stop();
 }
 
+void Anti_drop_Function()
+{
+  if (!trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
+    chassis.moveForward(60);
+  else
+  {
+    chassis.moveBackward(60);
+    delay(600);
+    chassis.rotateLeft(60);
+    delay(500);
+  }
+}
+
 void Following_Function()
 {
   int dist = measureDistance();
@@ -139,20 +152,6 @@ void Avoidance_Function()
   else
     chassis.moveForward(70);
 }
-
-void Anti_drop_Function()
-{
-  if (!trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
-    chassis.moveForward(60);
-  else
-  {
-    chassis.moveBackward(60);
-    delay(600);
-    chassis.rotateLeft(60);
-    delay(500);
-  }
-}
-
 
 
 void auto_do()
