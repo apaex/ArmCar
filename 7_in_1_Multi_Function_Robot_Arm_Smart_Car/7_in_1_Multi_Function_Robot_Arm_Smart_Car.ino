@@ -74,8 +74,8 @@ void setProgram(Program _program)
   if (_program == program)
     return;
 
-  DebugWrite(debugState(_program));
   program = _program;
+  DebugWrite(debugState(program));
 
   if (program == NONE)
   {
