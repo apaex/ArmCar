@@ -11,7 +11,7 @@ class Chassis
     int dutyR = 0;
     int dutyL = 0;
 
-    void setDirection(int dx, int dy)
+    void setDirection(int dx, int dy, bool instantly = false)
     {
         // преобразуем стики к -255, 255
         int LX = map(dx*2, STICK_X_MIN, STICK_X_MAX, -255, 255);
@@ -24,11 +24,11 @@ class Chassis
         dutyR = constrain(dutyR, -255, 255);
         dutyL = constrain(dutyL, -255, 255);
         
-#if MOTOR_SMOOTH_SPEED == 0        
-        motorR.setSpeed(dutyR);
-        motorL.setSpeed(dutyL);
-#endif
-        DebugWrite("SetDirection", dx, dy);
+        if (instantly)
+        {
+            motorR.setSpeed(dutyR);
+            motorL.setSpeed(dutyL);
+        }
     }
 
 public:
@@ -61,18 +61,13 @@ public:
     void moveBackward(int speed) { setDirection(0, speed); }
     void rotateLeft(int speed)   { setDirection(-speed, 0); }
     void rotateRight(int speed)  { setDirection(speed, 0); }
-    void stop()                  
-    { 
-        setDirection(0, 0);
-        motorR.setSpeed(0);
-        motorL.setSpeed(0);
-    }
+    void stop()                  { setDirection(0, 0); }
 
     void tick()
     {
-#if MOTOR_SMOOTH_SPEED > 0              
-        motorR.smoothTick(dutyR);
-        motorL.smoothTick(dutyL);
-#endif
+        if (motorR._duty != dutyR)
+            motorR.smoothTick(dutyR);
+        if (motorL._duty != dutyL)
+            motorL.smoothTick(dutyL);
     }
 };
