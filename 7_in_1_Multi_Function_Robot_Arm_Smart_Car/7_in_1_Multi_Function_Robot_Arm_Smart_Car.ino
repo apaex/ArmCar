@@ -203,28 +203,67 @@ void auto_do()
   nActions = 0;
 }
 
+void commandInterpretator(const char* cmd)
+{
+    DebugWrite("Command", cmd);
 
+    switch (cmd[0])
+    {
+      case 'o': setState(STATE_CLAW_OPENING);         break;
+      case 'c': setState(STATE_CLAW_CLOSING);         break;
+      case 'u': setState(STATE_ARM_RISING);           break;
+      case 'd': setState(STATE_ARM_DESCENDING);       break;
+      case 'l': setState(STATE_BASE_TURNING_LEFT);    break;
+      case 'r': setState(STATE_BASE_TURNING_RIGHT);   break;
+      case 'F': setState(STATE_MOVING_FORWARD);       break;
+      case 'B': setState(STATE_MOVING_BACKWARD);      break;
+      case 'L': setState(STATE_TURNING_LEFT);         break;
+      case 'R': setState(STATE_TURNING_RIGHT);        break;
+      case 'G':
+      case 'S': setState(NONE);                       break;
+
+      case 'm': storePosition(); break;
+      case 'a':
+        if (nActions)
+          setState(MEMORY_ACTION);
+        break;
+      case 'X': speed = SPEED_LOW;      break;
+      case 'Y': speed = SPEED_MEDIUM;   break;
+      case 'Z': speed = SPEED_HIGH;     break;
+      case 'A': setState(PROGRAM_AVOIDANCE);      break;
+      case 'D': setState(PROGRAM_ANTIDROP);       break;
+      case 'W': setState(PROGRAM_FOLLOWING);      break;
+      case 'T': setState(PROGRAM_LINE_TRACKING);  break;
+    }
+}
 
 void IR_control()
 {
   byte code = ir.getIrKey(ir.getCode(), 1);
-  if (code != 17)
-    DebugWrite("IR", code);
+  if (code > 16)
+    return;
 
-  switch (code)
-  {
-    case IR_KEYCODE_UP:     setState(STATE_MOVING_FORWARD);         break;
-    case IR_KEYCODE_DOWN:   setState(STATE_MOVING_BACKWARD);        break;
-    case IR_KEYCODE_LEFT:   setState(STATE_TURNING_LEFT);           break;
-    case IR_KEYCODE_RIGHT:  setState(STATE_TURNING_RIGHT);          break;
-    case IR_KEYCODE_OK:     setState(NONE);                         break;
-    case IR_KEYCODE_7:      setState(STATE_CLAW_OPENING);           break;
-    case IR_KEYCODE_9:      setState(STATE_CLAW_OPENING);           break;
-    case IR_KEYCODE_2:      setState(STATE_ARM_DESCENDING);         break;
-    case IR_KEYCODE_8:      setState(STATE_ARM_RISING);             break;
-    case IR_KEYCODE_4:      setState(STATE_BASE_TURNING_LEFT);      break;
-    case IR_KEYCODE_6:      setState(STATE_BASE_TURNING_RIGHT);     break;
-  }
+  static const char* map[] = {
+    "",   //IR_KEYCODE_1
+    "u",  //IR_KEYCODE_2,
+    "",   //IR_KEYCODE_3,
+    "l",  //IR_KEYCODE_4,
+    "",   //IR_KEYCODE_5,
+    "r",  //IR_KEYCODE_6,
+    "o",  //IR_KEYCODE_7,
+    "d",  //IR_KEYCODE_8,
+    "c",  //IR_KEYCODE_9,
+    "",   //IR_KEYCODE_0,
+    "",   //IR_KEYCODE_STAR,
+    "",   //IR_KEYCODE_POUND,
+    "F",  //IR_KEYCODE_UP,
+    "B",  //IR_KEYCODE_DOWN,
+    "S",  //IR_KEYCODE_OK,
+    "L",  //IR_KEYCODE_LEFT,
+    "R",  //IR_KEYCODE_RIGHT,
+  };
+
+  commandInterpretator(map[code]);
 }
 
 void UART_control()
@@ -238,38 +277,7 @@ void UART_control()
   }
 
   if (0 < String(st).length() && 2 >= String(st).length())
-  {
-    DebugWrite("UART", st);
-
-    switch (String(st).charAt(0))
-    {
-      case 'o': setState(STATE_CLAW_OPENING);         break;    
-      case 'c': setState(STATE_CLAW_CLOSING);         break;
-      case 'u': setState(STATE_ARM_RISING);           break;
-      case 'd': setState(STATE_ARM_DESCENDING);       break;
-      case 'l': setState(STATE_BASE_TURNING_LEFT);    break;
-      case 'r': setState(STATE_BASE_TURNING_RIGHT);   break;
-      case 'F': setState(STATE_MOVING_FORWARD);       break;
-      case 'B': setState(STATE_MOVING_BACKWARD);      break;
-      case 'L': setState(STATE_TURNING_LEFT);         break;
-      case 'R': setState(STATE_TURNING_RIGHT);        break;
-      case 'G':
-      case 'S': setState(NONE);                       break;
-      
-      case 'm': storePosition(); break;
-      case 'a': 
-        if (nActions) 
-          setState(MEMORY_ACTION);
-        break;
-      case 'X': speed = SPEED_LOW;      break;
-      case 'Y': speed = SPEED_MEDIUM;   break;
-      case 'Z': speed = SPEED_HIGH;     break;
-      case 'A': setState(PROGRAM_AVOIDANCE);      break;
-      case 'D': setState(PROGRAM_ANTIDROP);       break;
-      case 'W': setState(PROGRAM_FOLLOWING);      break;
-      case 'T': setState(PROGRAM_LINE_TRACKING);  break;
-    }
-  } 
+    commandInterpretator(st.c_str());
 }
 
 void setup()
@@ -289,7 +297,7 @@ void setup()
   pinMode(PIN_ULTRASOIC_ECHO, INPUT);
 
   hand.init();
-  chassis.init();  
+  chassis.init();
 }
 
 void loop()
@@ -301,7 +309,7 @@ void loop()
 
   switch (state)
   {
-    case STATE_CLAW_OPENING: hand.incClaw(1);      break;    
+    case STATE_CLAW_OPENING: hand.incClaw(1);      break;
     case STATE_CLAW_CLOSING: hand.incClaw(-1);      break;
     case STATE_ARM_RISING: hand.incArm(1);      break;
     case STATE_ARM_DESCENDING: hand.incArm(-1);      break;
