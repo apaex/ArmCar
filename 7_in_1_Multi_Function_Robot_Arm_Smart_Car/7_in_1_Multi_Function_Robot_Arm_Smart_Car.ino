@@ -69,6 +69,16 @@ void storePosition()
     mem[nActions++] = hand.position;
 }
 
+void setState(State _state)
+{
+  static State oldstate = NONE;
+
+  if (_state != oldstate)
+    DebugWrite(debugState(_state));
+
+  state = _state;
+}
+
 
 void Move_backward_Function()
 {
@@ -203,7 +213,6 @@ void IR_control()
     case IR_KEYCODE_LEFT:   setState(STATE_TURNING_LEFT); break;
     case IR_KEYCODE_RIGHT:  setState(STATE_TURNING_RIGHT); break;
     case IR_KEYCODE_OK:     setState(NONE);       chassis.stop();      break;
-
     case IR_KEYCODE_7:      setState(STATE_CLAW_OPENING);      break;
     case IR_KEYCODE_9:      setState(STATE_CLAW_OPENING);     break;
     case IR_KEYCODE_2:      setState(STATE_ARM_DESCENDING);       break;
@@ -212,17 +221,6 @@ void IR_control()
     case IR_KEYCODE_6:      setState(STATE_BASE_TURNING_RIGHT);     break;
   }
 }
-
-void setState(State _state)
-{
-  static State oldstate = NONE;
-
-  if (_state != oldstate)
-    DebugWrite(debugState(_state));
-
-  state = _state;
-}
-
 
 void UART_control()
 {
