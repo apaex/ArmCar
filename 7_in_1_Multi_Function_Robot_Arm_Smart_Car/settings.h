@@ -32,7 +32,7 @@
 
 #define SPEED_LOW 60
 #define SPEED_MEDIUM 120
-#define SPEED_HIGH 160
+#define SPEED_HIGH 255
 
 
 #define ACTIONS_COUNT 20

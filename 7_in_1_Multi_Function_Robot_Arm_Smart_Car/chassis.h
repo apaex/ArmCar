@@ -8,26 +8,18 @@ class Chassis
 {
     GMotor motorL;
     GMotor motorR;
-    int dutyR = 0;
-    int dutyL = 0;
+    int _dutyL = 0;
+    int _dutyR = 0;
 
-    void setDirection(int dx, int dy, bool instantly = false)
+    void setMotorSpeeds(int dutyL, int dutyR, bool instantly = false)
     {
-        // преобразуем стики к -255, 255
-        int LX = map(dx*2, STICK_X_MIN, STICK_X_MAX, -255, 255);
-        int LY = map(dy*2, STICK_Y_MIN, STICK_Y_MAX, -255, 255);
-
-        // танковая схема
-        dutyR = LY + LX;
-        dutyL = LY - LX;
-
-        dutyR = constrain(dutyR, -255, 255);
-        dutyL = constrain(dutyL, -255, 255);
+        _dutyL = constrain(dutyL, -255, 255);
+        _dutyR = constrain(dutyR, -255, 255);
         
         if (instantly)
         {
-            motorR.setSpeed(dutyR);
-            motorL.setSpeed(dutyL);
+            motorR.setSpeed(_dutyR);
+            motorL.setSpeed(_dutyL);
         }
     }
 
@@ -57,17 +49,30 @@ public:
     }        
             
 
-    void moveForward(int speed)  { setDirection(0, -speed); }
-    void moveBackward(int speed) { setDirection(0, speed); }
-    void rotateLeft(int speed)   { setDirection(speed, 0); }
-    void rotateRight(int speed)  { setDirection(-speed, 0); }
-    void stop()                  { setDirection(0, 0); }
+    void moveForward(int speed)  { setMotorSpeeds(speed, speed); }
+    void moveBackward(int speed) { setMotorSpeeds(-speed, -speed); }
+    void rotateLeft(int speed)   { setMotorSpeeds(-speed, speed); }
+    void rotateRight(int speed)  { setMotorSpeeds(speed, -speed); }
+    void stop()                  { setMotorSpeeds(0, 0); }
 
+    void setFromStickPositions(int dx, int dy, bool instantly = false)
+    {
+        // преобразуем стики к -255, 255
+        int LX = map(dx, STICK_X_MIN, STICK_X_MAX, -255, 255);
+        int LY = map(dy, STICK_Y_MIN, STICK_Y_MAX, -255, 255);
+
+        // танковая схема
+        int dutyL = LY - LX;
+        int dutyR = LY + LX;
+        
+        setMotorSpeeds(dutyL, dutyR, instantly);
+    }
+    
     void tick()
     {
-        if (motorR._duty != dutyR)
-            motorR.smoothTick(dutyR);
-        if (motorL._duty != dutyL)
-            motorL.smoothTick(dutyL);
+        if (motorL._duty != _dutyL)
+            motorL.smoothTick(_dutyL);
+        if (motorR._duty != _dutyR)
+            motorR.smoothTick(_dutyR);
     }
 };
