@@ -64,8 +64,8 @@ public:
             dy = 0;
 
         // преобразуем стики к -255, 255
-        int LX = map(dx, STICK_X_MIN, STICK_X_MAX, -255, 255);
-        int LY = map(dy, STICK_Y_MIN, STICK_Y_MAX, -255, 255);
+        int LX = map(dx, STICK_X_MAX, STICK_X_MIN, -255, 255);
+        int LY = map(dy, STICK_Y_MAX, STICK_Y_MIN, -255, 255);
 
         // танковая схема
         int dutyL = LY - LX;
