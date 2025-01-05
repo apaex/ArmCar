@@ -41,13 +41,18 @@ public:
                 cmd[i++] = _buf[_pb];
             }
 
+            ++_pb;
+            if (_pb >= COMMAND_QUEUE_SIZE)
+                _pb = 0;
+
             --_count;
         }
 
-        ++_pb;
-        if (_pb >= COMMAND_QUEUE_SIZE)
-            _pb = 0;
+        cmd[i] = 0;
+    }
 
-        cmd[i++] = 0;
+    int count() const
+    {
+        return _count;
     }
 };
