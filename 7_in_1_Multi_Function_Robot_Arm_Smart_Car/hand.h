@@ -32,7 +32,21 @@ class Hand
     {
 
     }
+
+    HandPosition target_pos;
+
+    void setBase(int v) {    current_pos.setBase(v);  }    
+    void setArm(int v)  {    current_pos.setArm(v);   }
+    void setClaw(int v) {    current_pos.setClaw(v);  }
+
+    void incBase(int v) {    setBase(current_pos.base + v); }
+    void incArm(int v)  {    setArm(current_pos.arm + v); }
+    void incClaw(int v) {    setClaw(current_pos.claw + v); }
+
+
 public:
+    HandPosition current_pos;
+
     void init()
     {    
         servo_base.attach(PIN_SERVO_BASE);
@@ -47,18 +61,14 @@ public:
         delay(500);
     }
 
-    HandPosition current_pos;
-    HandPosition target_pos;
-
-    void setBase(int v) {    current_pos.setBase(v);  }    
-    void setArm(int v)  {    current_pos.setArm(v);   }
-    void setClaw(int v) {    current_pos.setClaw(v);  }
-
-    void incBase(int v) {    setBase(current_pos.base + v); }
-    void incArm(int v)  {    setArm(current_pos.arm + v); }
-    void incClaw(int v) {    setClaw(current_pos.claw + v); }
-
+    void baseTurnLeft(int speed)   { setBase(BASE_ANGLE_MIN); }
+    void baseTurnRight(int speed)  { setBase(BASE_ANGLE_MAX); }
+    void armRise(int speed)        { setArm(ARM_ANGLE_MIN); }
+    void armDescend(int speed)     { setArm(ARM_ANGLE_MAX); }
+    void clawOpen(int speed)       { setClaw(CLAW_ANGLE_MIN); }
+    void clawClose(int speed)      { setClaw(CLAW_ANGLE_MAX); }
     void stop() {}
+
     void tick() 
     {
         static uint32_t tmr;
@@ -66,7 +76,7 @@ public:
             return;
         tmr = millis();
 
-    return;
+        return;
 /*            
             // преобразуем стики от 0..255 к -255, 255          
 
@@ -103,12 +113,6 @@ public:
         servo_claw.write(current_pos.claw); delay(100);        
     }
 
-    void baseTurnLeft(int speed)   { setBase(BASE_ANGLE_MIN); }
-    void baseTurnRight(int speed)  { setBase(BASE_ANGLE_MAX); }
-    void armRise(int speed)        { setArm(ARM_ANGLE_MIN); }
-    void armDescend(int speed)     { setArm(ARM_ANGLE_MAX); }
-    void clawOpen(int speed)       { setClaw(CLAW_ANGLE_MIN); }
-    void clawClose(int speed)      { setClaw(CLAW_ANGLE_MAX); }
 
     void moveTo(HandPosition pos, int speed)         { }
 };
