@@ -1,6 +1,6 @@
 #pragma once
 
-struct UartData
+struct GamepadData
 {
   uint8_t index;
   uint8_t dpad;
