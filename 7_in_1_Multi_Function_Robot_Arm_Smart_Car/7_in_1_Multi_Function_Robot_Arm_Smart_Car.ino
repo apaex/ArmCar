@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "hand.h"
 #include "chassis.h"
+#include "queue.h"
 #include "debug.h"
 
 IRremote ir(PIN_IR);
