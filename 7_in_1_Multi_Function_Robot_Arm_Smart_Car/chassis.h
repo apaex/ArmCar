@@ -3,6 +3,7 @@
 #include <GyverMotor.h>
 #include "settings.h"
 #include "debug.h"
+#define DEAD_ZONE 5
 
 class Chassis
 {
@@ -54,9 +55,14 @@ public:
     void rotateLeft(int speed)   { setMotorSpeeds(speed, -speed); }
     void rotateRight(int speed)  { setMotorSpeeds(-speed, speed); }
     void stop()                  { setMotorSpeeds(0, 0); }
-
+    
     void setFromStickPositions(int dx, int dy, bool instantly = false)
     {
+        if (abs(dx) < DEAD_ZONE)
+            dx = 0;
+        if (abs(dy) < DEAD_ZONE)
+            dy = 0;
+
         // преобразуем стики к -255, 255
         int LX = map(dx, STICK_X_MIN, STICK_X_MAX, -255, 255);
         int LY = map(dy, STICK_Y_MIN, STICK_Y_MAX, -255, 255);

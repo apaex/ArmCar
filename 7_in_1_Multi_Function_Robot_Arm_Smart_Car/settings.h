@@ -27,7 +27,7 @@
 #define STICK_Y_MAX 508
 
 #define MOTOR_SMOOTH_SPEED 10      // плавность скорости моторов
-#define MOTOR_MIN_DUTY 0                // мин. сигнал, при котором мотор начинает вращение
+#define MOTOR_MIN_DUTY 30                // мин. сигнал, при котором мотор начинает вращение
 
 
 #define SPEED_LOW 40

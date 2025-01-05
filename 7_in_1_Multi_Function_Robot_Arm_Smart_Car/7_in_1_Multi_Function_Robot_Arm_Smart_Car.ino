@@ -4,6 +4,7 @@
 #include "hand.h"
 #include "chassis.h"
 #include "queue.h"
+#include "uart_data.h"
 #include "debug.h"
 
 IRremote ir(PIN_IR);
@@ -165,11 +166,11 @@ void startProgram(Program _program)
   }
 }
 
-void commandInterpretator(const char* cmd)
+void commandInterpretator(char cmd)
 {
     DebugWrite("Command", cmd);
 
-    switch (cmd[0])
+    switch (cmd)
     {
       case 'F': startProgram(PRG_MOVING_FORWARD);       break;
       case 'B': startProgram(PRG_MOVING_BACKWARD);      break;
@@ -201,6 +202,27 @@ void commandInterpretator(const char* cmd)
     }
 }
 
+void exProcessor(const UartData &package)
+{ 
+/*
+    SerialPrintf(
+        "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, %4d, brake: %4d, throttle: %4d, "
+        "misc: 0x%02x\n",
+        package.index,        // Controller Index
+        package.dpad,         // D-pad
+        package.buttons,      // bitmask of pressed buttons
+        package.axisX,        // (-511 - 512) left X Axis
+        package.axisY,        // (-511 - 512) left Y axis
+        package.axisRX,       // (-511 - 512) right X axis
+        package.axisRY,       // (-511 - 512) right Y axis
+        package.brake,        // (0 - 1023): brake button
+        package.throttle,     // (0 - 1023): throttle (AKA gas) button
+        package.miscButtons  // bitmask of pressed "misc" buttons
+    ); 
+*/
+   chassis.setFromStickPositions(package.axisRX, package.axisRY, false);
+}
+
 void IR_control()
 {
   byte code = ir.getIrKey(ir.getCode(), 1);
@@ -227,21 +249,26 @@ void IR_control()
     "R",  //IR_KEYCODE_RIGHT,
   };
 
-  commandInterpretator(map[code]);
+  commandInterpretator(map[code][0]);
 }
+
 
 void UART_control()
 {
-  String st = "";
+  if (!Serial.available())
+    return;
 
-  while (Serial.available() > 0)
+  char ch = Serial.read();
+  
+  if (ch == '#')
   {
-    st = st + ((char)(Serial.read()));
-    delay(2);
+    UartData package;
+    int res = Serial.readBytes((char*)&package, sizeof(package));
+    if (res == sizeof(package))
+      exProcessor(package);
   }
-
-  if (0 < String(st).length() && 2 >= String(st).length())
-    commandInterpretator(st.c_str());
+  else    
+    commandInterpretator(ch);
 }
 
 void setup()

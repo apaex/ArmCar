@@ -79,8 +79,8 @@ public:
         {
             servos[i].attach(servosMeta[i].pin);
             _target_pos[i] = current_pos[i] = servosMeta[i].def;
-            servos[i].write(current_pos[i]);
-            delay(500);
+            //servos[i].write(current_pos[i]);
+            //delay(500);
         }
     }
 
@@ -106,8 +106,8 @@ public:
             if (current_pos[i] != _target_pos[i])
                 current_pos[i] += (current_pos[i] < _target_pos[i] ? 1 : -1);
 
-            servos[i].write(current_pos[i]);
-            delay(100);
+            //servos[i].write(current_pos[i]);
+            //delay(100);
         }
     }
 

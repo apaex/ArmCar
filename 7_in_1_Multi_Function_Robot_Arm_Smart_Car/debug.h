@@ -1,5 +1,7 @@
 #pragma once
 
+#include "serialPrintf.h"
+
 const char* debugState(int state)
 {
   const static char* states[] =
