@@ -2,7 +2,7 @@
 
 const char* debugState(int state)
 {
-  const static char* states[] = 
+  const static char* states[] =
   {
     "NONE",
     "STATE_TURNING_LEFT",
@@ -41,7 +41,7 @@ void TimePrint() {
   if (time % 60 < 10) { Serial.print("0"); }
   Serial.print(time % 60);
   Serial.print(" ");
-#endif  
+#endif
 }
 
 template<class T>
@@ -73,7 +73,7 @@ void DebugWrite(const char *st, const T arr[], int n) {
   TimePrint();
   Serial.print(st);
   Serial.print(": ");
-  
+
   for (int i = 0; i < n; ++i) {
     Serial.print(arr[i]);
     Serial.print(',');

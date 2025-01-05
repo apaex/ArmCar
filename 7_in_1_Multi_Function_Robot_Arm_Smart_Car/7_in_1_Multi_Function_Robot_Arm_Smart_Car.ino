@@ -145,7 +145,7 @@ void startProgram(Program _program)
 
   program = _program;
   DebugWrite(debugState(program));
-  
+
   switch (program)
   {
     case PRG_MOVING_FORWARD:  chassis.moveForward(speed);  break;

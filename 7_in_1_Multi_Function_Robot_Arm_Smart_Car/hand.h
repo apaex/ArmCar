@@ -32,7 +32,7 @@ struct HandPosition
     {
         return angles[index];
     }
-    
+
     HandPosition()
     {}
 
@@ -56,7 +56,7 @@ class Hand
     Servo servos[N_SERVOS];
 
     HandPosition _target_pos;
-    
+
     void setMotorAngles(int angles[], bool instantly = false)
     {
         for (byte i=0; i<N_SERVOS; ++i)
@@ -74,7 +74,7 @@ public:
     HandPosition current_pos;
 
     void init()
-    {    
+    {
         for (byte i=0; i<N_SERVOS; ++i)
         {
             servos[i].attach(servosMeta[i].pin);
@@ -94,10 +94,10 @@ public:
 
     void moveTo(HandPosition position)  { _target_pos = position; }
 
-    void tick() 
+    void tick()
     {
         static uint32_t tmr;
-        if (millis() - tmr < 30) 
+        if (millis() - tmr < 30)
             return;
         tmr = millis();
 

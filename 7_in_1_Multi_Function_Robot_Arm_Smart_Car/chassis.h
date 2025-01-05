@@ -15,7 +15,7 @@ class Chassis
     {
         _dutyL = constrain(dutyL, -255, 255);
         _dutyR = constrain(dutyR, -255, 255);
-        
+
         if (instantly)
         {
             motorL.setSpeed(_dutyL);
@@ -46,8 +46,8 @@ public:
         // плавность скорости моторов
         motorL.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
         motorR.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
-    }        
-            
+    }
+
 
     void moveForward(int speed)  { setMotorSpeeds(speed, speed); }
     void moveBackward(int speed) { setMotorSpeeds(-speed, -speed); }
@@ -64,10 +64,10 @@ public:
         // танковая схема
         int dutyL = LY - LX;
         int dutyR = LY + LX;
-        
+
         setMotorSpeeds(dutyL, dutyR, instantly);
     }
-    
+
     void tick()
     {
         if (motorL._duty != _dutyL)
