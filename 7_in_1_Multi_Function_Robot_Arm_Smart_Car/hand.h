@@ -19,9 +19,9 @@ struct {
     int pin;
 } servosMeta[N_SERVOS] =
     {
-        {BASE_ANGLE_MIN, BASE_ANGLE_MAX, 90, PIN_SERVO_BASE},
-        {ARM_ANGLE_MIN, ARM_ANGLE_MAX, 90, PIN_SERVO_ARM},
-        {CLAW_ANGLE_MIN, CLAW_ANGLE_MAX, 90, PIN_SERVO_CLAW},
+        { BASE_ANGLE_MIN, BASE_ANGLE_MAX, 90, PIN_SERVO_BASE },
+        { ARM_ANGLE_MIN,  ARM_ANGLE_MAX,  90, PIN_SERVO_ARM  },
+        { CLAW_ANGLE_MIN, CLAW_ANGLE_MAX, 90, PIN_SERVO_CLAW },
     };
 
 struct HandPosition
