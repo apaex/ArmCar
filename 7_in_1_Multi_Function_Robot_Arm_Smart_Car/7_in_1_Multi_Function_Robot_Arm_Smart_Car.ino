@@ -220,7 +220,7 @@ void exProcessor(const UartData &package)
         package.miscButtons  // bitmask of pressed "misc" buttons
     ); 
 */
-   chassis.setFromStickPositions(package.axisRX, package.axisRY, false);
+   chassis.setFromStickPositions(package.axisRX, package.axisRY, true);
 }
 
 void IR_control()
