@@ -136,6 +136,34 @@ void auto_do()
   }
 }
 
+
+
+void startProgram(Program _program)
+{
+  if (_program == program)
+    return;
+
+  program = _program;
+  DebugWrite(debugState(program));
+  
+  switch (program)
+  {
+    case PRG_MOVING_FORWARD:  chassis.moveForward(speed);  break;
+    case PRG_MOVING_BACKWARD: chassis.moveBackward(speed); break;
+    case PRG_TURNING_LEFT:    chassis.rotateRight(speed);  break;
+    case PRG_TURNING_RIGHT:   chassis.rotateLeft(speed);   break;
+
+    case PRG_CLAW_OPENING:        hand.clawOpen(speed);       break;
+    case PRG_CLAW_CLOSING:        hand.clawClose(speed);      break;
+    case PRG_ARM_RISING:          hand.armRise(speed);        break;
+    case PRG_ARM_DESCENDING:      hand.armDescend(speed);     break;
+    case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft(speed);   break;
+    case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight(speed);  break;
+
+    case PRG_NONE:            chassis.stop(); hand.stop(); break;
+  }
+}
+
 void commandInterpretator(const char* cmd)
 {
     DebugWrite("Command", cmd);
@@ -233,32 +261,6 @@ void setup()
 
   hand.init();
   chassis.init();
-}
-
-void startProgram(Program _program)
-{
-  if (_program == program)
-    return;
-
-  program = _program;
-  DebugWrite(debugState(program));
-  
-  switch (program)
-  {
-    case PRG_MOVING_FORWARD:  chassis.moveForward(speed);  break;
-    case PRG_MOVING_BACKWARD: chassis.moveBackward(speed); break;
-    case PRG_TURNING_LEFT:    chassis.rotateRight(speed);  break;
-    case PRG_TURNING_RIGHT:   chassis.rotateLeft(speed);   break;
-
-    case PRG_CLAW_OPENING:        hand.clawOpen(speed);       break;
-    case PRG_CLAW_CLOSING:        hand.clawClose(speed);      break;
-    case PRG_ARM_RISING:          hand.armRise(speed);        break;
-    case PRG_ARM_DESCENDING:      hand.armDescend(speed);     break;
-    case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft(speed);   break;
-    case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight(speed);  break;
-
-    case PRG_NONE:            chassis.stop(); hand.stop(); break;
-  }
 }
 
 void loop()
