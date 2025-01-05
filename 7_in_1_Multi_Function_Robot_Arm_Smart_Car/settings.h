@@ -36,3 +36,10 @@
 
 
 #define ACTIONS_COUNT 20
+
+#define BASE_ANGLE_MIN 0
+#define BASE_ANGLE_MAX 180
+#define ARM_ANGLE_MIN 0
+#define ARM_ANGLE_MAX 180
+#define CLAW_ANGLE_MIN 50
+#define CLAW_ANGLE_MAX 180

@@ -5,54 +5,82 @@
 
 struct HandPosition
 {
-  int claw;
-  int arm;
   int base;
+  int arm;
+  int claw;
 
-  void setClaw(int v) {    claw = constrain(v, 50, 180);  }
-  void setArm(int v)  {    arm = constrain(v, 0, 180);  }
-  void setBase(int v) {    base = constrain(v, 0, 180);  }
+  void setBase(int v) {    base = constrain(v, BASE_ANGLE_MIN, BASE_ANGLE_MAX);  }
+  void setArm(int v)  {    arm = constrain(v, ARM_ANGLE_MIN, ARM_ANGLE_MAX);  }
+  void setClaw(int v) {    claw = constrain(v, CLAW_ANGLE_MIN, CLAW_ANGLE_MAX);  }
 
   HandPosition() {}
-  HandPosition(int claw, int arm, int base)
+  HandPosition(int base, int arm, int claw)
   {
-    setClaw(claw);
-    setArm(arm);
     setBase(base);
+    setArm(arm);
+    setClaw(claw);
   }
 };
 
 class Hand
 {
-    Servo servo_claw;
-    Servo servo_arm;
     Servo servo_base;
+    Servo servo_arm;
+    Servo servo_claw;
 
+    void setPosition(int base, int arm, int claw)
+    {
+
+    }
 public:
     void init()
     {    
-        servo_claw.attach(PIN_SERVO_CLAW);
-        servo_arm.attach(PIN_SERVO_ARM);
         servo_base.attach(PIN_SERVO_BASE);
+        servo_arm.attach(PIN_SERVO_ARM);
+        servo_claw.attach(PIN_SERVO_CLAW);
 
-        setClaw(90);
+        setBase(90);
         delay(500);
         setArm(90);
         delay(500);
-        setBase(90);
+        setClaw(90);
         delay(500);
     }
 
-    HandPosition position;
+    HandPosition current_pos;
+    HandPosition target_pos;
 
-    void setClaw(int v) {    position.setClaw(v); servo_claw.write(position.claw); delay(100); }
-    void setArm(int v)  {    position.setArm(v);  servo_arm.write(position.arm); delay(100); }
-    void setBase(int v) {    position.setBase(v); servo_base.write(position.base); delay(100); }    
+    void setBase(int v) {    current_pos.setBase(v);  }    
+    void setArm(int v)  {    current_pos.setArm(v);   }
+    void setClaw(int v) {    current_pos.setClaw(v);  }
 
-    void incClaw(int v) {    setClaw(position.claw + v); }
-    void incArm(int v)  {    setArm(position.arm + v); }
-    void incBase(int v) {    setBase(position.base + v); }
+    void incBase(int v) {    setBase(current_pos.base + v); }
+    void incArm(int v)  {    setArm(current_pos.arm + v); }
+    void incClaw(int v) {    setClaw(current_pos.claw + v); }
 
     void stop() {}
-    void tick() {}
+    void tick() 
+    {
+        if (current_pos.base != target_pos.base)
+            incBase(current_pos.base < target_pos.base ? 1 : -1);
+
+        if (current_pos.arm != target_pos.arm)
+            incArm(current_pos.arm < target_pos.arm ? 1 : -1);
+
+        if (current_pos.claw != target_pos.claw)
+            incClaw(current_pos.claw < target_pos.claw ? 1 : -1);
+
+        servo_base.write(current_pos.base); delay(100);
+        servo_arm.write(current_pos.arm); delay(100);
+        servo_claw.write(current_pos.claw); delay(100);
+    }
+
+    void baseTurnLeft(int speed)   { setBase(BASE_ANGLE_MIN); }
+    void baseTurnRight(int speed)  { setBase(BASE_ANGLE_MAX); }
+    void armRise(int speed)        { setArm(ARM_ANGLE_MIN); }
+    void armDescend(int speed)     { setArm(ARM_ANGLE_MAX); }
+    void clawOpen(int speed)       { setClaw(CLAW_ANGLE_MIN); }
+    void clawClose(int speed)      { setClaw(CLAW_ANGLE_MAX); }
+
+    void moveTo(HandPosition pos, int speed)         { }
 };

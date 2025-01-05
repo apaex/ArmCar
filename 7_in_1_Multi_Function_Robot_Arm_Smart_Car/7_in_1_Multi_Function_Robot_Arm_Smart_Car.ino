@@ -62,7 +62,7 @@ float measureDistance()
 void storePosition()
 {
   if (nActions < ACTIONS_COUNT)
-    mem[nActions++] = hand.position;
+    mem[nActions++] = hand.current_pos;
 }
 
 void Line_tracking_Function()
@@ -132,34 +132,8 @@ void auto_do()
 {
   for (int i = 0; i < nActions; ++i)
   {
-    if (Serial.read() == 's')
-    {
-      program = PRG_NONE;
-      break;
-    }
-
-    while (hand.position.claw != mem[i].claw)
-      hand.incClaw(hand.position.claw < mem[i].claw ? 1 : -1);
-
-    if (Serial.read() == 's')
-    {
-      program = PRG_NONE;
-      break;
-    }
-
-    while (hand.position.arm != mem[i].arm)
-      hand.incArm(hand.position.arm < mem[i].arm ? 1 : -1);
-
-    if (Serial.read() == 's')
-    {
-      program = PRG_NONE;
-      break;
-    }
-
-    while (hand.position.base != mem[i].base)
-      hand.incBase(hand.position.base < mem[i].base ? 1 : -1);
+    hand.moveTo(mem[i], speed);
   }
-  nActions = 0;
 }
 
 void commandInterpretator(const char* cmd)
@@ -275,6 +249,14 @@ void startProgram(Program _program)
     case PRG_MOVING_BACKWARD: chassis.moveBackward(speed); break;
     case PRG_TURNING_LEFT:    chassis.rotateRight(speed);  break;
     case PRG_TURNING_RIGHT:   chassis.rotateLeft(speed);   break;
+
+    case PRG_CLAW_OPENING:        hand.clawOpen(speed);       break;
+    case PRG_CLAW_CLOSING:        hand.clawClose(speed);      break;
+    case PRG_ARM_RISING:          hand.armRise(speed);        break;
+    case PRG_ARM_DESCENDING:      hand.armDescend(speed);     break;
+    case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft(speed);   break;
+    case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight(speed);  break;
+
     case PRG_NONE:            chassis.stop(); hand.stop(); break;
   }
 }
@@ -288,17 +270,11 @@ void loop()
 
   switch (program)
   {
-    case PRG_CLAW_OPENING: hand.incClaw(1);      break;
-    case PRG_CLAW_CLOSING: hand.incClaw(-1);      break;
-    case PRG_ARM_RISING: hand.incArm(1);      break;
-    case PRG_ARM_DESCENDING: hand.incArm(-1);      break;
-    case PRG_BASE_TURNING_LEFT: hand.incBase(1);      break;
-    case PRG_BASE_TURNING_RIGHT: hand.incBase(-1);      break;
-    case PRG_MEMORY_ACTION: auto_do(); break;
-    case PRG_AVOIDANCE: Avoidance_Function();      break;
-    case PRG_ANTIDROP: Anti_drop_Function();      break;
-    case PRG_FOLLOWING: Following_Function();      break;
-    case PRG_LINE_TRACKING: Line_tracking_Function();      break;
+    case PRG_MEMORY_ACTION:       auto_do();                  break;
+    case PRG_AVOIDANCE:           Avoidance_Function();       break;
+    case PRG_ANTIDROP:            Anti_drop_Function();       break;
+    case PRG_FOLLOWING:           Following_Function();       break;
+    case PRG_LINE_TRACKING:       Line_tracking_Function();   break;
   }
 
   hand.tick();
