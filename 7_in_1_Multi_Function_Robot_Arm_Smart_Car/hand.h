@@ -13,15 +13,15 @@ enum
 };
 
 struct {
+    int pin;
     int min;
     int max;
     int def;
-    int pin;
 } servosMeta[N_SERVOS] =
     {
-        { BASE_ANGLE_MIN, BASE_ANGLE_MAX, 90, PIN_SERVO_BASE },
-        { ARM_ANGLE_MIN,  ARM_ANGLE_MAX,  90, PIN_SERVO_ARM  },
-        { CLAW_ANGLE_MIN, CLAW_ANGLE_MAX, 90, PIN_SERVO_CLAW },
+        { PIN_SERVO_BASE, BASE_ANGLE_MIN, BASE_ANGLE_MAX, 90 },
+        { PIN_SERVO_ARM,  ARM_ANGLE_MIN,  ARM_ANGLE_MAX,  90 },
+        { PIN_SERVO_CLAW, CLAW_ANGLE_MIN, CLAW_ANGLE_MAX, 90 },
     };
 
 struct HandPosition
