@@ -101,31 +101,6 @@ public:
             return;
         tmr = millis();
 
-        return;
-/*            
-            // преобразуем стики от 0..255 к -255, 255          
-
-            //if (ps2x.ButtonPressed(PSB_PAD_RIGHT));
-            // изменение позиции на величину скорости
-            clawP += map(ps2x.Analog(PSS_RX), 0, 255, MAX_ARM_SPEED, -MAX_ARM_SPEED);
-            wristP += map(ps2x.Analog(PSS_RY), 0, 255, MAX_ARM_SPEED, -MAX_ARM_SPEED);
-            armP += map(ps2x.Analog(PSS_LY), 0, 255, -MAX_ARM_SPEED, MAX_ARM_SPEED);
-            yawP += map(ps2x.Analog(PSS_LX), 0, 255, MAX_ARM_SPEED, -MAX_ARM_SPEED);
-
-            // ограничиваем скорость
-            clawP = constrain(clawP, CLAW_MIN, CLAW_MAX);
-            wristP = constrain(wristP, WRIST_MIN, WRIST_MAX);
-            armP = constrain(armP, ARM_MIN, ARM_MAX);
-            yawP = constrain(yawP, YAW_MIN, YAW_MAX);
-
-            // переводим в градусы и применяем
-            claw.write(clawP / 10);
-            wrist.write(wristP / 10);
-            arm.write(armP / 10);
-            yaw.write(yawP / 10);
-*/            
-
-
         for (byte i=0; i<N_SERVOS; ++i)
         {
             if (current_pos[i] != _target_pos[i])
