@@ -132,7 +132,7 @@ void auto_do()
 {
   for (int i = 0; i < nActions; ++i)
   {
-    hand.moveTo(mem[i], speed);
+    hand.moveTo(mem[i]);
   }
 }
 
@@ -153,12 +153,12 @@ void startProgram(Program _program)
     case PRG_TURNING_LEFT:    chassis.rotateRight(speed);  break;
     case PRG_TURNING_RIGHT:   chassis.rotateLeft(speed);   break;
 
-    case PRG_CLAW_OPENING:        hand.clawOpen(speed);       break;
-    case PRG_CLAW_CLOSING:        hand.clawClose(speed);      break;
-    case PRG_ARM_RISING:          hand.armRise(speed);        break;
-    case PRG_ARM_DESCENDING:      hand.armDescend(speed);     break;
-    case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft(speed);   break;
-    case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight(speed);  break;
+    case PRG_CLAW_OPENING:        hand.clawOpen();       break;
+    case PRG_CLAW_CLOSING:        hand.clawClose();      break;
+    case PRG_ARM_RISING:          hand.armRise();        break;
+    case PRG_ARM_DESCENDING:      hand.armDescend();     break;
+    case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft();   break;
+    case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight();  break;
 
     case PRG_NONE:            chassis.stop(); hand.stop(); break;
   }
