@@ -7,9 +7,9 @@
 
 enum
 {
-    BASE,
-    ARM,
-    CLAW
+    SERVO_BASE,
+    SERVO_ARM,
+    SERVO_CLAW
 };
 
 struct {
@@ -84,12 +84,12 @@ public:
         }
     }
 
-    void baseTurnLeft()   { _target_pos[BASE] = BASE_ANGLE_MIN; }
-    void baseTurnRight()  { _target_pos[BASE] = BASE_ANGLE_MAX; }
-    void armRise()        { _target_pos[ARM] = ARM_ANGLE_MIN; }
-    void armDescend()     { _target_pos[ARM] = ARM_ANGLE_MAX; }
-    void clawOpen()       { _target_pos[CLAW] = CLAW_ANGLE_MIN; }
-    void clawClose()      { _target_pos[CLAW] = CLAW_ANGLE_MAX; }
+    void baseTurnLeft()   { _target_pos[SERVO_BASE] = BASE_ANGLE_MIN; }
+    void baseTurnRight()  { _target_pos[SERVO_BASE] = BASE_ANGLE_MAX; }
+    void armRise()        { _target_pos[SERVO_ARM] = ARM_ANGLE_MIN; }
+    void armDescend()     { _target_pos[SERVO_ARM] = ARM_ANGLE_MAX; }
+    void clawOpen()       { _target_pos[SERVO_CLAW] = CLAW_ANGLE_MIN; }
+    void clawClose()      { _target_pos[SERVO_CLAW] = CLAW_ANGLE_MAX; }
     void stop()           { _target_pos = current_pos; }
 
     void moveTo(HandPosition position)  { _target_pos = position; }
