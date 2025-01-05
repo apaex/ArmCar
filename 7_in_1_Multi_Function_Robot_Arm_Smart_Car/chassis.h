@@ -18,8 +18,8 @@ class Chassis
         
         if (instantly)
         {
-            motorR.setSpeed(_dutyR);
             motorL.setSpeed(_dutyL);
+            motorR.setSpeed(_dutyR);
         }
     }
 
@@ -32,27 +32,27 @@ public:
 
     void init()
     {
-        motorR.setMode(AUTO);
         motorL.setMode(AUTO);
+        motorR.setMode(AUTO);
 
         // направление гусениц
-        motorR.setDirection(REVERSE);
-        motorL.setDirection(NORMAL);
+        motorL.setDirection(REVERSE);
+        motorR.setDirection(NORMAL);
 
         // мин. сигнал вращения
-        motorR.setMinDuty(MOTOR_MIN_DUTY);
         motorL.setMinDuty(MOTOR_MIN_DUTY);
+        motorR.setMinDuty(MOTOR_MIN_DUTY);
 
         // плавность скорости моторов
-        motorR.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
         motorL.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
+        motorR.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
     }        
             
 
     void moveForward(int speed)  { setMotorSpeeds(speed, speed); }
     void moveBackward(int speed) { setMotorSpeeds(-speed, -speed); }
-    void rotateLeft(int speed)   { setMotorSpeeds(-speed, speed); }
-    void rotateRight(int speed)  { setMotorSpeeds(speed, -speed); }
+    void rotateLeft(int speed)   { setMotorSpeeds(speed, -speed); }
+    void rotateRight(int speed)  { setMotorSpeeds(-speed, speed); }
     void stop()                  { setMotorSpeeds(0, 0); }
 
     void setFromStickPositions(int dx, int dy, bool instantly = false)

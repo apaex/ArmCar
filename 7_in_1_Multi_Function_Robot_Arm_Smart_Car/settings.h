@@ -30,7 +30,7 @@
 #define MOTOR_MIN_DUTY 0                // мин. сигнал, при котором мотор начинает вращение
 
 
-#define SPEED_LOW 60
+#define SPEED_LOW 40
 #define SPEED_MEDIUM 120
 #define SPEED_HIGH 255
 
