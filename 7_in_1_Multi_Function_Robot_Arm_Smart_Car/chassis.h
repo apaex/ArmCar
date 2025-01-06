@@ -40,6 +40,8 @@ public:
         _dutyL = constrain(dutyL, -255, 255);
         _dutyR = constrain(dutyR, -255, 255);
 
+        DebugWrite("dL-dR", _dutyL, _dutyR);
+
         if (instantly)
         {
             motorL.setSpeed(_dutyL);
@@ -52,6 +54,18 @@ public:
         // танковая схема
         int dutyL = vx - rz;
         int dutyR = vx + rz;
+
+        if (rz > 0)
+        {
+            dutyL = vx - rz;
+            dutyR = vx;
+        }
+        else
+        {
+            dutyL = vx;
+            dutyR = vx + rz;
+        }
+
 
         return setMotorSpeeds(dutyL, dutyR, instantly);
     }

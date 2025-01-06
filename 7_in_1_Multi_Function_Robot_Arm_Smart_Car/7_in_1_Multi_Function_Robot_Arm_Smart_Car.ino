@@ -233,8 +233,8 @@ void setFromStickPositions(const GamepadData &package)
 
   if (!(package.buttons & 8))
   {
-    vx >>= 1;
-    rz >>= 1;
+    vx >>= 2;
+    rz >>= 2;
   }
 
   chassis.setVelocities(vx, rz, true);
