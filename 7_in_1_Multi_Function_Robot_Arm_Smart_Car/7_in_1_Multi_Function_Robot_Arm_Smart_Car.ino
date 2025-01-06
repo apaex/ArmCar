@@ -223,9 +223,9 @@ void setFromStickPositions(const GamepadData &package)
   int dx = package.axisRX;
   int dy = package.axisRY;
 
-  if (abs(dx) < DEAD_ZONE)
+  if (abs(dx) < GAMEPAD_STICK_DEAD_ZONE)
       dx = 0;
-  if (abs(dy) < DEAD_ZONE)
+  if (abs(dy) < GAMEPAD_STICK_DEAD_ZONE)
       dy = 0;
 
   // преобразуем стики к -255, 255

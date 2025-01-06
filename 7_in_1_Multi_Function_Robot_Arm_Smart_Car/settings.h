@@ -29,6 +29,8 @@
 #define MOTOR_SMOOTH_SPEED 10      // плавность скорости моторов
 #define MOTOR_MIN_DUTY 30                // мин. сигнал, при котором мотор начинает вращение
 
+#define GAMEPAD_STICK_DEAD_ZONE 5
+
 
 #define SPEED_LOW 40
 #define SPEED_MEDIUM 120

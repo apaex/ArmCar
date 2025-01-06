@@ -3,7 +3,6 @@
 #include <GyverMotor.h>
 #include "settings.h"
 #include "debug.h"
-#define DEAD_ZONE 5
 
 class Chassis
 {
@@ -47,7 +46,7 @@ public:
             motorR.setSpeed(_dutyR);
         }
     }
-    
+
     void moveForward(int speed)  { setMotorSpeeds(speed, speed); }
     void moveBackward(int speed) { setMotorSpeeds(-speed, -speed); }
     void rotateLeft(int speed)   { setMotorSpeeds(speed, -speed); }
