@@ -4,7 +4,7 @@
 #include "hand.h"
 #include "chassis.h"
 #include "queue.h"
-#include "uart_data.h"
+#include "gamepad.h"
 #include "debug.h"
 
 IRremote ir(PIN_IR);
@@ -223,9 +223,9 @@ void setFromStickPositions(const GamepadData &package)
   int dx = package.axisRX;
   int dy = package.axisRY;
 
-  if (abs(dx) < GAMEPAD_STICK_DEAD_ZONE)
+  if (abs(dx) < GAMEPAD_STICK_DEAD_ZONE_RX)
       dx = 0;
-  if (abs(dy) < GAMEPAD_STICK_DEAD_ZONE)
+  if (abs(dy) < GAMEPAD_STICK_DEAD_ZONE_RY)
       dy = 0;
 
   // преобразуем стики к -255, 255
