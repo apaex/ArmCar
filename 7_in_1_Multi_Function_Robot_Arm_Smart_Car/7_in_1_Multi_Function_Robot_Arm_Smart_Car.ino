@@ -203,8 +203,8 @@ void commandInterpretator(char cmd)
 }
 
 void setFromStickPositions(const GamepadData &package)
-{
-  /*
+{ 
+/* 
   SerialPrintf(
       "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, %4d, brake: %4d, throttle: %4d, "
       "misc: 0x%02x\n",
@@ -219,24 +219,25 @@ void setFromStickPositions(const GamepadData &package)
       package.throttle,     // (0 - 1023): throttle (AKA gas) button
       package.miscButtons  // bitmask of pressed "misc" buttons
   ); 
-  */
-  int dx = package.axisRX;
-  int dy = package.axisRY;
+*/  
+  int vx = package.axisY;
+  int rz = package.axisRX;    
 
-  if (abs(dx) < GAMEPAD_STICK_DEAD_ZONE_RX)
-      dx = 0;
-  if (abs(dy) < GAMEPAD_STICK_DEAD_ZONE_RY)
-      dy = 0;
+  if (abs(vx) < GAMEPAD_STICK_DEAD_ZONE_RY)
+      vx = 0;
+  if (abs(rz) < GAMEPAD_STICK_DEAD_ZONE_RX)
+      rz = 0;
 
-  // преобразуем стики к -255, 255
-  int LX = map(dx, STICK_X_MAX, STICK_X_MIN, -255, 255);
-  int LY = map(dy, STICK_Y_MAX, STICK_Y_MIN, -255, 255);
+  vx = map(vx, STICK_Y_MAX, STICK_Y_MIN, -255, 255);
+  rz = map(rz, STICK_X_MAX, STICK_X_MIN, -255, 255);
 
-  // танковая схема
-  int dutyL = LY - LX;
-  int dutyR = LY + LX;
+  if (!(package.buttons & 8))
+  {
+    vx >>= 1;
+    rz >>= 1;
+  }
 
-  chassis.setMotorSpeeds(dutyL, dutyR, true);
+  chassis.setVelocities(vx, rz, true);
 }
 
 

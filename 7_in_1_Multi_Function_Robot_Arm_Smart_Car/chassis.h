@@ -47,6 +47,15 @@ public:
         }
     }
 
+    void setVelocities(int vx, int rz, bool instantly = false)
+    { 
+        // танковая схема
+        int dutyL = vx - rz;
+        int dutyR = vx + rz;
+
+        return setMotorSpeeds(dutyL, dutyR, instantly);
+    }
+
     void moveForward(int speed)  { setMotorSpeeds(speed, speed); }
     void moveBackward(int speed) { setMotorSpeeds(-speed, -speed); }
     void rotateLeft(int speed)   { setMotorSpeeds(speed, -speed); }
