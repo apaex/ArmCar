@@ -245,9 +245,23 @@ void setFromStickPositions(const GamepadData &package)
 
 void IR_control()
 {
+  static uint32_t tmr;
+
+  static byte old = -1;
   byte code = ir.getIrKey(ir.getCode(), 1);
   if (code > 16)
+  {
+    if (millis() - tmr > 200)
+      code = IR_KEYCODE_OK;
+    else
+      return;
+  }
+
+  tmr = millis();
+
+  if (old == code)
     return;
+  old = code;
 
   static const char* map[] = {
     "",   //IR_KEYCODE_1
