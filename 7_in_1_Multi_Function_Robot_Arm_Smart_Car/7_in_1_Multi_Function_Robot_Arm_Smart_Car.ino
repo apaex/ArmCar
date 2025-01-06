@@ -40,6 +40,8 @@ enum Program
 
 HandPosition mem[ACTIONS_COUNT];
 int nActions = 0;
+int currentAction = -1;
+bool programMayBeRewrite = true;
 
 void readTrackerSensors()
 {
@@ -132,12 +134,14 @@ void Avoidance_Function()
 
 void auto_do()
 {
-  for (int i = 0; i < nActions; ++i)
-  {
-    hand.moveTo(mem[i]);
-  }
-}
+  if (!hand.isReady())
+    return;
 
+  if (++currentAction >= nActions)
+    currentAction = 0;
+
+  hand.moveTo(mem[currentAction]);  
+}
 
 
 void startProgram(Program _program)
@@ -162,6 +166,7 @@ void startProgram(Program _program)
     case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft();   break;
     case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight();  break;
 
+    case PRG_MEMORY_ACTION:   currentAction = 0; break;
     case PRG_NONE:            chassis.stop(); hand.stop(); break;
   }
 }
@@ -187,8 +192,14 @@ void commandInterpretator(char cmd)
       case 'G':
       case 'S': startProgram(PRG_NONE);                 break;
 
-      case 'm': storePosition(); break;
+      case 'm': 
+        if (programMayBeRewrite)
+          nActions = 0;
+        storePosition(); 
+        programMayBeRewrite = false;
+        break;
       case 'a':
+        programMayBeRewrite = true;
         if (nActions)
           startProgram(PRG_MEMORY_ACTION);
         break;
@@ -247,7 +258,7 @@ void IR_control()
 {
   static uint32_t tmr;
 
-  static byte old = -1;
+  static byte old = IR_KEYCODE_OK;
   byte code = ir.getIrKey(ir.getCode(), 1);
   if (code > 16)
   {

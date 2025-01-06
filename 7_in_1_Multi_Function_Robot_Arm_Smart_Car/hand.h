@@ -94,6 +94,15 @@ public:
 
     void moveTo(HandPosition position)  { _target_pos = position; }
 
+    bool isReady() 
+    {         
+        bool result = true;
+        for (byte i=0; i<N_SERVOS; ++i)
+            if (current_pos[i] != _target_pos[i])
+                result = false;
+        return result;    
+    }
+
     void tick()
     {
         static uint32_t tmr;
