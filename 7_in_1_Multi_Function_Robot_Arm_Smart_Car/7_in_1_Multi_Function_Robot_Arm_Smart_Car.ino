@@ -223,7 +223,9 @@ void setFromStickPositions(const GamepadData &package)
   int vx = package.axisY;
   int rz = package.axisRX;    
 
-  if (abs(vx) < GAMEPAD_STICK_DEAD_ZONE_RY)
+  DebugWrite("vx-rz", vx, rz);
+
+  if (abs(vx) < GAMEPAD_STICK_DEAD_ZONE_Y)
       vx = 0;
   if (abs(rz) < GAMEPAD_STICK_DEAD_ZONE_RX)
       rz = 0;

@@ -40,7 +40,7 @@ public:
         _dutyL = constrain(dutyL, -255, 255);
         _dutyR = constrain(dutyR, -255, 255);
 
-        DebugWrite("dL-dR", _dutyL, _dutyR);
+        //DebugWrite("dL-dR", _dutyL, _dutyR);
 
         if (instantly)
         {
