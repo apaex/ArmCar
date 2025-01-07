@@ -239,15 +239,15 @@ void setFromStickPositions(const GamepadData &package)
 
   //DebugWrite("vx-rz", vx, rz);
 
-  if (abs(vx) < GAMEPAD_STICK_DEAD_ZONE_Y)
+  if (abs(vx) < GAMEPAD_DEAD_ZONE_Y)
       vx = 0;
-  if (abs(rz) < GAMEPAD_STICK_DEAD_ZONE_RX)
+  if (abs(rz) < GAMEPAD_DEAD_ZONE_RX)
       rz = 0;
 
   rz /= 1.5;
 
-  vx = map(vx, STICK_Y_MAX, STICK_Y_MIN, -255, 255);
-  rz = map(rz, STICK_X_MAX, STICK_X_MIN, -255, 255);
+  vx = map(vx, GAMEPAD_Y_MAX, GAMEPAD_Y_MIN, -255, 255);
+  rz = map(rz, GAMEPAD_X_MAX, GAMEPAD_X_MIN, -255, 255);
 
   if (!(package.buttons & 8))
   {

@@ -19,9 +19,9 @@ struct {
     int def;
 } servosMeta[N_SERVOS] =
     {
-        { PIN_SERVO_BASE, BASE_ANGLE_MIN, BASE_ANGLE_MAX, 90 },
-        { PIN_SERVO_ARM,  ARM_ANGLE_MIN,  ARM_ANGLE_MAX,  90 },
-        { PIN_SERVO_CLAW, CLAW_ANGLE_MIN, CLAW_ANGLE_MAX, 90 },
+        { PIN_SERVO_BASE, SERVO_BASE_MIN, SERVO_BASE_MAX, SERVO_BASE_DEF },
+        { PIN_SERVO_ARM,  SERVO_ARM_MIN,  SERVO_ARM_MAX,  SERVO_ARM_DEF },
+        { PIN_SERVO_CLAW, SERVO_CLAW_MIN, SERVO_CLAW_MAX, SERVO_CLAW_DEF },
     };
 
 struct HandPosition
@@ -84,12 +84,12 @@ public:
         }
     }
 
-    void baseTurnLeft()   { _target_pos[SERVO_BASE] = BASE_ANGLE_MIN; }
-    void baseTurnRight()  { _target_pos[SERVO_BASE] = BASE_ANGLE_MAX; }
-    void armRise()        { _target_pos[SERVO_ARM] = ARM_ANGLE_MIN; }
-    void armDescend()     { _target_pos[SERVO_ARM] = ARM_ANGLE_MAX; }
-    void clawOpen()       { _target_pos[SERVO_CLAW] = CLAW_ANGLE_MIN; }
-    void clawClose()      { _target_pos[SERVO_CLAW] = CLAW_ANGLE_MAX; }
+    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SERVO_BASE_MIN; }
+    void baseTurnRight()  { _target_pos[SERVO_BASE] = SERVO_BASE_MAX; }
+    void armRise()        { _target_pos[SERVO_ARM] = SERVO_ARM_MIN; }
+    void armDescend()     { _target_pos[SERVO_ARM] = SERVO_ARM_MAX; }
+    void clawOpen()       { _target_pos[SERVO_CLAW] = SERVO_CLAW_MIN; }
+    void clawClose()      { _target_pos[SERVO_CLAW] = SERVO_CLAW_MAX; }
     void stop()           { _target_pos = current_pos; }
 
     void moveTo(HandPosition position)  { _target_pos = position; }
