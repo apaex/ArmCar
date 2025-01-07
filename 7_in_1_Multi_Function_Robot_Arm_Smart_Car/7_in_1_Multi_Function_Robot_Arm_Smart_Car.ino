@@ -90,6 +90,9 @@ void Anti_drop_Function()
     chassis.moveForward(60);
   else
   {
+    //push(MOVE_BACKWARD, 60, 200);
+    //push(ROTATE_LEFT, 60, 500);
+
     chassis.moveBackward(60);
     delay(600);
     chassis.rotateLeft(60);
@@ -234,20 +237,22 @@ void setFromStickPositions(const GamepadData &package)
   int vx = package.axisY;
   int rz = package.axisRX;    
 
-  DebugWrite("vx-rz", vx, rz);
+  //DebugWrite("vx-rz", vx, rz);
 
   if (abs(vx) < GAMEPAD_STICK_DEAD_ZONE_Y)
       vx = 0;
   if (abs(rz) < GAMEPAD_STICK_DEAD_ZONE_RX)
       rz = 0;
 
+  rz /= 1.5;
+
   vx = map(vx, STICK_Y_MAX, STICK_Y_MIN, -255, 255);
   rz = map(rz, STICK_X_MAX, STICK_X_MIN, -255, 255);
 
   if (!(package.buttons & 8))
   {
-    vx >>= 2;
-    rz >>= 2;
+    vx /= 2;
+    rz /= 2;
   }
 
   chassis.setVelocities(vx, rz, true);

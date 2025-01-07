@@ -55,17 +55,6 @@ public:
         int dutyL = vx - rz;
         int dutyR = vx + rz;
 
-        if (rz > 0)
-        {
-            dutyL = vx - rz;
-            dutyR = vx;
-        }
-        else
-        {
-            dutyL = vx;
-            dutyR = vx + rz;
-        }
-
         return setMotorSpeeds(dutyL, dutyR, instantly);
     }
 
@@ -77,9 +66,11 @@ public:
 
     void tick()
     {
+        /*
         if (motorL._duty != _dutyL)
             motorL.smoothTick(_dutyL);
         if (motorR._duty != _dutyR)
             motorR.smoothTick(_dutyR);
+            */
     }
 };
