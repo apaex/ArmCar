@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * SerialPrintf
  * Реализует функциональность printf в Serial.print

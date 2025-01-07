@@ -66,11 +66,12 @@ public:
 
     void tick()
     {
+        DebugWrite("dl-dr", (motorL._duty - _dutyL), (motorR._duty - _dutyR));
         /*
         if (motorL._duty != _dutyL)
             motorL.smoothTick(_dutyL);
         if (motorR._duty != _dutyR)
             motorR.smoothTick(_dutyR);
-            */
+        */    
     }
 };
