@@ -66,7 +66,6 @@ public:
             dutyR = vx + rz;
         }
 
-
         return setMotorSpeeds(dutyL, dutyR, instantly);
     }
 
