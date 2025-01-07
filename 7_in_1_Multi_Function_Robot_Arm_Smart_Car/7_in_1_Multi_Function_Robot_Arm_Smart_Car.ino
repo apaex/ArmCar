@@ -166,7 +166,6 @@ void startProgram(Program _program)
     case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft();   break;
     case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight();  break;
 
-    case PRG_MEMORY_ACTION:   currentAction = 0; break;
     case PRG_NONE:            chassis.stop(); hand.stop(); break;
   }
 }
@@ -200,6 +199,7 @@ void commandInterpretator(char cmd)
         break;
       case 'a':
         programMayBeRewrite = true;
+        currentAction = 0; 
         if (nActions)
           startProgram(PRG_MEMORY_ACTION);
         break;
