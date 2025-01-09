@@ -6,6 +6,9 @@
 
 #define N_SERVOS 3
 
+#define SCALE(A) (A << 7)
+#define DESCALE(A) (A >> 7)
+
 enum
 {
     SERVO_BASE,
@@ -20,9 +23,9 @@ struct {
     int def;
 } servosMeta[N_SERVOS] =
     {
-        { PIN_SERVO_BASE, SERVO_BASE_MIN, SERVO_BASE_MAX, SERVO_BASE_DEF },
-        { PIN_SERVO_ARM,  SERVO_ARM_MIN,  SERVO_ARM_MAX,  SERVO_ARM_DEF },
-        { PIN_SERVO_CLAW, SERVO_CLAW_MIN, SERVO_CLAW_MAX, SERVO_CLAW_DEF },
+        { PIN_SERVO_BASE, SCALE(SERVO_BASE_MIN), SCALE(SERVO_BASE_MAX), SCALE(SERVO_BASE_DEF) },
+        { PIN_SERVO_ARM,  SCALE(SERVO_ARM_MIN),  SCALE(SERVO_ARM_MAX),  SCALE(SERVO_ARM_DEF) },
+        { PIN_SERVO_CLAW, SCALE(SERVO_CLAW_MIN), SCALE(SERVO_CLAW_MAX), SCALE(SERVO_CLAW_DEF) },
     };
 
 struct HandPosition
@@ -50,8 +53,6 @@ struct HandPosition
     }
 };
 
-
-
 class Hand
 {
     Servo servos[N_SERVOS];
@@ -68,7 +69,7 @@ class Hand
         {
             current_pos = _target_pos;
             for (byte i=0; i<N_SERVOS; ++i)
-                servos[i].write(current_pos[i]);
+                servos[i].write(DESCALE(current_pos[i]));
         }
     }
 
@@ -81,7 +82,7 @@ public:
         {
             servos[i].attach(servosMeta[i].pin);
             _target_pos[i] = current_pos[i] = servosMeta[i].def;
-            servos[i].write(current_pos[i]);
+            servos[i].write(DESCALE(current_pos[i]));
         }
     }
 
@@ -97,12 +98,12 @@ public:
     }
 
 
-    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SERVO_BASE_MAX; applyNow(); }
-    void baseTurnRight()  { _target_pos[SERVO_BASE] = SERVO_BASE_MIN; applyNow(); }
-    void armRise()        { _target_pos[SERVO_ARM] = SERVO_ARM_MIN;    }
-    void armDescend()     { _target_pos[SERVO_ARM] = SERVO_ARM_MAX;    }
-    void clawOpen()       { _target_pos[SERVO_CLAW] = SERVO_CLAW_MIN;  }
-    void clawClose()      { _target_pos[SERVO_CLAW] = SERVO_CLAW_MAX;  }
+    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MAX); applyNow(); }
+    void baseTurnRight()  { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MIN); applyNow(); }
+    void armRise()        { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MIN);    }
+    void armDescend()     { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MAX);    }
+    void clawOpen()       { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MIN);  }
+    void clawClose()      { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MAX);  }
     void stop()           { 
         for (byte i=0; i<N_SERVOS; ++i)
             _velocities[i] = 0;
@@ -123,7 +124,7 @@ public:
     {
         current_pos = _target_pos;
         for (byte i=0; i<N_SERVOS; ++i)
-            servos[i].write(current_pos[i]); 
+            servos[i].write(DESCALE(current_pos[i])); 
     }
 
     bool isReady() 
@@ -138,7 +139,7 @@ public:
     void tick()
     {
         static uint32_t tmr;
-        if (millis() - tmr < 100)
+        if (millis() - tmr < SERVO_POLLING_PERIOD)
             return;
         tmr = millis();
 
@@ -150,15 +151,18 @@ public:
         {
             if (_velocities[i])
             {
+                int pos_old = DESCALE(current_pos[i]);
                 current_pos[i] = constrain(current_pos[i] + _velocities[i], servosMeta[i].min, servosMeta[i].max);
                 _target_pos[i] = current_pos[i];
+                
+                int pos_new = DESCALE(current_pos[i]);
+                if (pos_old != pos_new)
+                    servos[i].write(pos_new);
             }
 
 //            if (current_pos[i] != _target_pos[i])
 //                current_pos[i] += (current_pos[i] < _target_pos[i] ? 1 : -1);
 
-            servos[i].write(current_pos[i]);
-           // delay(40);
         }
     }
 

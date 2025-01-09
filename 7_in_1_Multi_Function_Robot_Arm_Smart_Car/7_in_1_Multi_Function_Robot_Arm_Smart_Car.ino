@@ -151,7 +151,7 @@ void gamepadControl(const GamepadData &package)
 { 
   static int8_t gamepadMode = 1;
 
-  DebugWrite(package);
+  //DebugWrite(package);
   
   int axisY = package.axisY;
   int axisRX = package.axisRX;    
@@ -163,16 +163,16 @@ void gamepadControl(const GamepadData &package)
   if (abs(axisRX) < GAMEPAD_DEAD_ZONE_RX)
       axisRX = 0;
 
+  axisY = map(axisY, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255);
+  axisRX = map(axisRX, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255);
+
+
   if (gamepadMode == 0)
   {
     int vx = -axisY;
     int rz = -axisRX;    
 
     rz /= 1.5;
-
-    vx = map(vx, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255);
-    rz = map(rz, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255);
-
     if (!(package.buttons & 8))
     {
       vx /= 2;
@@ -185,8 +185,6 @@ void gamepadControl(const GamepadData &package)
   {
     int r_base = -axisRX;
     int r_arm = axisY;    
-
-    r_base = map(r_base, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255);
 
     hand.baseTurn(r_base);
   }
