@@ -6,8 +6,8 @@
 
 #define N_SERVOS 3
 
-#define SCALE(A) (A << 7)
-#define DESCALE(A) (A >> 7)
+#define SCALE(A) (A << SERVO_SCALE_FACTOR)
+#define DESCALE(A) (A >> SERVO_SCALE_FACTOR)
 
 enum
 {
