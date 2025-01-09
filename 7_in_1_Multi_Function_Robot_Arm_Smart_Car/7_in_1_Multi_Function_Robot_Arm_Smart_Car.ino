@@ -151,7 +151,7 @@ void gamepadControl(const GamepadData &package)
 { 
   static int8_t gamepadMode = 1;
 
-  //DebugWrite(package);
+  DebugWrite(package);
   
   int axisY = package.axisY;
   int axisRX = package.axisRX;    
@@ -165,13 +165,13 @@ void gamepadControl(const GamepadData &package)
 
   if (gamepadMode == 0)
   {
-    int vx = axisY;
-    int rz = axisRX;    
+    int vx = -axisY;
+    int rz = -axisRX;    
 
     rz /= 1.5;
 
-    vx = map(vx, GAMEPAD_Y_MAX, GAMEPAD_Y_MIN, -255, 255);
-    rz = map(rz, GAMEPAD_X_MAX, GAMEPAD_X_MIN, -255, 255);
+    vx = map(vx, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255);
+    rz = map(rz, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255);
 
     if (!(package.buttons & 8))
     {
@@ -183,10 +183,10 @@ void gamepadControl(const GamepadData &package)
   }
   else if (gamepadMode == 1)
   {
+    int r_base = -axisRX;
     int r_arm = axisY;    
-    int r_base = axisRX;
 
-    r_base = map(r_base, GAMEPAD_Y_MAX, GAMEPAD_Y_MIN, SERVO_BASE_MIN, SERVO_BASE_MAX);
+    r_base = map(r_base, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255);
 
     hand.baseTurn(r_base);
   }
@@ -222,7 +222,7 @@ void startProgram(Program _program)
 
 void commandInterpretator(char cmd)
 {
-    DebugWrite("Command", cmd);
+    //DebugWrite("Command", cmd);
 
     switch (cmd)
     {
@@ -321,6 +321,8 @@ void UART_control()
     int res = Serial.readBytes((char*)&package, sizeof(package));
     if (res == sizeof(package))
       gamepadControl(package);
+    else
+      DebugWrite("ERROR: size of data package=", res);
   }
   else    
     commandInterpretator(ch);
@@ -346,8 +348,28 @@ void setup()
   chassis.init();
 }
 
+#define FPS_FRAMES_COUNT 25000
+
+void showFps()
+{
+  static uint32_t nFrames = 0;
+  static uint32_t tmr = millis();
+
+  if (nFrames >= FPS_FRAMES_COUNT) 
+  {
+      float fps = nFrames * 1000. / (millis() - tmr);
+      tmr = millis();
+      nFrames = 0;
+      DebugWrite("fps", fps);
+  }
+  ++nFrames;
+}
+
+
 void loop()
 {
+  showFps();
+
   IR_control();
   UART_control();
 
@@ -364,5 +386,4 @@ void loop()
 
   hand.tick();
   chassis.tick();
-  delay(10);
 }

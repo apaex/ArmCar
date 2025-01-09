@@ -57,6 +57,7 @@ class Hand
     Servo servos[N_SERVOS];
 
     HandPosition _target_pos;
+    HandPosition _velocities;
 
     void setMotorAngles(int angles[], bool instantly = false)
     {
@@ -81,9 +82,20 @@ public:
             servos[i].attach(servosMeta[i].pin);
             _target_pos[i] = current_pos[i] = servosMeta[i].def;
             servos[i].write(current_pos[i]);
-            delay(500);
         }
     }
+
+    void baseTurn(int speed)   { _velocities[SERVO_BASE] = speed; }
+    void armRise(int speed)    { _velocities[SERVO_ARM] = speed; }
+    void clawOpen(int speed)   { _velocities[SERVO_CLAW] = speed; }
+
+    void setVelocities(int r_base, int r_arm, int r_claw)
+    {
+        _velocities[SERVO_BASE] = r_base;
+        _velocities[SERVO_ARM] = r_arm;
+        _velocities[SERVO_CLAW] = r_claw;
+    }
+
 
     void baseTurnLeft()   { _target_pos[SERVO_BASE] = SERVO_BASE_MAX; applyNow(); }
     void baseTurnRight()  { _target_pos[SERVO_BASE] = SERVO_BASE_MIN; applyNow(); }
@@ -91,12 +103,11 @@ public:
     void armDescend()     { _target_pos[SERVO_ARM] = SERVO_ARM_MAX;    }
     void clawOpen()       { _target_pos[SERVO_CLAW] = SERVO_CLAW_MIN;  }
     void clawClose()      { _target_pos[SERVO_CLAW] = SERVO_CLAW_MAX;  }
-    void stop()           { _target_pos = current_pos; }
-
-    void baseTurn(int angle)   { _target_pos[SERVO_BASE] = angle; applyNow(); }
-    void armRise(int angle)    { _target_pos[SERVO_ARM] = angle; }
-    void clawOpen(int angle)   { _target_pos[SERVO_CLAW] = angle; }
-
+    void stop()           { 
+        for (byte i=0; i<N_SERVOS; ++i)
+            _velocities[i] = 0;
+        _target_pos = current_pos; 
+    }
 
     void moveTo(HandPosition position)  { _target_pos = position; }
     void moveToDefault()  
@@ -126,22 +137,28 @@ public:
 
     void tick()
     {
-        return;
         static uint32_t tmr;
-        if (millis() - tmr < 30)
+        if (millis() - tmr < 100)
             return;
         tmr = millis();
 
-        DebugWrite("current_pos", current_pos.angles, N_SERVOS);
-        DebugWrite("_target_pos", _target_pos.angles, N_SERVOS);
+//        DebugWrite("current_pos", current_pos.angles, N_SERVOS);
+//        DebugWrite("_target_pos", _target_pos.angles, N_SERVOS);
+//        DebugWrite("_velocities", _velocities.angles, N_SERVOS);
 
         for (byte i=0; i<N_SERVOS; ++i)
         {
-            if (current_pos[i] != _target_pos[i])
-                current_pos[i] += (current_pos[i] < _target_pos[i] ? 1 : -1);
+            if (_velocities[i])
+            {
+                current_pos[i] = constrain(current_pos[i] + _velocities[i], servosMeta[i].min, servosMeta[i].max);
+                _target_pos[i] = current_pos[i];
+            }
+
+//            if (current_pos[i] != _target_pos[i])
+//                current_pos[i] += (current_pos[i] < _target_pos[i] ? 1 : -1);
 
             servos[i].write(current_pos[i]);
-            delay(100);
+           // delay(40);
         }
     }
 

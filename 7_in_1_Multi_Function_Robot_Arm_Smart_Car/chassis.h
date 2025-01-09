@@ -72,6 +72,5 @@ public:
             motorL.smoothTick(_dutyL);
         if (motorR._duty != _dutyR)
             motorR.smoothTick(_dutyR);
-        */    
     }
 };
