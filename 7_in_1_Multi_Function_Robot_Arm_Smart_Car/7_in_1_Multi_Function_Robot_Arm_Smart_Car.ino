@@ -147,6 +147,53 @@ void auto_do()
 }
 
 
+void gamepadControl(const GamepadData &package)
+{ 
+  static int8_t gamepadMode = 1;
+
+  //DebugWrite(package);
+  
+  int axisY = package.axisY;
+  int axisRX = package.axisRX;    
+
+  //DebugWrite("vx-rz", vx, rz);
+
+  if (abs(axisY) < GAMEPAD_DEAD_ZONE_Y)
+      axisY = 0;
+  if (abs(axisRX) < GAMEPAD_DEAD_ZONE_RX)
+      axisRX = 0;
+
+  if (gamepadMode == 0)
+  {
+    int vx = axisY;
+    int rz = axisRX;    
+
+    rz /= 1.5;
+
+    vx = map(vx, GAMEPAD_Y_MAX, GAMEPAD_Y_MIN, -255, 255);
+    rz = map(rz, GAMEPAD_X_MAX, GAMEPAD_X_MIN, -255, 255);
+
+    if (!(package.buttons & 8))
+    {
+      vx /= 2;
+      rz /= 2;
+    }
+
+    chassis.setVelocities(vx, rz, true);
+  }
+  else if (gamepadMode == 1)
+  {
+    int r_arm = axisY;    
+    int r_base = axisRX;
+
+    r_base = map(r_base, GAMEPAD_Y_MAX, GAMEPAD_Y_MIN, SERVO_BASE_MIN, SERVO_BASE_MAX);
+
+    hand.baseTurn(r_base);
+  }
+}
+
+
+
 void startProgram(Program _program)
 {
   if (_program == program)
@@ -190,6 +237,7 @@ void commandInterpretator(char cmd)
       case 'd': startProgram(PRG_ARM_DESCENDING);       break;
       case 'l': startProgram(PRG_BASE_TURNING_LEFT);    break;
       case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   break;
+      case 'x': hand.moveToDefault(); break;
 
       case 'G':
       case 'S': startProgram(PRG_NONE);                 break;
@@ -216,35 +264,6 @@ void commandInterpretator(char cmd)
     }
 }
 
-void setFromStickPositions(const GamepadData &package)
-{ 
-  //DebugWrite(package);
-  
-  int vx = package.axisY;
-  int rz = package.axisRX;    
-
-  //DebugWrite("vx-rz", vx, rz);
-
-  if (abs(vx) < GAMEPAD_DEAD_ZONE_Y)
-      vx = 0;
-  if (abs(rz) < GAMEPAD_DEAD_ZONE_RX)
-      rz = 0;
-
-  rz /= 1.5;
-
-  vx = map(vx, GAMEPAD_Y_MAX, GAMEPAD_Y_MIN, -255, 255);
-  rz = map(rz, GAMEPAD_X_MAX, GAMEPAD_X_MIN, -255, 255);
-
-  if (!(package.buttons & 8))
-  {
-    vx /= 2;
-    rz /= 2;
-  }
-
-  chassis.setVelocities(vx, rz, true);
-}
-
-
 void IR_control()
 {
   static uint32_t tmr;
@@ -270,7 +289,7 @@ void IR_control()
     "u",  //IR_KEYCODE_2,
     "",   //IR_KEYCODE_3,
     "l",  //IR_KEYCODE_4,
-    "",   //IR_KEYCODE_5,
+    "x",   //IR_KEYCODE_5,
     "r",  //IR_KEYCODE_6,
     "o",  //IR_KEYCODE_7,
     "d",  //IR_KEYCODE_8,
@@ -301,7 +320,7 @@ void UART_control()
     GamepadData package;
     int res = Serial.readBytes((char*)&package, sizeof(package));
     if (res == sizeof(package))
-      setFromStickPositions(package);
+      gamepadControl(package);
   }
   else    
     commandInterpretator(ch);

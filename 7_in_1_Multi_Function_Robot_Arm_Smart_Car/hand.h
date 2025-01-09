@@ -2,6 +2,7 @@
 
 #include <Servo.h>
 #include "settings.h"
+#include "debug.h"
 
 #define N_SERVOS 3
 
@@ -79,20 +80,40 @@ public:
         {
             servos[i].attach(servosMeta[i].pin);
             _target_pos[i] = current_pos[i] = servosMeta[i].def;
-            //servos[i].write(current_pos[i]);
-            //delay(500);
+            servos[i].write(current_pos[i]);
+            delay(500);
         }
     }
 
-    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SERVO_BASE_MIN; }
-    void baseTurnRight()  { _target_pos[SERVO_BASE] = SERVO_BASE_MAX; }
-    void armRise()        { _target_pos[SERVO_ARM] = SERVO_ARM_MIN; }
-    void armDescend()     { _target_pos[SERVO_ARM] = SERVO_ARM_MAX; }
-    void clawOpen()       { _target_pos[SERVO_CLAW] = SERVO_CLAW_MIN; }
-    void clawClose()      { _target_pos[SERVO_CLAW] = SERVO_CLAW_MAX; }
+    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SERVO_BASE_MAX; applyNow(); }
+    void baseTurnRight()  { _target_pos[SERVO_BASE] = SERVO_BASE_MIN; applyNow(); }
+    void armRise()        { _target_pos[SERVO_ARM] = SERVO_ARM_MIN;    }
+    void armDescend()     { _target_pos[SERVO_ARM] = SERVO_ARM_MAX;    }
+    void clawOpen()       { _target_pos[SERVO_CLAW] = SERVO_CLAW_MIN;  }
+    void clawClose()      { _target_pos[SERVO_CLAW] = SERVO_CLAW_MAX;  }
     void stop()           { _target_pos = current_pos; }
 
+    void baseTurn(int angle)   { _target_pos[SERVO_BASE] = angle; applyNow(); }
+    void armRise(int angle)    { _target_pos[SERVO_ARM] = angle; }
+    void clawOpen(int angle)   { _target_pos[SERVO_CLAW] = angle; }
+
+
     void moveTo(HandPosition position)  { _target_pos = position; }
+    void moveToDefault()  
+    { 
+        for (byte i=0; i<N_SERVOS; ++i)
+            _target_pos[i] = servosMeta[i].def;
+ 
+       applyNow();
+    }
+
+
+    void applyNow()
+    {
+        current_pos = _target_pos;
+        for (byte i=0; i<N_SERVOS; ++i)
+            servos[i].write(current_pos[i]); 
+    }
 
     bool isReady() 
     {         
@@ -105,18 +126,22 @@ public:
 
     void tick()
     {
+        return;
         static uint32_t tmr;
         if (millis() - tmr < 30)
             return;
         tmr = millis();
+
+        DebugWrite("current_pos", current_pos.angles, N_SERVOS);
+        DebugWrite("_target_pos", _target_pos.angles, N_SERVOS);
 
         for (byte i=0; i<N_SERVOS; ++i)
         {
             if (current_pos[i] != _target_pos[i])
                 current_pos[i] += (current_pos[i] < _target_pos[i] ? 1 : -1);
 
-            //servos[i].write(current_pos[i]);
-            //delay(100);
+            servos[i].write(current_pos[i]);
+            delay(100);
         }
     }
 
