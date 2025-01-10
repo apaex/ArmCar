@@ -6,19 +6,13 @@
 
 #define N_SERVOS 3
 
-#define SCALE(A) (A << SERVO_SCALE_FACTOR)
-#define DESCALE(A) (A >> SERVO_SCALE_FACTOR)
+#define MAP(x, in_min, in_max, out_min, out_max) ( int(int32_t(x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min) )
 
-#define MIN_PULSE_WIDTH       0     // the shortest pulse sent to a servo  
-#define MAX_PULSE_WIDTH      (180 << 6)     // the longest pulse sent to a servo 
+#define DEG2MKS(A) ( MAP(A, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH) )
+#define MKS2DEG(A) ( MAP(A, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 180) )
 
-//#define MIN_PULSE_WIDTH       5440     // the shortest pulse sent to a servo  
-//#define MAX_PULSE_WIDTH      24000     // the longest pulse sent to a servo 
-
-#define MAP(x, in_min, in_max, out_min, out_max) ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min )
-
-//#define SCALE(A) ( MAP(A, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH) )
-//#define DESCALE(A) ( MAP(A, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 180) )
+#define SCALE(A) ( DEG2MKS(A) )
+#define DESCALE(A) ( A )
 
 
 enum
@@ -76,7 +70,7 @@ class Hand
     {
         current_pos = _target_pos;
         for (byte i=0; i<N_SERVOS; ++i)
-            servos[i].write(DESCALE(current_pos[i])); 
+            servos[i].writeMicroseconds(DESCALE(current_pos[i])); 
     }
 
 public:
@@ -88,7 +82,7 @@ public:
         {
             servos[i].attach(servosMeta[i].pin);
             _target_pos[i] = current_pos[i] = servosMeta[i].def;
-            servos[i].write(DESCALE(current_pos[i]));
+            //?servos[i].writeMicroseconds(DESCALE(current_pos[i]));
         }
     }
 
@@ -180,7 +174,10 @@ public:
                 
                 int pos_new = DESCALE(current_pos[i]);
                 if (pos_old != pos_new)
-                    servos[i].write(pos_new);
+                {
+                    servos[i].writeMicroseconds(pos_new);
+                    DebugWrite("pos", pos_new);
+                }
             }
 
 
@@ -192,7 +189,7 @@ public:
                 
                 int pos_new = DESCALE(current_pos[i]);
                 if (pos_old != pos_new)
-                    servos[i].write(pos_new);
+                    servos[i].writeMicroseconds(pos_new);
             }
         }
     }
