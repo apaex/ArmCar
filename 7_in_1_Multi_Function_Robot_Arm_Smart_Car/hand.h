@@ -88,7 +88,7 @@ public:
     }
 
     void baseVelocity(int speed)   { _target_pos[SERVO_BASE] = current_pos[SERVO_BASE]; _velocities[SERVO_BASE] = speed; }
-    void armVelocity(int speed)    { _target_pos[SERVO_ARM] = current_pos[SERVO_ARM]; _velocities[SERVO_ARM] = speed;  }
+    void armVelocity(int speed)    { _target_pos[SERVO_ARM] = current_pos[SERVO_ARM];   _velocities[SERVO_ARM] = speed;  }
     void clawVelocity(int speed)   { _target_pos[SERVO_CLAW] = current_pos[SERVO_CLAW]; _velocities[SERVO_CLAW] = speed; }
 
     void setVelocities(int r_base, int r_arm, int r_claw)
@@ -99,7 +99,7 @@ public:
     }
 
     void baseAngle(int angle)      { _target_pos[SERVO_BASE] = SCALE(angle); _velocities[SERVO_BASE] = 0; }
-    void armAngle(int angle)       { _target_pos[SERVO_ARM] = SCALE(angle);  _velocities[SERVO_ARM] = 0; }
+    void armAngle(int angle)       { _target_pos[SERVO_ARM] = SCALE(angle);  _velocities[SERVO_ARM] = 0;  }
     void clawAngle(int angle)      { _target_pos[SERVO_CLAW] = SCALE(angle); _velocities[SERVO_CLAW] = 0; }
 
     void setAngles(int a_base, int a_arm, int a_claw)
@@ -134,12 +134,12 @@ public:
 
 
 
-    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MAX);  }
-    void baseTurnRight()  { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MIN);  }
-    void armRise()        { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MIN);    }
-    void armDescend()     { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MAX);    }
-    void clawOpen()       { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MIN);  }
-    void clawClose()      { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MAX);  }
+    void baseTurnLeft()   { _target_pos[SERVO_BASE] = servosMeta[SERVO_BASE].max;  }
+    void baseTurnRight()  { _target_pos[SERVO_BASE] = servosMeta[SERVO_BASE].min;  }
+    void armRise()        { _target_pos[SERVO_ARM] = servosMeta[SERVO_ARM].min;    }
+    void armDescend()     { _target_pos[SERVO_ARM] = servosMeta[SERVO_ARM].max;    }
+    void clawOpen()       { _target_pos[SERVO_CLAW] = servosMeta[SERVO_CLAW].min;  }
+    void clawClose()      { _target_pos[SERVO_CLAW] = servosMeta[SERVO_CLAW].max;  }
 
 
 
