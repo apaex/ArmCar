@@ -190,7 +190,7 @@ void gamepadControl(const GamepadData &package)
   }
   else if (gamepadMode == 1)
   {
-    int r_base = -axisRX / 4;
+    int r_base = -axisRX;
     int r_arm = axisY;    
     int r_claw = brake - throttle;    
 

@@ -11,8 +11,8 @@
 #define DEG2MKS(A) ( MAP(A, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH) )
 #define MKS2DEG(A) ( MAP(A, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 180) )
 
-#define SCALE(A) ( DEG2MKS(A) )
-#define DESCALE(A) ( A )
+#define SCALE(A) ( DEG2MKS(A) << SERVO_SCALE_FACTOR)
+#define DESCALE(A) ( A >> SERVO_SCALE_FACTOR)
 
 
 enum
