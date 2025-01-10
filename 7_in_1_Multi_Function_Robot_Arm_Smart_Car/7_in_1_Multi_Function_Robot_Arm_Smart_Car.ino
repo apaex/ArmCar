@@ -220,7 +220,7 @@ void startProgram(Program _program)
 
 void commandInterpretator(char cmd)
 {
-    //DebugWrite("Command", cmd);
+    DebugWrite("Command", cmd);
 
     switch (cmd)
     {
@@ -366,7 +366,7 @@ void showFps()
 
 void loop()
 {
-  showFps();
+  //showFps();
 
   IR_control();
   UART_control();

@@ -9,6 +9,18 @@
 #define SCALE(A) (A << SERVO_SCALE_FACTOR)
 #define DESCALE(A) (A >> SERVO_SCALE_FACTOR)
 
+#define MIN_PULSE_WIDTH       0     // the shortest pulse sent to a servo  
+#define MAX_PULSE_WIDTH      (180 << 6)     // the longest pulse sent to a servo 
+
+//#define MIN_PULSE_WIDTH       5440     // the shortest pulse sent to a servo  
+//#define MAX_PULSE_WIDTH      24000     // the longest pulse sent to a servo 
+
+#define MAP(x, in_min, in_max, out_min, out_max) ( (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min )
+
+//#define SCALE(A) ( MAP(A, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH) )
+//#define DESCALE(A) ( MAP(A, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 180) )
+
+
 enum
 {
     SERVO_BASE,
