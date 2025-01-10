@@ -81,31 +81,32 @@ public:
         for (byte i=0; i<N_SERVOS; ++i)
         {
             servos[i].attach(servosMeta[i].pin);
-            _target_pos[i] = current_pos[i] = servosMeta[i].def;
-            //?servos[i].writeMicroseconds(DESCALE(current_pos[i]));
+            _target_pos[i] = servosMeta[i].def;
+            _velocities[i] = 0;
         }
+        applyNow();
     }
 
-    void baseVelocity(int speed)   { _velocities[SERVO_BASE] = speed; }
-    void armVelocity(int speed)    { _velocities[SERVO_ARM] = speed;  }
-    void clawVelocity(int speed)   { _velocities[SERVO_CLAW] = speed; }
+    void baseVelocity(int speed)   { _target_pos[SERVO_BASE] = current_pos[SERVO_BASE]; _velocities[SERVO_BASE] = speed; }
+    void armVelocity(int speed)    { _target_pos[SERVO_ARM] = current_pos[SERVO_ARM]; _velocities[SERVO_ARM] = speed;  }
+    void clawVelocity(int speed)   { _target_pos[SERVO_CLAW] = current_pos[SERVO_CLAW]; _velocities[SERVO_CLAW] = speed; }
 
     void setVelocities(int r_base, int r_arm, int r_claw)
     {
-        _velocities[SERVO_BASE] = r_base;
-        _velocities[SERVO_ARM] = r_arm;
-        _velocities[SERVO_CLAW] = r_claw;
+        baseVelocity(r_base);
+        armVelocity(r_arm);
+        clawVelocity(r_claw);
     }
 
-    void baseAngle(int angle)      { _target_pos[SERVO_BASE] = SCALE(angle);  }
-    void armAngle(int angle)       { _target_pos[SERVO_ARM] = SCALE(angle);   }
-    void clawAngle(int angle)      { _target_pos[SERVO_CLAW] = SCALE(angle);  }
+    void baseAngle(int angle)      { _target_pos[SERVO_BASE] = SCALE(angle); _velocities[SERVO_BASE] = 0; }
+    void armAngle(int angle)       { _target_pos[SERVO_ARM] = SCALE(angle);  _velocities[SERVO_ARM] = 0; }
+    void clawAngle(int angle)      { _target_pos[SERVO_CLAW] = SCALE(angle); _velocities[SERVO_CLAW] = 0; }
 
     void setAngles(int a_base, int a_arm, int a_claw)
     {
-        _target_pos[SERVO_BASE] = a_base;
-        _target_pos[SERVO_ARM] = a_arm;
-        _target_pos[SERVO_CLAW] = a_claw;
+        baseAngle(a_base);
+        armAngle(a_arm);
+        clawAngle(a_claw);
     }
 
     void moveTo(HandPosition position, bool instantly = false)  
