@@ -151,6 +151,11 @@ void gamepadControl(const GamepadData &package)
 { 
   static int8_t gamepadMode = 1;
 
+  if (package.buttons & 1)
+    gamepadMode = 0;
+  if (package.buttons & 2)
+    gamepadMode = 1;
+
   //DebugWrite(package);
   
   int axisY = package.axisY;
