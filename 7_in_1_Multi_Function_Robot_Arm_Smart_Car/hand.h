@@ -98,9 +98,9 @@ public:
         }
     }
 
-    void baseTurn(int speed)   { _velocities[SERVO_BASE] = speed; }
-    void armRise(int speed)    { _velocities[SERVO_ARM] = speed; }
-    void clawOpen(int speed)   { _velocities[SERVO_CLAW] = speed; }
+    void baseVelocity(int speed)   { _velocities[SERVO_BASE] = speed; }
+    void armVelocity(int speed)    { _velocities[SERVO_ARM] = speed; }
+    void clawVelocity(int speed)   { _velocities[SERVO_CLAW] = speed; }
 
     void setVelocities(int r_base, int r_arm, int r_claw)
     {

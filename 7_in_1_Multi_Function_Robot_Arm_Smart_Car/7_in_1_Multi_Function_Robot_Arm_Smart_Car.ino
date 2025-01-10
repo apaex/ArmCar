@@ -160,6 +160,8 @@ void gamepadControl(const GamepadData &package)
   
   int axisY = package.axisY;
   int axisRX = package.axisRX;    
+  int brake = package.brake;    
+  int throttle = package.throttle;    
 
   //DebugWrite("vx-rz", vx, rz);
 
@@ -190,8 +192,11 @@ void gamepadControl(const GamepadData &package)
   {
     int r_base = -axisRX;
     int r_arm = axisY;    
+    int r_claw = brake - throttle;    
 
-    hand.baseTurn(r_base);
+    hand.baseVelocity(r_base);
+    hand.armVelocity(r_arm);
+    hand.clawVelocity(r_claw);
   }
 }
 
