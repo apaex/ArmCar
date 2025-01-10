@@ -171,6 +171,19 @@ public:
 
         for (byte i=0; i<N_SERVOS; ++i)
         {
+            if (current_pos[i] - _target_pos[i])
+            {
+                int v = (current_pos[i] < _target_pos[i] ? SERVO_DEFAULT_VELOCITY : -SERVO_DEFAULT_VELOCITY);
+
+                int pos_old = DESCALE(current_pos[i]);
+                current_pos[i] = constrain(current_pos[i] + v, servosMeta[i].min, servosMeta[i].max);
+                
+                int pos_new = DESCALE(current_pos[i]);
+                if (pos_old != pos_new)
+                    servos[i].write(pos_new);
+            }
+
+
             if (_velocities[i])
             {
                 int pos_old = DESCALE(current_pos[i]);
@@ -182,11 +195,7 @@ public:
                     servos[i].write(pos_new);
             }
 
-//            if (current_pos[i] != _target_pos[i])
-//                current_pos[i] += (current_pos[i] < _target_pos[i] ? 1 : -1);
-
         }
     }
-
 
 };
