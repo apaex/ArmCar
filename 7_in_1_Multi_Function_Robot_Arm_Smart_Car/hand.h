@@ -72,17 +72,11 @@ class Hand
     HandPosition _target_pos;
     HandPosition _velocities;
 
-    void setMotorAngles(int angles[], bool instantly = false)
+    void applyNow()
     {
+        current_pos = _target_pos;
         for (byte i=0; i<N_SERVOS; ++i)
-            _target_pos[i] = constrain(angles[i], servosMeta[i].min, servosMeta[i].max);
-
-        if (instantly)
-        {
-            current_pos = _target_pos;
-            for (byte i=0; i<N_SERVOS; ++i)
-                servos[i].write(DESCALE(current_pos[i]));
-        }
+            servos[i].write(DESCALE(current_pos[i])); 
     }
 
 public:
@@ -99,7 +93,7 @@ public:
     }
 
     void baseVelocity(int speed)   { _velocities[SERVO_BASE] = speed; }
-    void armVelocity(int speed)    { _velocities[SERVO_ARM] = speed; }
+    void armVelocity(int speed)    { _velocities[SERVO_ARM] = speed;  }
     void clawVelocity(int speed)   { _velocities[SERVO_CLAW] = speed; }
 
     void setVelocities(int r_base, int r_arm, int r_claw)
@@ -109,35 +103,51 @@ public:
         _velocities[SERVO_CLAW] = r_claw;
     }
 
+    void baseAngle(int angle)      { _target_pos[SERVO_BASE] = SCALE(angle);  }
+    void armAngle(int angle)       { _target_pos[SERVO_ARM] = SCALE(angle);   }
+    void clawAngle(int angle)      { _target_pos[SERVO_CLAW] = SCALE(angle);  }
 
-    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MAX); applyNow(); }
-    void baseTurnRight()  { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MIN); applyNow(); }
-    void armRise()        { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MIN);    }
-    void armDescend()     { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MAX);    }
-    void clawOpen()       { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MIN);  }
-    void clawClose()      { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MAX);  }
-    void stop()           { 
+    void setAngles(int a_base, int a_arm, int a_claw)
+    {
+        _target_pos[SERVO_BASE] = a_base;
+        _target_pos[SERVO_ARM] = a_arm;
+        _target_pos[SERVO_CLAW] = a_claw;
+    }
+
+    void moveTo(HandPosition position, bool instantly = false)  
+    { 
+        _target_pos = position; 
+        if (instantly)
+            applyNow();
+    }
+
+    void moveToDefault(bool instantly = true)  
+    { 
+        for (byte i=0; i<N_SERVOS; ++i)
+            _target_pos[i] = servosMeta[i].def;
+ 
+        if (instantly)
+            applyNow();
+    }
+
+    void stop() 
+    { 
         for (byte i=0; i<N_SERVOS; ++i)
             _velocities[i] = 0;
         _target_pos = current_pos; 
     }
 
-    void moveTo(HandPosition position)  { _target_pos = position; }
-    void moveToDefault()  
-    { 
-        for (byte i=0; i<N_SERVOS; ++i)
-            _target_pos[i] = servosMeta[i].def;
- 
-       applyNow();
-    }
 
 
-    void applyNow()
-    {
-        current_pos = _target_pos;
-        for (byte i=0; i<N_SERVOS; ++i)
-            servos[i].write(DESCALE(current_pos[i])); 
-    }
+    void baseTurnLeft()   { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MAX);  }
+    void baseTurnRight()  { _target_pos[SERVO_BASE] = SCALE(SERVO_BASE_MIN);  }
+    void armRise()        { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MIN);    }
+    void armDescend()     { _target_pos[SERVO_ARM] = SCALE(SERVO_ARM_MAX);    }
+    void clawOpen()       { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MIN);  }
+    void clawClose()      { _target_pos[SERVO_CLAW] = SCALE(SERVO_CLAW_MAX);  }
+
+
+
 
     bool isReady() 
     {         
