@@ -312,7 +312,14 @@ void IR_control()
     "R",  //IR_KEYCODE_RIGHT,
   };
 
-  commandInterpretator(map[code][0]);
+  if (map[code][0])
+    commandInterpretator(map[code][0]);
+
+  // test
+  if (code == IR_KEYCODE_1)
+    hand.baseAngle(180);
+  else if (code == IR_KEYCODE_3)
+    hand.baseAngle(0);
 }
 
 

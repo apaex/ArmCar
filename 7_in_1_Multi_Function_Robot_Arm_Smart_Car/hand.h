@@ -121,7 +121,7 @@ public:
             applyNow();
     }
 
-    void moveToDefault(bool instantly = true)  
+    void moveToDefault(bool instantly = false)  
     { 
         for (byte i=0; i<N_SERVOS; ++i)
             _target_pos[i] = servosMeta[i].def;
@@ -194,7 +194,6 @@ public:
                 if (pos_old != pos_new)
                     servos[i].write(pos_new);
             }
-
         }
     }
 
