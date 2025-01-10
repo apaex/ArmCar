@@ -178,7 +178,7 @@ public:
                 if (pos_old != pos_new)
                 {
                     servos[i].writeMicroseconds(pos_new);
-                    DebugWrite("pos", pos_new);
+                    //DebugWrite("pos", pos_new);
                 }
             }
 
@@ -193,7 +193,7 @@ public:
                 if (pos_old != pos_new)
                 {
                     servos[i].writeMicroseconds(pos_new);
-                    DebugWrite("pos", pos_new);
+                    //DebugWrite("pos", pos_new);
                 }
             }
         }

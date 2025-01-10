@@ -171,7 +171,7 @@ void gamepadControl(const GamepadData &package)
       axisRX = 0;
 
   axisY = map(axisY, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255);
-  axisRX = map(axisRX, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255);
+  axisRX = map(axisRX, GAMEPAD_RX_MIN, GAMEPAD_RX_MAX, -255, 255);
 
 
   if (gamepadMode == 0)
