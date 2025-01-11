@@ -194,9 +194,7 @@ void gamepadControl(const GamepadData &package)
     int r_arm = axisY;
     int r_claw = brake - throttle;
 
-    hand.baseVelocity(r_base);
-    hand.armVelocity(r_arm);
-    hand.clawVelocity(r_claw);
+    hand.setVelocities(r_base, r_arm, r_claw);
   }
 }
 
