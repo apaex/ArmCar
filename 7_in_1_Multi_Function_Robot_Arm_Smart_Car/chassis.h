@@ -101,4 +101,6 @@ public:
     {
         return _state != MOVING_STOP;
     }
+
+    ChassisState getState() const { return _state; }
 };

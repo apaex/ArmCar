@@ -143,12 +143,12 @@ void auto_do()
   if (++currentAction >= nActions)
     currentAction = 0;
 
-  hand.moveTo(mem[currentAction]);  
+  hand.moveTo(mem[currentAction]);
 }
 
 
 void gamepadControl(const GamepadData &package)
-{ 
+{
   static int8_t gamepadMode = 1;
 
   if (package.buttons & 1)
@@ -157,11 +157,11 @@ void gamepadControl(const GamepadData &package)
     gamepadMode = 1;
 
   //DebugWrite(package);
-  
+
   int axisY = package.axisY;
-  int axisRX = package.axisRX;    
-  int brake = package.brake;    
-  int throttle = package.throttle;    
+  int axisRX = package.axisRX;
+  int brake = package.brake;
+  int throttle = package.throttle;
 
   //DebugWrite("vx-rz", vx, rz);
 
@@ -177,7 +177,7 @@ void gamepadControl(const GamepadData &package)
   if (gamepadMode == 0)
   {
     int vx = -axisY;
-    int rz = -axisRX;    
+    int rz = -axisRX;
 
     rz /= 1.5;
     if (!(package.buttons & 8))
@@ -191,8 +191,8 @@ void gamepadControl(const GamepadData &package)
   else if (gamepadMode == 1)
   {
     int r_base = -axisRX;
-    int r_arm = axisY;    
-    int r_claw = brake - throttle;    
+    int r_arm = axisY;
+    int r_claw = brake - throttle;
 
     hand.baseVelocity(r_base);
     hand.armVelocity(r_arm);
@@ -250,15 +250,15 @@ void commandInterpretator(char cmd)
       case 'G':
       case 'S': startProgram(PRG_NONE);                 break;
 
-      case 'm': 
+      case 'm':
         if (programMayBeRewrite)
           nActions = 0;
-        storePosition(); 
+        storePosition();
         programMayBeRewrite = false;
         break;
       case 'a':
         programMayBeRewrite = true;
-        currentAction = 0; 
+        currentAction = 0;
         if (nActions)
           startProgram(PRG_MEMORY_ACTION);
         break;
@@ -329,7 +329,7 @@ void UART_control()
     return;
 
   char ch = Serial.read();
-  
+
   if (ch == '#')
   {
     GamepadData package;
@@ -339,7 +339,7 @@ void UART_control()
     else
       DebugWrite("ERROR: size of data package=", res);
   }
-  else    
+  else
     commandInterpretator(ch);
 }
 
