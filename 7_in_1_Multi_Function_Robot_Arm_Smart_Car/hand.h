@@ -190,7 +190,7 @@ public:
             if (current_pos[i] - _target_pos[i])
             {
                 int v = (current_pos[i] < _target_pos[i] ? SERVO_DEFAULT_VELOCITY : -SERVO_DEFAULT_VELOCITY);
-                if (abs((_target_pos[i] - current_pos[i])) < SERVO_DEFAULT_VELOCITY )
+                if (abs(_target_pos[i] - current_pos[i]) < SERVO_DEFAULT_VELOCITY )
                     v = _target_pos[i] - current_pos[i];
 
                 current_pos[i] = constrain(current_pos[i] + v, servosMeta[i].min, servosMeta[i].max);
