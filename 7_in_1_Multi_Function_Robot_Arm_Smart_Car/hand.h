@@ -181,6 +181,12 @@ public:
         {
             int pos_old = current_pos[i];
 
+            if (_velocities[i])
+            {
+                current_pos[i] = constrain(current_pos[i] + _velocities[i], servosMeta[i].min, servosMeta[i].max);
+                _target_pos[i] = current_pos[i];
+            }
+
             if (current_pos[i] - _target_pos[i])
             {
                 int v = (current_pos[i] < _target_pos[i] ? SERVO_DEFAULT_VELOCITY : -SERVO_DEFAULT_VELOCITY);
@@ -189,12 +195,6 @@ public:
 
                 current_pos[i] = constrain(current_pos[i] + v, servosMeta[i].min, servosMeta[i].max);
                 _velocities[i] = 0;
-            }
-
-            if (_velocities[i])
-            {
-                current_pos[i] = constrain(current_pos[i] + _velocities[i], servosMeta[i].min, servosMeta[i].max);
-                _target_pos[i] = current_pos[i];
             }
 
             if (pos_old != current_pos[i])
