@@ -73,7 +73,7 @@ public:
     }
 
     void setVelocities(int vx, int rz, bool instantly = false)
-    { 
+    {
         // танковая схема
         int dutyL = vx - rz;
         int dutyR = vx + rz;
@@ -90,7 +90,7 @@ public:
     void tick()
     {
         //DebugWrite("dl-dr", (motorL._duty - _dutyL), (motorR._duty - _dutyR));
-        
+
         if (motorL._duty != _dutyL)
             motorL.smoothTick(_dutyL);
         if (motorR._duty != _dutyR)

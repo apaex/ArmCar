@@ -109,27 +109,27 @@ public:
         clawAngle(a_claw);
     }
 
-    void moveTo(HandPosition position, bool instantly = false)  
-    { 
-        _target_pos = position; 
+    void moveTo(HandPosition position, bool instantly = false)
+    {
+        _target_pos = position;
         if (instantly)
             applyNow();
     }
 
-    void moveToDefault(bool instantly = false)  
-    { 
+    void moveToDefault(bool instantly = false)
+    {
         for (byte i=0; i<N_SERVOS; ++i)
             _target_pos[i] = servosMeta[i].def;
- 
+
         if (instantly)
             applyNow();
     }
 
-    void stop() 
-    { 
+    void stop()
+    {
         for (byte i=0; i<N_SERVOS; ++i)
             _velocities[i] = 0;
-        _target_pos = current_pos; 
+        _target_pos = current_pos;
     }
 
 
@@ -144,13 +144,13 @@ public:
 
 
 
-    bool isReady() 
-    {         
+    bool isReady()
+    {
         bool result = true;
         for (byte i=0; i<N_SERVOS; ++i)
             if (current_pos[i] != _target_pos[i])
                 result = false;
-        return result;    
+        return result;
     }
 
     void tick()
@@ -174,7 +174,7 @@ public:
 
                 int pos_old = DESCALE(current_pos[i]);
                 current_pos[i] = constrain(current_pos[i] + v, servosMeta[i].min, servosMeta[i].max);
-                
+
                 int pos_new = DESCALE(current_pos[i]);
                 if (pos_old != pos_new)
                 {
@@ -189,7 +189,7 @@ public:
                 int pos_old = DESCALE(current_pos[i]);
                 current_pos[i] = constrain(current_pos[i] + _velocities[i], servosMeta[i].min, servosMeta[i].max);
                 _target_pos[i] = current_pos[i];
-                
+
                 int pos_new = DESCALE(current_pos[i]);
                 if (pos_old != pos_new)
                 {

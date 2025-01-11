@@ -370,7 +370,7 @@ void showFps()
   static uint32_t nFrames = 0;
   static uint32_t tmr = millis();
 
-  if (nFrames >= FPS_FRAMES_COUNT) 
+  if (nFrames >= FPS_FRAMES_COUNT)
   {
       float fps = nFrames * 1000. / (millis() - tmr);
       tmr = millis();
