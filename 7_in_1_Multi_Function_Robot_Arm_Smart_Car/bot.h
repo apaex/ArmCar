@@ -1,6 +1,8 @@
 #pragma once
+#include "settings.h"
 #include "hand.h"
 #include "chassis.h"
+#include "debug.h"
 
 
 class Bot
@@ -13,7 +15,7 @@ public:
     bool bumperSensorLeft = 0;
     bool bumperSensorRight = 0;
 
-    float distanceSensor = 0;
+    uint16_t distanceSensor = 0;
 
     Chassis chassis;
     Hand hand;
@@ -27,8 +29,8 @@ public:
 
     void readBumperSensors()
     {
-        bumperSensorLeft = digitalRead(PIN_BUMPER_LEFT);
-        bumperSensorRight = digitalRead(PIN_BUMPER_RIGHT);
+        bumperSensorLeft = !digitalRead(PIN_BUMPER_LEFT);
+        bumperSensorRight = !digitalRead(PIN_BUMPER_RIGHT);
     }
 
     void measureDistance()
@@ -39,7 +41,7 @@ public:
         delayMicroseconds(10);
         digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
 
-        distanceSensor = pulseIn(PIN_ULTRASOIC_ECHO, HIGH) / 58.00;
+        distanceSensor = uint16_t((PIN_ULTRASOIC_ECHO, HIGH) / 5.8);
     }
 
     void init()
@@ -50,11 +52,28 @@ public:
 
     void readSensors()
     {
-        if (chassis.isMoving())
+        //if (chassis.isMoving())
         {
+            bool trackingSensorLeft_old = trackingSensorLeft;
+            bool trackingSensorCenter_old = trackingSensorCenter;
+            bool trackingSensorRight_old = trackingSensorRight;
+            bool bumperSensorLeft_old = bumperSensorLeft;
+            bool bumperSensorRight_old = bumperSensorRight;
+            uint16_t distanceSensor_old = distanceSensor;
+
             readTrackerSensors();
             readBumperSensors();
             measureDistance();
+
+            if (
+                trackingSensorLeft_old != trackingSensorLeft ||
+                trackingSensorCenter_old != trackingSensorCenter ||
+                trackingSensorRight_old != trackingSensorRight ||
+                bumperSensorLeft_old != bumperSensorLeft ||
+                bumperSensorRight_old != bumperSensorRight ||
+                distanceSensor_old != distanceSensor )
+                //SerialPrintf("Tracking: %d%d%d, Distance: %d, Bumper: %d%d\n", trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
+            ;
         }
     }
 
