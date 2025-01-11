@@ -57,3 +57,6 @@
 #define SERVO_SCALE_FACTOR 3                                // ((2400-544) << 3)/255 = 58 шагов на самой быстрой скорости [шаг 3 градуса]
 #define SERVO_POLLING_PERIOD (48 >> SERVO_SCALE_FACTOR)     // по (48 >> 3) = 6 мс
 #define SERVO_DEFAULT_VELOCITY 64
+
+#define BAUD_RATE 115200
+#define SERIAL_TIMEOUT 5

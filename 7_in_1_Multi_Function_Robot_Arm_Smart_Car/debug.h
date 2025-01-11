@@ -83,6 +83,24 @@ void DebugWrite(const char *st, const T arr[], int n) {
   Serial.println("");
 }
 
+#define FPS_FRAMES_COUNT 25000
+
+void showFps()
+{
+  static uint32_t nFrames = 0;
+  static uint32_t tmr = millis();
+
+  if (nFrames >= FPS_FRAMES_COUNT)
+  {
+      float fps = nFrames * 1000. / (millis() - tmr);
+      tmr = millis();
+      nFrames = 0;
+      DebugWrite("fps", fps);
+  }
+  ++nFrames;
+}
+
+
 #else
 
 template<class T>

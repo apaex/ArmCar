@@ -1,3 +1,4 @@
+#include <CRC.h>
 #include "IR_remote.h"
 #include "keymap.h"
 #include "settings.h"
@@ -304,11 +305,23 @@ void UART_control()
   if (ch == '#')
   {
     GamepadData package;
-    int res = Serial.readBytes((char*)&package, sizeof(package));
-    if (res == sizeof(package))
-      gamepadControl(package);
-    else
+    size_t res = Serial.readBytes((char*)&package, sizeof(package));
+    if (res != sizeof(package))
+    {
       DebugWrite("ERROR: size of data package=", res);
+      return;
+    }
+    int8_t crc = -1;
+    res = Serial.readBytes((char*)&crc, 1);
+
+    int8_t crc2 = calcCRC8((byte*)&package, sizeof(package));
+    if (crc != crc2)
+    {
+      DebugWrite("ERROR: crc of data package=", crc);
+      return;
+    }
+
+    gamepadControl(package);
   }
   else
     commandInterpretator(ch);
@@ -316,7 +329,8 @@ void UART_control()
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(BAUD_RATE);
+  Serial.setTimeout(SERIAL_TIMEOUT);
 
   pinMode(PIN_MOTOR_LEFT_DIRECTION, OUTPUT);
   pinMode(PIN_MOTOR_LEFT_PWM, OUTPUT);
@@ -334,24 +348,6 @@ void setup()
 
   bot.init();
 }
-
-#define FPS_FRAMES_COUNT 25000
-
-void showFps()
-{
-  static uint32_t nFrames = 0;
-  static uint32_t tmr = millis();
-
-  if (nFrames >= FPS_FRAMES_COUNT)
-  {
-      float fps = nFrames * 1000. / (millis() - tmr);
-      tmr = millis();
-      nFrames = 0;
-      DebugWrite("fps", fps);
-  }
-  ++nFrames;
-}
-
 
 void loop()
 {
