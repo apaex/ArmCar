@@ -47,22 +47,22 @@ void storePosition()
 
 void Line_tracking_Function()
 {
-  if (!bot.trackingSensorLeft && bot.trackingSensorCenter && !bot.trackingSensorRight)
+  if (bot.trackingSensorLeft && !bot.trackingSensorCenter && bot.trackingSensorRight)
     bot.chassis.moveForward(120);
 
-  else if (bot.trackingSensorLeft && !bot.trackingSensorRight)
-    bot.chassis.rotateLeft(bot.trackingSensorCenter ? 80 : 120);
-
   else if (!bot.trackingSensorLeft && bot.trackingSensorRight)
-    bot.chassis.rotateRight(bot.trackingSensorCenter ? 80 : 120);
+    bot.chassis.rotateLeft(!bot.trackingSensorCenter ? 80 : 120);
 
-  else if (bot.trackingSensorLeft && bot.trackingSensorCenter && bot.trackingSensorRight)
+  else if (bot.trackingSensorLeft && !bot.trackingSensorRight)
+    bot.chassis.rotateRight(!bot.trackingSensorCenter ? 80 : 120);
+
+  else if (!bot.trackingSensorLeft && !bot.trackingSensorCenter && !bot.trackingSensorRight)
     bot.chassis.stop();
 }
 
 void Anti_drop_Function()
 {
-  if (!bot.trackingSensorLeft && !bot.trackingSensorCenter && !bot.trackingSensorRight)
+  if (bot.trackingSensorLeft && bot.trackingSensorCenter && bot.trackingSensorRight)
     bot.chassis.moveForward(60);
   else
   {

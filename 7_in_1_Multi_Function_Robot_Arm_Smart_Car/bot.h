@@ -22,9 +22,9 @@ public:
 
     void readTrackerSensors()
     {
-        trackingSensorLeft = digitalRead(PIN_TRACKER_LEFT);
-        trackingSensorCenter = digitalRead(PIN_TRACKER_CENTER);
-        trackingSensorRight = digitalRead(PIN_TRACKER_RIGHT);
+        trackingSensorLeft = !digitalRead(PIN_TRACKER_LEFT);
+        trackingSensorCenter = !digitalRead(PIN_TRACKER_CENTER);
+        trackingSensorRight = !digitalRead(PIN_TRACKER_RIGHT);
     }
 
     void readBumperSensors()
