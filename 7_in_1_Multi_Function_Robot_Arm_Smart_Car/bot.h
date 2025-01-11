@@ -88,3 +88,6 @@ public:
         chassis.tick();
     }
 };
+
+
+extern Bot bot;

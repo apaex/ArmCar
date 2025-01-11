@@ -132,8 +132,7 @@ void gamepadControl(const GamepadData &package)
 
   int axisY = package.axisY;
   int axisRX = package.axisRX;
-  int brake = package.brake;
-  int throttle = package.throttle;
+  int axisT = package.throttle - package.brake;
 
   //DebugWrite("vx-rz", vx, rz);
 
@@ -144,11 +143,13 @@ void gamepadControl(const GamepadData &package)
 
   axisY = map(axisY, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255);
   axisRX = map(axisRX, GAMEPAD_RX_MIN, GAMEPAD_RX_MAX, -255, 255);
+  axisT = map(axisT, GAMEPAD_T_MIN, GAMEPAD_T_MAX, -255, 255);
 
 
   if (gamepadMode == 0)
   {
-    int vx = -axisY;
+//    int vx = -axisY;
+    int vx = axisT-axisY;
     int rz = -axisRX;
 
     rz /= 1.5;
@@ -164,7 +165,7 @@ void gamepadControl(const GamepadData &package)
   {
     int r_base = -axisRX;
     int r_arm = axisY;
-    int r_claw = brake - throttle;
+    int r_claw = axisT;
 
     bot.hand.setVelocities(r_base, r_arm, r_claw);
   }
