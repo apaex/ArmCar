@@ -5,16 +5,12 @@
 #include "chassis.h"
 #include "queue.h"
 #include "gamepad.h"
+#include "bot.h"
 #include "debug.h"
 
 IRremote ir(PIN_IR);
 
-Hand hand;
-Chassis chassis;
-
-bool trackingSensorLeft = 0;
-bool trackingSensorCenter = 0;
-bool trackingSensorRight = 0;
+Bot bot;
 
 int speed = SPEED_LOW;
 
@@ -43,107 +39,83 @@ int nActions = 0;
 int currentAction = -1;
 bool programMayBeRewrite = true;
 
-void readTrackerSensors()
-{
-  trackingSensorLeft = digitalRead(PIN_TRACKER_LEFT);
-  trackingSensorCenter = digitalRead(PIN_TRACKER_CENTER);
-  trackingSensorRight = digitalRead(PIN_TRACKER_RIGHT);
-}
-
-float measureDistance()
-{
-  digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
-  delayMicroseconds(2);
-  digitalWrite(PIN_ULTRASOIC_TRIG, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
-
-  float distance = pulseIn(PIN_ULTRASOIC_ECHO, HIGH) / 58.00;
-  delay(10);
-  return distance;
-}
-
 void storePosition()
 {
   if (nActions < ACTIONS_COUNT)
-    mem[nActions++] = hand.current_pos;
+    mem[nActions++] = bot.hand.current_pos;
 }
 
 void Line_tracking_Function()
 {
-  if (!trackingSensorLeft && trackingSensorCenter && !trackingSensorRight)
-    chassis.moveForward(120);
+  if (!bot.trackingSensorLeft && bot.trackingSensorCenter && !bot.trackingSensorRight)
+    bot.chassis.moveForward(120);
 
-  else if (trackingSensorLeft && !trackingSensorRight)
-    chassis.rotateLeft(trackingSensorCenter ? 80 : 120);
+  else if (bot.trackingSensorLeft && !bot.trackingSensorRight)
+    bot.chassis.rotateLeft(bot.trackingSensorCenter ? 80 : 120);
 
-  else if (!trackingSensorLeft && trackingSensorRight)
-    chassis.rotateRight(trackingSensorCenter ? 80 : 120);
+  else if (!bot.trackingSensorLeft && bot.trackingSensorRight)
+    bot.chassis.rotateRight(bot.trackingSensorCenter ? 80 : 120);
 
-  else if (trackingSensorLeft && trackingSensorCenter && trackingSensorRight)
-    chassis.stop();
+  else if (bot.trackingSensorLeft && bot.trackingSensorCenter && bot.trackingSensorRight)
+    bot.chassis.stop();
 }
 
 void Anti_drop_Function()
 {
-  if (!trackingSensorLeft && !trackingSensorCenter && !trackingSensorRight)
-    chassis.moveForward(60);
+  if (!bot.trackingSensorLeft && !bot.trackingSensorCenter && !bot.trackingSensorRight)
+    bot.chassis.moveForward(60);
   else
   {
     //push(MOVE_BACKWARD, 60, 200);
     //push(ROTATE_LEFT, 60, 500);
 
-    chassis.moveBackward(60);
+    bot.chassis.moveBackward(60);
     delay(600);
-    chassis.rotateLeft(60);
+    bot.chassis.rotateLeft(60);
     delay(500);
   }
 }
 
 void Following_Function()
 {
-  int dist = measureDistance();
-
-  if (dist < 15)
-    chassis.moveBackward(80);
-  else if (dist <= 20)
-    chassis.stop();
-  else if (dist <= 25)
-    chassis.moveForward(80);
-  else if (dist <= 30)
-    chassis.moveForward(100);
+  if (bot.distanceSensor < 15)
+    bot.chassis.moveBackward(80);
+  else if (bot.distanceSensor <= 20)
+    bot.chassis.stop();
+  else if (bot.distanceSensor <= 25)
+    bot.chassis.moveForward(80);
+  else if (bot.distanceSensor <= 30)
+    bot.chassis.moveForward(100);
   else
-    chassis.stop();
+    bot.chassis.stop();
 }
 
 void Avoidance_Function()
 {
-  int dist = measureDistance();
-
-  if (dist <= 25)
+  if (bot.distanceSensor <= 25)
   {
-    chassis.stop();
+    bot.chassis.stop();
     delay(100);
-    if (dist <= 15)
-      chassis.moveBackward(100);
+    if (bot.distanceSensor <= 15)
+      bot.chassis.moveBackward(100);
     else
-      chassis.rotateLeft(100);
+      bot.chassis.rotateLeft(100);
     delay(600);
   }
   else
-    chassis.moveForward(70);
+    bot.chassis.moveForward(70);
 }
 
 
 void auto_do()
 {
-  if (!hand.isReady())
+  if (!bot.hand.isReady())
     return;
 
   if (++currentAction >= nActions)
     currentAction = 0;
 
-  hand.moveTo(mem[currentAction]);
+  bot.hand.moveTo(mem[currentAction]);
 }
 
 
@@ -186,7 +158,7 @@ void gamepadControl(const GamepadData &package)
       rz /= 2;
     }
 
-    chassis.setVelocities(vx, rz, true);
+    bot.chassis.setVelocities(vx, rz, true);
   }
   else if (gamepadMode == 1)
   {
@@ -194,7 +166,7 @@ void gamepadControl(const GamepadData &package)
     int r_arm = axisY;
     int r_claw = brake - throttle;
 
-    hand.setVelocities(r_base, r_arm, r_claw);
+    bot.hand.setVelocities(r_base, r_arm, r_claw);
   }
 }
 
@@ -210,19 +182,19 @@ void startProgram(Program _program)
 
   switch (program)
   {
-    case PRG_MOVING_FORWARD:  chassis.moveForward(speed);  break;
-    case PRG_MOVING_BACKWARD: chassis.moveBackward(speed); break;
-    case PRG_TURNING_LEFT:    chassis.rotateRight(speed);  break;
-    case PRG_TURNING_RIGHT:   chassis.rotateLeft(speed);   break;
+    case PRG_MOVING_FORWARD:  bot.chassis.moveForward(speed);  break;
+    case PRG_MOVING_BACKWARD: bot.chassis.moveBackward(speed); break;
+    case PRG_TURNING_LEFT:    bot.chassis.rotateRight(speed);  break;
+    case PRG_TURNING_RIGHT:   bot.chassis.rotateLeft(speed);   break;
 
-    case PRG_CLAW_OPENING:        hand.clawOpen();       break;
-    case PRG_CLAW_CLOSING:        hand.clawClose();      break;
-    case PRG_ARM_RISING:          hand.armRise();        break;
-    case PRG_ARM_DESCENDING:      hand.armDescend();     break;
-    case PRG_BASE_TURNING_LEFT:   hand.baseTurnLeft();   break;
-    case PRG_BASE_TURNING_RIGHT:  hand.baseTurnRight();  break;
+    case PRG_CLAW_OPENING:        bot.hand.clawOpen();       break;
+    case PRG_CLAW_CLOSING:        bot.hand.clawClose();      break;
+    case PRG_ARM_RISING:          bot.hand.armRise();        break;
+    case PRG_ARM_DESCENDING:      bot.hand.armDescend();     break;
+    case PRG_BASE_TURNING_LEFT:   bot.hand.baseTurnLeft();   break;
+    case PRG_BASE_TURNING_RIGHT:  bot.hand.baseTurnRight();  break;
 
-    case PRG_NONE:            chassis.stop(); hand.stop(); break;
+    case PRG_NONE:            bot.chassis.stop(); bot.hand.stop();  break;
   }
 }
 
@@ -243,7 +215,7 @@ void commandInterpretator(char cmd)
       case 'd': startProgram(PRG_ARM_DESCENDING);       break;
       case 'l': startProgram(PRG_BASE_TURNING_LEFT);    break;
       case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   break;
-      case 'x': hand.moveToDefault(); break;
+      case 'x': bot.hand.moveToDefault(); break;
 
       case 'G':
       case 'S': startProgram(PRG_NONE);                 break;
@@ -315,9 +287,9 @@ void IR_control()
 
   // test
   if (code == IR_KEYCODE_1)
-    hand.baseAngle(180);
+    bot.hand.baseAngle(180);
   else if (code == IR_KEYCODE_3)
-    hand.baseAngle(0);
+    bot.hand.baseAngle(0);
 }
 
 
@@ -353,12 +325,13 @@ void setup()
   pinMode(PIN_TRACKER_LEFT, INPUT);
   pinMode(PIN_TRACKER_CENTER, INPUT);
   pinMode(PIN_TRACKER_RIGHT, INPUT);
+  pinMode(PIN_BUMPER_LEFT, INPUT);
+  pinMode(PIN_BUMPER_RIGHT, INPUT);
 
   pinMode(PIN_ULTRASOIC_TRIG, OUTPUT);
   pinMode(PIN_ULTRASOIC_ECHO, INPUT);
 
-  hand.init();
-  chassis.init();
+  bot.init();
 }
 
 #define FPS_FRAMES_COUNT 25000
@@ -386,8 +359,7 @@ void loop()
   IR_control();
   UART_control();
 
-  if (chassis.isMoving())
-    readTrackerSensors();
+  bot.readSensors();
 
   switch (program)
   {
@@ -398,6 +370,5 @@ void loop()
     case PRG_LINE_TRACKING:       Line_tracking_Function();   break;
   }
 
-  hand.tick();
-  chassis.tick();
+  bot.tick();
 }
