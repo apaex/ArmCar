@@ -15,7 +15,7 @@ public:
     bool bumperSensorLeft = 0;
     bool bumperSensorRight = 0;
 
-    uint16_t distanceSensor = 0;
+    uint8_t distanceSensor = 0;
 
     Chassis chassis;
     Hand hand;
@@ -41,7 +41,7 @@ public:
         delayMicroseconds(10);
         digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
 
-        distanceSensor = uint16_t((PIN_ULTRASOIC_ECHO, HIGH) / 5.8);
+        distanceSensor = pulseIn(PIN_ULTRASOIC_ECHO, HIGH) / 58;
     }
 
     void init()
@@ -59,7 +59,7 @@ public:
             bool trackingSensorRight_old = trackingSensorRight;
             bool bumperSensorLeft_old = bumperSensorLeft;
             bool bumperSensorRight_old = bumperSensorRight;
-            uint16_t distanceSensor_old = distanceSensor;
+            uint8_t distanceSensor_old = distanceSensor;
 
             readTrackerSensors();
             readBumperSensors();
@@ -72,7 +72,7 @@ public:
                 bumperSensorLeft_old != bumperSensorLeft ||
                 bumperSensorRight_old != bumperSensorRight ||
                 distanceSensor_old != distanceSensor )
-                //SerialPrintf("Tracking: %d%d%d, Distance: %d, Bumper: %d%d\n", trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
+                SerialPrintf("Tracking: %d%d%d, Distance: %d, Bumper: %d%d\n", trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
             ;
         }
     }
