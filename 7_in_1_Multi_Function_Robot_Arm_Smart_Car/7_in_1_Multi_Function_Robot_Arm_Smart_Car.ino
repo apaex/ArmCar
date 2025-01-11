@@ -388,7 +388,8 @@ void loop()
   IR_control();
   UART_control();
 
-  readTrackerSensors();
+  if (chassis.isMoving())
+    readTrackerSensors();
 
   switch (program)
   {

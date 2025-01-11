@@ -70,7 +70,7 @@ class Hand
     {
         current_pos = _target_pos;
         for (byte i=0; i<N_SERVOS; ++i)
-            servos[i].writeMicroseconds(DESCALE(current_pos[i])); 
+            servos[i].writeMicroseconds(DESCALE(current_pos[i]));
     }
 
 public:

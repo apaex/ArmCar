@@ -4,12 +4,34 @@
 #include "settings.h"
 #include "debug.h"
 
+enum ChassisState
+{
+    MOVING_STOP,
+    MOVING_FORWARD,
+    MOVING_BACKWARD,
+    MOVING_LEFT,
+    MOVING_RIGHT
+};
+
 class Chassis
 {
     GMotor motorL;
     GMotor motorR;
     int _dutyL = 0;
     int _dutyR = 0;
+    ChassisState _state = MOVING_STOP;
+
+    void setState(int dutyL, int dutyR)
+    {
+        if (_dutyL == _dutyR) {
+            if (_dutyL == 0) _state = MOVING_STOP;
+            else if (_dutyL > 0) _state = MOVING_FORWARD;
+            else if (_dutyL < 0) _state = MOVING_BACKWARD;
+        }
+        else if (_dutyL < _dutyR) _state = MOVING_LEFT;
+        else if (_dutyL > _dutyR) _state = MOVING_RIGHT;
+    }
+
 public:
     Chassis(): motorL(DRIVER2WIRE_NO_INVERT, PIN_MOTOR_LEFT_DIRECTION, PIN_MOTOR_LEFT_PWM, HIGH),
                motorR(DRIVER2WIRE_NO_INVERT, PIN_MOTOR_RIGHT_DIRECTION, PIN_MOTOR_RIGHT_PWM, HIGH)
@@ -40,6 +62,7 @@ public:
         _dutyL = constrain(dutyL, -255, 255);
         _dutyR = constrain(dutyR, -255, 255);
 
+        setState(_dutyL, _dutyR);
         //DebugWrite("dL-dR", _dutyL, _dutyR);
 
         if (instantly)
@@ -72,5 +95,10 @@ public:
             motorL.smoothTick(_dutyL);
         if (motorR._duty != _dutyR)
             motorR.smoothTick(_dutyR);
+    }
+
+    bool isMoving() const
+    {
+        return _state != MOVING_STOP;
     }
 };
