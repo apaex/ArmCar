@@ -66,6 +66,9 @@ class Hand
     HandPosition _target_pos;
     HandPosition _velocities;
 
+    void setVelocity(int servo, int speed) { _velocities[servo] = speed; _target_pos[servo] = current_pos[servo]; }
+    void setTarget(int servo, int angle) { _target_pos[servo] = angle; _velocities[servo] = 0; }
+
     void applyNow()
     {
         current_pos = _target_pos;
@@ -73,23 +76,31 @@ class Hand
             servos[i].writeMicroseconds(DESCALE(current_pos[i]));
     }
 
+
 public:
     HandPosition current_pos;
 
     void init()
     {
-        for (byte i=0; i<N_SERVOS; ++i)
-        {
-            servos[i].attach(servosMeta[i].pin);
-            _target_pos[i] = servosMeta[i].def;
-            _velocities[i] = 0;
-        }
-        applyNow();
+        attach();
+        moveToDefault();
     }
 
-    void baseVelocity(int speed)   { _target_pos[SERVO_BASE] = current_pos[SERVO_BASE]; _velocities[SERVO_BASE] = speed; }
-    void armVelocity(int speed)    { _target_pos[SERVO_ARM] = current_pos[SERVO_ARM];   _velocities[SERVO_ARM] = speed;  }
-    void clawVelocity(int speed)   { _target_pos[SERVO_CLAW] = current_pos[SERVO_CLAW]; _velocities[SERVO_CLAW] = speed; }
+    void attach()
+    {
+        for (byte i=0; i<N_SERVOS; ++i)
+            servos[i].attach(servosMeta[i].pin);
+    }
+
+    void detach()
+    {
+        for (byte i=0; i<N_SERVOS; ++i)
+            servos[i].detach();
+    }
+
+    void baseVelocity(int speed)   { setVelocity(SERVO_BASE, speed); }
+    void armVelocity(int speed)    { setVelocity(SERVO_ARM, speed); }
+    void clawVelocity(int speed)   { setVelocity(SERVO_CLAW, speed); }
 
     void setVelocities(int r_base, int r_arm, int r_claw)
     {
@@ -98,9 +109,10 @@ public:
         clawVelocity(r_claw);
     }
 
-    void baseAngle(int angle)      { _target_pos[SERVO_BASE] = SCALE(angle); _velocities[SERVO_BASE] = 0; }
-    void armAngle(int angle)       { _target_pos[SERVO_ARM] = SCALE(angle);  _velocities[SERVO_ARM] = 0;  }
-    void clawAngle(int angle)      { _target_pos[SERVO_CLAW] = SCALE(angle); _velocities[SERVO_CLAW] = 0; }
+
+    void baseAngle(int angle)      { setTarget(SERVO_BASE, SCALE(angle)); }
+    void armAngle(int angle)       { setTarget(SERVO_ARM, SCALE(angle)); }
+    void clawAngle(int angle)      { setTarget(SERVO_CLAW, SCALE(angle)); }
 
     void setAngles(int a_base, int a_arm, int a_claw)
     {
@@ -111,7 +123,9 @@ public:
 
     void moveTo(HandPosition position, bool instantly = false)
     {
-        _target_pos = position;
+        for (byte i=0; i<N_SERVOS; ++i)
+            setTarget(i, position[i]);
+
         if (instantly)
             applyNow();
     }
@@ -119,7 +133,7 @@ public:
     void moveToDefault(bool instantly = false)
     {
         for (byte i=0; i<N_SERVOS; ++i)
-            _target_pos[i] = servosMeta[i].def;
+            setTarget(i, servosMeta[i].def);
 
         if (instantly)
             applyNow();
@@ -128,18 +142,17 @@ public:
     void stop()
     {
         for (byte i=0; i<N_SERVOS; ++i)
-            _velocities[i] = 0;
-        _target_pos = current_pos;
+            setTarget(i, current_pos[i]);
     }
 
 
 
-    void baseTurnLeft()   { _target_pos[SERVO_BASE] = servosMeta[SERVO_BASE].max;  }
-    void baseTurnRight()  { _target_pos[SERVO_BASE] = servosMeta[SERVO_BASE].min;  }
-    void armRise()        { _target_pos[SERVO_ARM] = servosMeta[SERVO_ARM].min;    }
-    void armDescend()     { _target_pos[SERVO_ARM] = servosMeta[SERVO_ARM].max;    }
-    void clawOpen()       { _target_pos[SERVO_CLAW] = servosMeta[SERVO_CLAW].min;  }
-    void clawClose()      { _target_pos[SERVO_CLAW] = servosMeta[SERVO_CLAW].max;  }
+    void baseTurnLeft()   { setTarget(SERVO_BASE, servosMeta[SERVO_BASE].max);  }
+    void baseTurnRight()  { setTarget(SERVO_BASE, servosMeta[SERVO_BASE].min);  }
+    void armRise()        { setTarget(SERVO_ARM, servosMeta[SERVO_ARM].min);    }
+    void armDescend()     { setTarget(SERVO_ARM, servosMeta[SERVO_ARM].max);    }
+    void clawOpen()       { setTarget(SERVO_CLAW, servosMeta[SERVO_CLAW].min);  }
+    void clawClose()      { setTarget(SERVO_CLAW, servosMeta[SERVO_CLAW].max);  }
 
 
 
@@ -148,7 +161,7 @@ public:
     {
         bool result = true;
         for (byte i=0; i<N_SERVOS; ++i)
-            if (current_pos[i] != _target_pos[i])
+            if (current_pos[i] != _target_pos[i] || _velocities[i])
                 result = false;
         return result;
     }
@@ -166,36 +179,28 @@ public:
 
         for (byte i=0; i<N_SERVOS; ++i)
         {
+            int pos_old = current_pos[i];
+
             if (current_pos[i] - _target_pos[i])
             {
                 int v = (current_pos[i] < _target_pos[i] ? SERVO_DEFAULT_VELOCITY : -SERVO_DEFAULT_VELOCITY);
                 if (abs((_target_pos[i] - current_pos[i])) < SERVO_DEFAULT_VELOCITY )
                     v = _target_pos[i] - current_pos[i];
 
-                int pos_old = DESCALE(current_pos[i]);
                 current_pos[i] = constrain(current_pos[i] + v, servosMeta[i].min, servosMeta[i].max);
-
-                int pos_new = DESCALE(current_pos[i]);
-                if (pos_old != pos_new)
-                {
-                    servos[i].writeMicroseconds(pos_new);
-                    //DebugWrite("pos", pos_new);
-                }
+                _velocities[i] = 0;
             }
-
 
             if (_velocities[i])
             {
-                int pos_old = DESCALE(current_pos[i]);
                 current_pos[i] = constrain(current_pos[i] + _velocities[i], servosMeta[i].min, servosMeta[i].max);
                 _target_pos[i] = current_pos[i];
+            }
 
-                int pos_new = DESCALE(current_pos[i]);
-                if (pos_old != pos_new)
-                {
-                    servos[i].writeMicroseconds(pos_new);
-                    //DebugWrite("pos", pos_new);
-                }
+            if (pos_old != current_pos[i])
+            {
+                servos[i].writeMicroseconds(DESCALE(current_pos[i]));
+                //DebugWrite("pos", DESCALE(current_pos[i]));
             }
         }
     }
