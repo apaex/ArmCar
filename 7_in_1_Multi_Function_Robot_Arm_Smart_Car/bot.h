@@ -35,6 +35,11 @@ public:
 
     void measureDistance()
     {
+        static uint32_t tmr;
+        if (millis() - tmr < 10)
+            return;
+        tmr = millis();
+
         digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
         delayMicroseconds(2);
         digitalWrite(PIN_ULTRASOIC_TRIG, HIGH);
@@ -52,7 +57,7 @@ public:
 
     void readSensors()
     {
-        //if (chassis.isMoving())
+        if (chassis.isMoving())
         {
             bool trackingSensorLeft_old = trackingSensorLeft;
             bool trackingSensorCenter_old = trackingSensorCenter;
@@ -71,8 +76,8 @@ public:
                 trackingSensorRight_old != trackingSensorRight ||
                 bumperSensorLeft_old != bumperSensorLeft ||
                 bumperSensorRight_old != bumperSensorRight ||
-                distanceSensor_old != distanceSensor )
-                SerialPrintf("Tracking: %d%d%d, Distance: %d, Bumper: %d%d\n", trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
+                abs(distanceSensor_old - distanceSensor) > 1)
+                //SerialPrintf("Tracking: %d%d%d, Distance: %d, Bumper: %d%d\n", trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
             ;
         }
     }
