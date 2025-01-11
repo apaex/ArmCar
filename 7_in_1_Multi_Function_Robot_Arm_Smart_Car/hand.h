@@ -83,7 +83,7 @@ public:
     void init()
     {
         attach();
-        moveToDefault();
+        moveToDefault(true);
     }
 
     void attach()
