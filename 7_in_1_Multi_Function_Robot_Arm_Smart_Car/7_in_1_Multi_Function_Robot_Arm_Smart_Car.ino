@@ -331,6 +331,7 @@ void setup()
 {
   Serial.begin(BAUD_RATE);
   Serial.setTimeout(SERIAL_TIMEOUT);
+  Serial.println("Start");
 
   pinMode(PIN_MOTOR_LEFT_DIRECTION, OUTPUT);
   pinMode(PIN_MOTOR_LEFT_PWM, OUTPUT);
