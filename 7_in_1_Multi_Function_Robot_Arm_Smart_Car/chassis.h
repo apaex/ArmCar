@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GyverMotor.h>
+#include <GyverMotor2.h>
 #include "settings.h"
 #include "debug.h"
 
@@ -15,42 +15,35 @@ enum ChassisState
 
 class Chassis
 {
-    GMotor motorL;
-    GMotor motorR;
-    int _dutyL = 0;
-    int _dutyR = 0;
+    GMotor2<DRIVER2WIRE_NO_INVERT> motorL;
+    GMotor2<DRIVER2WIRE_NO_INVERT> motorR;
     ChassisState _state = MOVING_STOP;
 
     void setState(int dutyL, int dutyR)
     {
-        if (_dutyL == _dutyR) {
-            if (_dutyL == 0) _state = MOVING_STOP;
-            else if (_dutyL > 0) _state = MOVING_FORWARD;
-            else if (_dutyL < 0) _state = MOVING_BACKWARD;
+        if (dutyL == dutyR) {
+            if (dutyL == 0) _state = MOVING_STOP;
+            else if (dutyL > 0) _state = MOVING_FORWARD;
+            else if (dutyL < 0) _state = MOVING_BACKWARD;
         }
-        else if (_dutyL < _dutyR) _state = MOVING_LEFT;
-        else if (_dutyL > _dutyR) _state = MOVING_RIGHT;
+        else if (dutyL < dutyR) _state = MOVING_LEFT;
+        else if (dutyL > dutyR) _state = MOVING_RIGHT;
     }
 
 public:
-    Chassis(): motorL(DRIVER2WIRE_NO_INVERT, PIN_MOTOR_LEFT_DIRECTION, PIN_MOTOR_LEFT_PWM, HIGH),
-               motorR(DRIVER2WIRE_NO_INVERT, PIN_MOTOR_RIGHT_DIRECTION, PIN_MOTOR_RIGHT_PWM, HIGH)
+    Chassis(): motorL(PIN_MOTOR_LEFT_DIRECTION, PIN_MOTOR_LEFT_PWM),
+               motorR(PIN_MOTOR_RIGHT_DIRECTION, PIN_MOTOR_RIGHT_PWM)
     {
-
     }
 
     void init()
     {
-        motorL.setMode(AUTO);
-        motorR.setMode(AUTO);
-
-        // направление гусениц
-        motorL.setDirection(REVERSE);
-        motorR.setDirection(NORMAL);
-
         // мин. сигнал вращения
         motorL.setMinDuty(MOTOR_MIN_DUTY);
         motorR.setMinDuty(MOTOR_MIN_DUTY);
+
+        motorL.smoothMode(false);
+        motorR.smoothMode(false);
 
         // плавность скорости моторов
         motorL.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
@@ -59,17 +52,15 @@ public:
 
     void setMotorSpeeds(int dutyL, int dutyR, bool instantly = false)
     {
-        _dutyL = constrain(dutyL, -255, 255);
-        _dutyR = constrain(dutyR, -255, 255);
+        dutyL = constrain(dutyL, -255, 255);
+        dutyR = constrain(dutyR, -255, 255);
 
-        setState(_dutyL, _dutyR);
-        //DebugWrite("dL-dR", _dutyL, _dutyR);
+        setState(dutyL, dutyR);
 
-        if (instantly)
-        {
-            motorL.setSpeed(_dutyL);
-            motorR.setSpeed(_dutyR);
-        }
+        //DebugWrite("dl-dr", _dutyL, _dutyR);
+        motorR.smoothMode(!instantly);
+        motorL.setSpeed(-dutyL);
+        motorR.setSpeed(dutyR);
     }
 
     void setVelocities(int vx, int rz, bool instantly = false)
@@ -89,12 +80,8 @@ public:
 
     void tick()
     {
-        //DebugWrite("dl-dr", (motorL._duty - _dutyL), (motorR._duty - _dutyR));
-
-        if (motorL._duty != _dutyL)
-            motorL.smoothTick(_dutyL);
-        if (motorR._duty != _dutyR)
-            motorR.smoothTick(_dutyR);
+        motorL.tick();
+        motorR.tick();
     }
 
     bool isMoving() const
