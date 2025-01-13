@@ -163,11 +163,16 @@ void gamepadControl(const GamepadData &package)
   }
   else if (gamepadMode == 1)
   {
-    int r_base = -axisRX;
-    int r_arm = axisY;
-    int r_claw = axisT;
+    if (package.buttons & 0x0200)
+      bot.hand.moveToDefault();
+    else
+    {
+      int r_base = -axisRX;
+      int r_arm = axisY;
+      int r_claw = axisT;
 
-    bot.hand.setVelocities(r_base, r_arm, r_claw);
+      bot.hand.setVelocities(r_base, r_arm, r_claw);
+    }
   }
 }
 
