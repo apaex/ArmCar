@@ -149,8 +149,7 @@ void gamepadControl(const GamepadData &package)
 
   if (gamepadMode == 0)
   {
-//    int vx = -axisY;
-    int vx = axisT-axisY;
+    int vx = -axisY;
     int rz = -axisRX;
 
     rz /= 1.5;
