@@ -13,7 +13,7 @@ IRremote ir(PIN_IR);
 
 Bot bot;
 
-int speed = SPEED_LOW;
+int speed = SPEED_MEDIUM;
 
 enum Program
 {
