@@ -1,6 +1,6 @@
 #pragma once
 
-#include "serialPrintf.h"
+#include "printf.h"
 
 const char* debugState(int state)
 {
@@ -31,56 +31,58 @@ const char* debugState(int state)
 
 #include <HardwareSerial.h>
 
+Print* debugStream = &Serial;
+
 void TimePrint() {
 #if DEBUG_TIME_PRINT==1
   int time = millis() / 1000;
-  if (time / 60 / 60 < 10) { Serial.print("0"); }
-  Serial.print(time / 60 / 60);
-  Serial.print(":");
-  if (time / 60 % 60 < 10) { Serial.print("0"); }
-  Serial.print((time / 60) % 60);
-  Serial.print(":");
-  if (time % 60 < 10) { Serial.print("0"); }
-  Serial.print(time % 60);
-  Serial.print(" ");
+  if (time / 60 / 60 < 10) { debugStream->print("0"); }
+  debugStream->print(time / 60 / 60);
+  debugStream->print(":");
+  if (time / 60 % 60 < 10) { debugStream->print("0"); }
+  debugStream->print((time / 60) % 60);
+  debugStream->print(":");
+  if (time % 60 < 10) { debugStream->print("0"); }
+  debugStream->print(time % 60);
+  debugStream->print(" ");
 #endif
 }
 
 template<class T>
 void DebugWrite(T v) {
   TimePrint();
-  Serial.println(v);
+  debugStream->println(v);
 }
 
 template<class T>
 void DebugWrite(const char *st, T v) {
   TimePrint();
-  Serial.print(st);
-  Serial.print(": ");
-  Serial.println(v);
+  debugStream->print(st);
+  debugStream->print(": ");
+  debugStream->println(v);
 }
 
 void DebugWrite(const char *st, int32_t x, int32_t y) {
   TimePrint();
-  Serial.print(st);
-  Serial.print("(");
-  Serial.print(x);
-  Serial.print(',');
-  Serial.print(y);
-  Serial.println(")");
+  debugStream->print(st);
+  debugStream->print("(");
+  debugStream->print(x);
+  debugStream->print(',');
+  debugStream->print(y);
+  debugStream->println(")");
 }
 
 template<class T>
 void DebugWrite(const char *st, const T arr[], int n) {
   TimePrint();
-  Serial.print(st);
-  Serial.print(": ");
+  debugStream->print(st);
+  debugStream->print(": ");
 
   for (int i = 0; i < n; ++i) {
-    Serial.print(arr[i]);
-    Serial.print(',');
+    debugStream->print(arr[i]);
+    debugStream->print(',');
   }
-  Serial.println("");
+  debugStream->println("");
 }
 
 #define FPS_FRAMES_COUNT 25000

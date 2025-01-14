@@ -58,5 +58,9 @@
 #define SERVO_POLLING_PERIOD (48 >> SERVO_SCALE_FACTOR)     // по (48 >> 3) = 6 мс
 #define SERVO_DEFAULT_VELOCITY 64
 
-#define BAUD_RATE 115200
+#define BAUD_RATE 9600
 #define SERIAL_TIMEOUT 1000
+
+#define DISPLAY_NCOL        20           // размер дисплея: ширина
+#define DISPLAY_NROW        4            // размер дисплея: высота
+#define DISPLAY_ADDRESS     0x27         // I2C адрес дисплея (0x27 для PCF8574T, 0x3F для PCF8574AT)

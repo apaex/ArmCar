@@ -8,6 +8,7 @@
 #include "gamepad.h"
 #include "bot.h"
 #include "debug.h"
+#include "lcd.h"
 
 IRremote ir(PIN_IR);
 
@@ -298,6 +299,8 @@ void IR_control()
     bot.hand.baseAngle(0);
 }
 
+int nError = 0;
+int nPacket = 0;
 
 void UART_control()
 {
@@ -313,6 +316,8 @@ void UART_control()
     if (res != sizeof(package))
     {
       DebugWrite("ERROR: size of data package=", res);
+      lcdPrintError("Size error");
+      lcdPrintErrorCount(nError);
       return;
     }
     int8_t crc = -1;
@@ -322,20 +327,29 @@ void UART_control()
     if (crc != crc2)
     {
       DebugWrite("ERROR: crc of data package=", crc);
+      lcdPrintError("CRC error");
+      lcdPrintErrorCount(nError);
       return;
     }
 
+    nPacket++;
+    lcdPrintPacketCount(nPacket);
     gamepadControl(package);
   }
   else
     commandInterpretator(ch);
 }
 
+LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
+
 void setup()
 {
   Serial.begin(BAUD_RATE);
   Serial.setTimeout(SERIAL_TIMEOUT);
   Serial.println("Start");
+
+  lcd.init();
+  lcd.backlight();
 
   pinMode(PIN_MOTOR_LEFT_DIRECTION, OUTPUT);
   pinMode(PIN_MOTOR_LEFT_PWM, OUTPUT);

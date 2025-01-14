@@ -1,12 +1,12 @@
 #pragma once
 
-#include "serialPrintf.h"
+#include "printf.h"
 #include "GamepadData.h"
 
 
 void DebugWrite(const GamepadData& package)
 {
-  SerialPrintf(
+  printf(Serial,
       "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, %4d, brake: %4d, throttle: %4d, misc: 0x%02x\n",
       package.index,        // Controller Index
       package.dpad,         // D-pad
