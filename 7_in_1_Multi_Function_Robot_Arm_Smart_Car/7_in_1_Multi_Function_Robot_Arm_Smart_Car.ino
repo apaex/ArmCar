@@ -299,9 +299,6 @@ void IR_control()
     bot.hand.baseAngle(0);
 }
 
-int nError = 0;
-int nPacket = 0;
-
 void UART_control()
 {
   if (!Serial.available())
@@ -316,8 +313,7 @@ void UART_control()
     if (res != sizeof(package))
     {
       DebugWrite("ERROR: size of data package=", res);
-      lcdPrintError("Size error");
-      lcdPrintErrorCount(nError);
+      lcdSizeError();
       return;
     }
     int8_t crc = -1;
@@ -327,13 +323,10 @@ void UART_control()
     if (crc != crc2)
     {
       DebugWrite("ERROR: crc of data package=", crc);
-      lcdPrintError("CRC error");
-      lcdPrintErrorCount(nError);
+      lcdCrcError();
       return;
     }
 
-    nPacket++;
-    lcdPrintPacketCount(nPacket);
     gamepadControl(package);
   }
   else

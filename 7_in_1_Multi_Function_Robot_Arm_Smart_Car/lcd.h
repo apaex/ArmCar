@@ -12,20 +12,24 @@ void lcd_printAt(uint8_t col, uint8_t row, T param)
 }
 
 
-void lcdPrintError(const char message)
+void lcdPrintError(const char* message)
 {
   lcd.setCursor(0,0);
   lcd.print(message);
 }
 
-void lcdPrintErrorCount(int count)
+void lcdSizeError()
 {
+  static int count = 0;
+  ++count;
   lcd.setCursor(0,1);
-  printf(lcd, "Errors:   %3d", count);
+  printf(lcd, "Size error: %3d", count);
 }
 
-void lcdPrintPacketCount(int count)
+void lcdCrcError()
 {
+  static int count = 0;
+  ++count;
   lcd.setCursor(0,2);
-  printf(lcd, "Packages: %3d", count);
+  printf(lcd, "CRC error:  %3d", count);
 }
