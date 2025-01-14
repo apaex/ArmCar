@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "lcd.h"
 
+LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
 IRremote ir(PIN_IR);
 
 Bot bot;
@@ -332,8 +333,6 @@ void UART_control()
   else
     commandInterpretator(ch);
 }
-
-LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
 
 void setup()
 {
