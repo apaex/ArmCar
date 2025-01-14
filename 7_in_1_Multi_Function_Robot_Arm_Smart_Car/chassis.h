@@ -58,6 +58,7 @@ public:
         setState(dutyL, dutyR);
 
         //DebugWrite("dl-dr", _dutyL, _dutyR);
+        motorL.smoothMode(!instantly);
         motorR.smoothMode(!instantly);
         motorL.setSpeed(-dutyL);
         motorR.setSpeed(dutyR);
