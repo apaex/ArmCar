@@ -30,12 +30,18 @@
 
 #define GAMEPAD_RX_MIN -508        //LEFT-RIGHT
 #define GAMEPAD_RX_MAX 508
+#define GAMEPAD_RY_MIN -508        
+#define GAMEPAD_RY_MAX 508
 #define GAMEPAD_DEAD_ZONE_RX 9
+#define GAMEPAD_DEAD_ZONE_RY 0
+#define GAMEPAD_X_MIN -508
+#define GAMEPAD_X_MAX 508
 #define GAMEPAD_Y_MIN -508         //FORWARD-BACKWARD
 #define GAMEPAD_Y_MAX 508
+#define GAMEPAD_DEAD_ZONE_X 0
+#define GAMEPAD_DEAD_ZONE_Y 0
 #define GAMEPAD_T_MIN -1020
 #define GAMEPAD_T_MAX 1020
-#define GAMEPAD_DEAD_ZONE_Y 0
 
 
 #define SPEED_LOW 40
@@ -45,14 +51,15 @@
 #define ACTIONS_COUNT 20
 
 #define SERVO_BASE_DEF 90
+#define SERVO_ARM_DEF 50
+#define SERVO_CLAW_DEF 120
+
 #define SERVO_BASE_MIN 0
 #define SERVO_BASE_MAX 180
-#define SERVO_ARM_DEF 90
-#define SERVO_ARM_MIN 0
-#define SERVO_ARM_MAX 180
-#define SERVO_CLAW_DEF 90
-#define SERVO_CLAW_MIN 50
-#define SERVO_CLAW_MAX 180
+#define SERVO_ARM_MIN 30    //верх
+#define SERVO_ARM_MAX 175   //низ
+#define SERVO_CLAW_MIN 120   // открыто
+#define SERVO_CLAW_MAX 173  // закрыто
 
 #define SERVO_SCALE_FACTOR 3                                // ((2400-544) << 3)/255 = 58 шагов на самой быстрой скорости [шаг 3 градуса]
 #define SERVO_POLLING_PERIOD (48 >> SERVO_SCALE_FACTOR)     // по (48 >> 3) = 6 мс

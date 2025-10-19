@@ -3,6 +3,10 @@
 #include "printf.h"
 #include "GamepadData.h"
 
+#define BUTTON_A  
+#define BUTTON_B 
+#define BUTTON_X 
+#define BUTTON_Y 
 
 void DebugWrite(const GamepadData& package)
 {
