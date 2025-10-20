@@ -67,4 +67,25 @@ void lcdDebugWrite<uint16_t>(const char *st, uint16_t v) {
   printf(lcd, "%s %3d     ", st, v);
 }
 
+template<>
+void lcdDebugWrite<uint32_t>(const char *st, uint32_t v) {
 
+  lcd.setCursor(0,3);
+  printf(lcd, "%s %3d     ", st, v);
+}
+
+void lcdShowFps()
+{
+  static uint32_t nFrames = 0;
+  static uint32_t tmr = millis();
+  uint32_t now = millis();
+
+  if (now - tmr > 1000)
+  {
+      uint32_t fps = nFrames * 1000 / (now - tmr);
+      tmr = now;
+      nFrames = 0;
+      lcdDebugWrite("ips", fps);
+  }
+  ++nFrames;
+}
