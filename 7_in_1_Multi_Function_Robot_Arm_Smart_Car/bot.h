@@ -33,20 +33,28 @@ public:
         bumperSensorRight = !digitalRead(PIN_BUMPER_RIGHT);
     }
 
+    int getMm(uint8_t trig, uint8_t echo, int t)
+    {
+        // импульс 10 мкс
+        digitalWrite(trig, HIGH);
+        delayMicroseconds(10);
+        digitalWrite(trig, LOW);
+
+        // измеряем время ответного импульса
+        uint32_t us = pulseIn(echo, HIGH, 5000);
+
+        // считаем расстояние и возвращаем
+        return us * (t * 6 / 10 + 330) / 2000ul;
+    }
+
     void measureDistance()
     {
         static uint32_t tmr;
-        if (millis() - tmr < 10)
+        if (millis() - tmr < 30)
             return;
         tmr = millis();
 
-        digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
-        delayMicroseconds(2);
-        digitalWrite(PIN_ULTRASOIC_TRIG, HIGH);
-        delayMicroseconds(10);
-        digitalWrite(PIN_ULTRASOIC_TRIG, LOW);
-
-        distanceSensor = pulseIn(PIN_ULTRASOIC_ECHO, HIGH) / 58;
+        distanceSensor = getMm(PIN_ULTRASOIC_TRIG, PIN_ULTRASOIC_ECHO, 22) / 10;
     }
 
     void init()

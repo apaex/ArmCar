@@ -354,7 +354,7 @@ void loop()
   IR_control();
   UART_control();
 
-  //bot.readSensors();
+  bot.readSensors();
 
   switch (program)
   {
