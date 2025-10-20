@@ -133,7 +133,7 @@ void gamepadControl(const GamepadData &package)
   int axisRY = (abs(package.axisRY) >= GAMEPAD_DEAD_ZONE_RY) ? map(package.axisRY, GAMEPAD_RY_MIN, GAMEPAD_RY_MAX, -255, 255) : 0;
   int axisT = map((int16_t)package.throttle - (int16_t)package.brake, GAMEPAD_T_MIN, GAMEPAD_T_MAX, -255, 255);
 
-  lcdDebugWrite("axisT", axisT);
+  //lcdDebugWrite("axisT", axisT);
 
   int vx = -axisRY;
   int rz = -axisRX;
@@ -349,12 +349,12 @@ void setup()
 
 void loop()
 {
-  //showFps();
+  lcdShowFps();
 
   IR_control();
   UART_control();
 
-  bot.readSensors();
+  //bot.readSensors();
 
   switch (program)
   {
