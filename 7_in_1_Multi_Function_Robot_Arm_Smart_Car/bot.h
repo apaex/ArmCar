@@ -3,7 +3,7 @@
 #include "hand.h"
 #include "chassis.h"
 #include "debug.h"
-
+#include "lcd.h"
 
 class Bot
 {
@@ -50,7 +50,7 @@ public:
     void measureDistance()
     {
         static uint32_t tmr;
-        if (millis() - tmr < 30)
+        if (millis() - tmr < 300)
             return;
         tmr = millis();
 
@@ -65,7 +65,7 @@ public:
 
     void readSensors()
     {
-        if (chassis.isMoving())
+        //if (chassis.isMoving())
         {
             bool trackingSensorLeft_old = trackingSensorLeft;
             bool trackingSensorCenter_old = trackingSensorCenter;
@@ -85,6 +85,9 @@ public:
                 bumperSensorLeft_old != bumperSensorLeft ||
                 bumperSensorRight_old != bumperSensorRight ||
                 abs(distanceSensor_old - distanceSensor) > 1)
+
+                lcdShowSensors(trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
+
                 //SerialPrintf("Tracking: %d%d%d, Distance: %d, Bumper: %d%d\n", trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
             ;
         }
