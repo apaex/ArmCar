@@ -124,22 +124,22 @@ void auto_do()
 
 void gamepadControl(const GamepadData &package)
 {
-  //DebugWrite(package);
-  //DebugWrite("vx-rz", vx, rz);
-
   int axisX = (abs(package.axisX) >= GAMEPAD_DEAD_ZONE_X) ? map(package.axisX, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255) : 0;
   int axisY = (abs(package.axisY) >= GAMEPAD_DEAD_ZONE_Y) ? map(package.axisY, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255) : 0;
   int axisRX = (abs(package.axisRX) >= GAMEPAD_DEAD_ZONE_RX) ? map(package.axisRX, GAMEPAD_RX_MIN, GAMEPAD_RX_MAX, -255, 255) : 0;
   int axisRY = (abs(package.axisRY) >= GAMEPAD_DEAD_ZONE_RY) ? map(package.axisRY, GAMEPAD_RY_MIN, GAMEPAD_RY_MAX, -255, 255) : 0;
   int axisT = map((int16_t)package.throttle - (int16_t)package.brake, GAMEPAD_T_MIN, GAMEPAD_T_MAX, -255, 255);
 
-  //lcdDebugWrite("axisT", axisT);
-
   int vx = -axisRY;
   int rz = -axisRX;
 
   rz /= 1.5;
-  if (!(package.buttons & 8))
+  if (!(package.buttons & GAMEPAD_BUTTON_M3))
+  {
+    vx /= 2;
+    rz /= 2;
+  }
+  if ((package.buttons & GAMEPAD_BUTTON_M4))
   {
     vx /= 2;
     rz /= 2;
@@ -149,7 +149,7 @@ void gamepadControl(const GamepadData &package)
 
 
 
-  if (package.buttons & 0x0200)
+  if (package.buttons & GAMEPAD_BUTTON_L)
     bot.hand.moveToDefault();
   else
   {
@@ -295,7 +295,7 @@ void UART_control()
     GamepadData package;
     size_t res = Serial.readBytes((char*)&package, sizeof(package));
 
-    lcdPacketCount();
+    //lcdPacketCount();
 
     if (res != sizeof(package))
     {
@@ -354,7 +354,7 @@ void loop()
   IR_control();
   UART_control();
 
-  bot.readSensors();
+  //bot.readSensors();
 
   switch (program)
   {

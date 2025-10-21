@@ -8,12 +8,12 @@
 class Bot
 {
 public:
-    bool trackingSensorLeft = 0;
-    bool trackingSensorCenter = 0;
-    bool trackingSensorRight = 0;
+    uint8_t trackingSensorLeft : 1;
+    uint8_t trackingSensorCenter : 1;
+    uint8_t trackingSensorRight : 1;
 
-    bool bumperSensorLeft = 0;
-    bool bumperSensorRight = 0;
+    uint8_t bumperSensorLeft : 1;
+    uint8_t bumperSensorRight : 1;
 
     uint8_t distanceSensor = 0;
 

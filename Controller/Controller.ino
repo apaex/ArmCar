@@ -57,13 +57,11 @@ void dumpGamepad(ControllerPtr ctl) {
     package.miscButtons = ctl->miscButtons();
 
     uint8_t crc = calcCRC8((uint8_t *)&package, sizeof(package));
-    
+
     Serial2.write('#');
     Serial2.write((uint8_t *)&package, sizeof(package));
     Serial2.write(crc);
 
-    return;
-    
     Serial.printf(
         "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, %4d, brake: %4d, throttle: %4d, "
         "misc: 0x%02x, gyro x:%6d y:%6d z:%6d, accel x:%6d y:%6d z:%6d\n",
@@ -268,7 +266,7 @@ void processControllers() {
 // Arduino setup function. Runs in CPU 1
 void setup() {
     Serial.begin(115200);
-    Serial2.begin(9600);
+    Serial2.begin(115200);
     Serial.printf("Firmware: %s\n", BP32.firmwareVersion());
     const uint8_t* addr = BP32.localBdAddress();
     Serial.printf("BD Addr: %2X:%2X:%2X:%2X:%2X:%2X\n", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);

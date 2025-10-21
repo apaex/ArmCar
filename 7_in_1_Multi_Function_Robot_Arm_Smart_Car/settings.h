@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 #define DEBUG_TIME_PRINT 0
 
 
@@ -30,7 +30,7 @@
 
 #define GAMEPAD_RX_MIN -508        //LEFT-RIGHT
 #define GAMEPAD_RX_MAX 508
-#define GAMEPAD_RY_MIN -508        
+#define GAMEPAD_RY_MIN -508
 #define GAMEPAD_RY_MAX 508
 #define GAMEPAD_DEAD_ZONE_RX 9
 #define GAMEPAD_DEAD_ZONE_RY 0
@@ -65,7 +65,7 @@
 #define SERVO_POLLING_PERIOD (48 >> SERVO_SCALE_FACTOR)     // по (48 >> 3) = 6 мс
 #define SERVO_DEFAULT_VELOCITY 64
 
-#define BAUD_RATE 9600
+#define BAUD_RATE 115200
 #define SERIAL_TIMEOUT 1000
 
 #define DISPLAY_NCOL        20           // размер дисплея: ширина
