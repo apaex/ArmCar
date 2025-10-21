@@ -11,6 +11,13 @@ void lcd_printAt(uint8_t col, uint8_t row, T param)
     lcd.print(param);
 }
 
+template <>
+void lcd_printAt<uint8_t>(uint8_t col, uint8_t row, uint8_t param)
+{
+    lcd.setCursor(col, row);
+    lcd.print(param, 16);
+}
+
 
 void lcdPrintError(const char* message)
 {
@@ -71,7 +78,7 @@ template<>
 void lcdDebugWrite<uint32_t>(const char *st, uint32_t v) {
 
   lcd.setCursor(0,3);
-  printf(lcd, "%s %3d     ", st, v);
+  printf(lcd, "%s %3lu     ", st, v);
 }
 
 void lcdShowFps()
