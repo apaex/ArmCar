@@ -132,8 +132,8 @@ void gamepadControl(const GamepadData &package)
   int axisRY = (abs(package.axisRY) >= GAMEPAD_DEAD_ZONE_RY) ? map(package.axisRY, GAMEPAD_RY_MIN, GAMEPAD_RY_MAX, -255, 255) : 0;
   int axisT = map((int16_t)package.throttle - (int16_t)package.brake, GAMEPAD_T_MIN, GAMEPAD_T_MAX, -255, 255);
 
-  int vx = -axisRY;
-  int rz = -axisRX;
+  int vx = -axisY;
+  int rz = -axisX;
 
   rz /= 1.5;
   if (!(package.buttons & GAMEPAD_BUTTON_M3))
@@ -151,13 +151,24 @@ void gamepadControl(const GamepadData &package)
 
 
 
-  if (package.buttons & GAMEPAD_BUTTON_L)
-    bot.hand.moveToDefault();
+  if (package.buttons & GAMEPAD_BUTTON_R)
+    commandInterpretator('x');
   else
   {
-    int r_base = -axisX/4;
-    int r_arm = -axisY/4;
-    int r_claw = axisT/4;
+    int r_base = -axisRX/2;
+    int r_arm = -axisRY/2;
+    int r_claw = axisT;
+
+    if (!(package.buttons & GAMEPAD_BUTTON_M3))
+    {
+      r_base /= 2;
+      r_arm /= 2;
+    }
+    if ((package.buttons & GAMEPAD_BUTTON_M4))
+    {
+      r_base /= 2;
+      r_arm /= 2;
+    }
 
     bot.hand.setVelocities(r_base, r_arm, r_claw);
   }
@@ -293,11 +304,9 @@ void UART_control()
     GamepadData package;
     size_t res = Serial.readBytes((char*)&package, sizeof(package));
 
-    //lcdPacketCount();
-
     if (res != sizeof(package))
     {
-      //DebugWrite("ERROR: size of data package=", res);
+      DebugWrite("ERROR: size of data package=", res);
       lcdSizeError();
       return;
     }
@@ -307,16 +316,15 @@ void UART_control()
     int8_t crc2 = calcCRC8((byte*)&package, sizeof(package));
     if (crc != crc2)
     {
-      //DebugWrite("ERROR: crc of data package=", crc);
+      DebugWrite("ERROR: crc of data package=", crc);
       lcdCrcError();
       return;
     }
-    //lcdGamepadData(package);
 
     gamepadControl(package);
   }
   else
-    ;//commandInterpretator(ch);
+    commandInterpretator(ch);
 }
 
 void irIsr() {
