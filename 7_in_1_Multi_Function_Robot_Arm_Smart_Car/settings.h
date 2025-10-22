@@ -25,7 +25,7 @@
 
 
 
-#define MOTOR_SMOOTH_SPEED 10      // плавность скорости моторов
+#define MOTOR_SMOOTH_SPEED 100      // плавность скорости моторов
 #define MOTOR_MIN_DUTY 30          // мин. сигнал, при котором мотор начинает вращение
 
 #define GAMEPAD_RX_MIN -508        //LEFT-RIGHT
