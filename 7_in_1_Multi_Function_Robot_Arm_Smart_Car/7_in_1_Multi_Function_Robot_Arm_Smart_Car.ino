@@ -1,6 +1,4 @@
 #include <CRC.h>
-#include "IR_remote.h"
-#include "keymap.h"
 #include "settings.h"
 #include "hand.h"
 #include "chassis.h"
@@ -9,10 +7,14 @@
 #include "bot.h"
 #include "debug.h"
 #include "lcd.h"
+#define NEC_SKIP_REPEATS 0// пропуск повторов
+#include <NecDecoder.h>
+#include "ir.h"
 
 LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
-IRremote ir(PIN_IR);
 
+NecDecoder ir;
+//IRremote ir(PIN_IR);
 Bot bot;
 
 int speed = SPEED_MEDIUM;
@@ -191,6 +193,10 @@ void startProgram(Program _program)
 
 void commandInterpretator(char cmd)
 {
+    static int counter = 0;
+    counter++;
+    lcd_printAt(0, 0, counter);
+    lcd_printAt(5, 0, cmd);
     DebugWrite("Command", cmd);
 
     switch (cmd)
@@ -235,52 +241,44 @@ void commandInterpretator(char cmd)
 
 void IR_control()
 {
-  static uint32_t tmr;
+  static uint8_t old = IR_KEYCODE_OK;
 
-  static byte old = IR_KEYCODE_OK;
-  byte code = ir.getIrKey(ir.getCode(), 1);
-  if (code > 16)
+  if (ir.available(true))
   {
-    if (millis() - tmr > 200)
-      code = IR_KEYCODE_OK;
-    else
+    uint8_t code = ir.readCommand();
+    if (old == code)
       return;
+    old = code;
+
+    char command = 0;
+    switch (code)
+    {
+      //case IR_KEYCODE_1: command = ''; break;
+      case IR_KEYCODE_2: command = 'd'; break;
+      //case IR_KEYCODE_3: command = ''; break;
+      case IR_KEYCODE_4: command = 'l'; break;
+      case IR_KEYCODE_5: command = 'x'; break;
+      case IR_KEYCODE_6: command = 'r'; break;
+      case IR_KEYCODE_7: command = 'o'; break;
+      case IR_KEYCODE_8: command = 'u'; break;
+      case IR_KEYCODE_9: command = 'c'; break;
+      //case IR_KEYCODE_0: command = ''; break;
+      //case IR_KEYCODE_STAR: command = ''; break;
+      //case IR_KEYCODE_POUND: command = ''; break;
+      case IR_KEYCODE_UP: command = 'F'; break;
+      case IR_KEYCODE_DOWN: command = 'B'; break;
+      case IR_KEYCODE_OK: command = 'S'; break;
+      case IR_KEYCODE_LEFT: command = 'L'; break;
+      case IR_KEYCODE_RIGHT: command = 'R'; break;
+    };
+    if (command)
+      commandInterpretator(command);
   }
-
-  tmr = millis();
-
-  if (old == code)
-    return;
-  old = code;
-
-  static const char* map[] = {
-    "",   //IR_KEYCODE_1
-    "u",  //IR_KEYCODE_2,
-    "",   //IR_KEYCODE_3,
-    "l",  //IR_KEYCODE_4,
-    "x",   //IR_KEYCODE_5,
-    "r",  //IR_KEYCODE_6,
-    "o",  //IR_KEYCODE_7,
-    "d",  //IR_KEYCODE_8,
-    "c",  //IR_KEYCODE_9,
-    "",   //IR_KEYCODE_0,
-    "",   //IR_KEYCODE_STAR,
-    "",   //IR_KEYCODE_POUND,
-    "F",  //IR_KEYCODE_UP,
-    "B",  //IR_KEYCODE_DOWN,
-    "S",  //IR_KEYCODE_OK,
-    "L",  //IR_KEYCODE_LEFT,
-    "R",  //IR_KEYCODE_RIGHT,
-  };
-
-  if (map[code][0])
-    commandInterpretator(map[code][0]);
-
-  // test
-  if (code == IR_KEYCODE_1)
-    bot.hand.baseAngle(180);
-  else if (code == IR_KEYCODE_3)
-    bot.hand.baseAngle(0);
+  else if (ir.timeout(200)) // ждём таймаут от последнего кода и стоп
+  {
+    old = IR_KEYCODE_OK;
+    commandInterpretator('S');
+  }
 }
 
 void UART_control()
@@ -321,6 +319,10 @@ void UART_control()
     ;//commandInterpretator(ch);
 }
 
+void irIsr() {
+    ir.tick();
+}
+
 void setup()
 {
   Serial.begin(BAUD_RATE);
@@ -345,6 +347,8 @@ void setup()
   pinMode(PIN_ULTRASOIC_ECHO, INPUT);
 
   bot.init();
+
+  attachInterrupt(1, irIsr, FALLING);
 }
 
 void loop()
