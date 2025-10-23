@@ -169,7 +169,7 @@ public:
     void tick()
     {
         static uint32_t tmr;
-        uint32_t now;
+        uint32_t now = millis();
         if (now - tmr < SERVO_POLLING_PERIOD)
             return;
         tmr = now;
