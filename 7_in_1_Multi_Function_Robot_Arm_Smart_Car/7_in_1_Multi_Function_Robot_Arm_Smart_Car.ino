@@ -1,4 +1,6 @@
 #include <CRC.h>
+#define NEC_SKIP_REPEATS 0
+#include <NecDecoder.h>
 #include "settings.h"
 #include "hand.h"
 #include "chassis.h"
@@ -7,14 +9,11 @@
 #include "bot.h"
 #include "debug.h"
 #include "lcd.h"
-#define NEC_SKIP_REPEATS 0// пропуск повторов
-#include <NecDecoder.h>
 #include "ir.h"
 
 LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
 
 NecDecoder ir;
-//IRremote ir(PIN_IR);
 Bot bot;
 
 int speed = SPEED_MEDIUM;
@@ -366,7 +365,7 @@ void loop()
   IR_control();
   UART_control();
 
-  //bot.readSensors();
+  bot.readSensors();
 
   switch (program)
   {
