@@ -168,11 +168,7 @@ public:
 
     void tick()
     {
-        static uint32_t tmr;
-        uint32_t now = millis();
-        if (now - tmr < SERVO_POLLING_PERIOD)
-            return;
-        tmr = now;
+        EVERY(SERVO_POLLING_PERIOD);
 
 //        DebugWrite("current_pos", current_pos.angles, N_SERVOS);
 //        DebugWrite("_target_pos", _target_pos.angles, N_SERVOS);
