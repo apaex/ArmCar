@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Servo.h>
 #include "settings.h"
 #include "debug.h"
