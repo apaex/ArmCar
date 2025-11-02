@@ -218,8 +218,8 @@ void commandInterpretator(char cmd)
 
       case 'o': startProgram(PRG_CLAW_OPENING);         break;
       case 'c': startProgram(PRG_CLAW_CLOSING);         break;
-      case 'u': startProgram(PRG_ARM_RISING);           break;
-      case 'd': startProgram(PRG_ARM_DESCENDING);       break;
+      case 'u': startProgram(PRG_ARM_DESCENDING);       break;
+      case 'd': startProgram(PRG_ARM_RISING);           break;
       case 'l': startProgram(PRG_BASE_TURNING_LEFT);    break;
       case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   break;
       case 'x': bot.hand.moveToDefault(); break;
@@ -265,13 +265,13 @@ void IR_control()
     switch (code)
     {
       //case IR_KEYCODE_1: command = ''; break;
-      case IR_KEYCODE_2: command = 'd'; break;
+      case IR_KEYCODE_2: command = 'u'; break;
       //case IR_KEYCODE_3: command = ''; break;
       case IR_KEYCODE_4: command = 'l'; break;
       case IR_KEYCODE_5: command = 'x'; break;
       case IR_KEYCODE_6: command = 'r'; break;
       case IR_KEYCODE_7: command = 'o'; break;
-      case IR_KEYCODE_8: command = 'u'; break;
+      case IR_KEYCODE_8: command = 'd'; break;
       case IR_KEYCODE_9: command = 'c'; break;
       //case IR_KEYCODE_0: command = ''; break;
       //case IR_KEYCODE_STAR: command = ''; break;
