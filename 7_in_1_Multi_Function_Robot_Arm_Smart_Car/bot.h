@@ -1,4 +1,6 @@
 #pragma once
+#define GP_MAX_DIST 40ul     // макс. измеряемое расстояние [см]
+#include <GyverPing.h>
 #include "settings.h"
 #include "hand.h"
 #include "chassis.h"
@@ -20,6 +22,8 @@ public:
     Chassis chassis;
     Hand hand;
 
+    Bot() : sonar(PIN_ULTRASOIC_TRIG, PIN_ULTRASOIC_ECHO) {}
+
     void readTrackerSensors()
     {
         trackingSensorLeft = !digitalRead(PIN_TRACKER_LEFT);
@@ -33,28 +37,12 @@ public:
         bumperSensorRight = !digitalRead(PIN_BUMPER_RIGHT);
     }
 
-    int getMm(uint8_t trig, uint8_t echo, int t)
-    {
-        // импульс 10 мкс
-        digitalWrite(trig, HIGH);
-        delayMicroseconds(10);
-        digitalWrite(trig, LOW);
-
-        // измеряем время ответного импульса
-        uint32_t us = pulseIn(echo, HIGH, 5000);
-
-        // считаем расстояние и возвращаем
-        return us * (t * 6 / 10 + 330) / 2000ul;
-    }
-
     void measureDistance()
     {
-        static uint32_t tmr;
-        if (millis() - tmr < 300)
-            return;
-        tmr = millis();
+        EVERY(300);
 
-        distanceSensor = getMm(PIN_ULTRASOIC_TRIG, PIN_ULTRASOIC_ECHO, 22) / 10;
+        sonar.ping();
+        distanceSensor = sonar.getRaw() / 10;
     }
 
     void init()
@@ -97,7 +85,11 @@ public:
     {
         hand.tick();
         chassis.tick();
+        //sonar.tick();
     }
+
+private:
+    GPingSync sonar;
 };
 
 
