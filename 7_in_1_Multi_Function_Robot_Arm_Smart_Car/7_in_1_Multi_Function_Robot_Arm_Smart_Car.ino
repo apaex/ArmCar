@@ -355,7 +355,7 @@ void setup()
 
   bot.init();
 
-  attachInterrupt(1, irIsr, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PIN_IR), irIsr, FALLING);
 }
 
 void loop()
