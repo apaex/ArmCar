@@ -224,6 +224,7 @@ void commandInterpretator(char cmd)
       case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   break;
       case 'x': bot.hand.moveToDefault(); break;
 
+      case 's':
       case 'G':
       case 'S': startProgram(PRG_NONE);                 break;
 
@@ -277,7 +278,7 @@ void IR_control()
       //case IR_KEYCODE_POUND: command = ''; break;
       case IR_KEYCODE_UP: command = 'F'; break;
       case IR_KEYCODE_DOWN: command = 'B'; break;
-      case IR_KEYCODE_OK: command = 'S'; break;
+      case IR_KEYCODE_OK: command = 's'; break;
       case IR_KEYCODE_LEFT: command = 'L'; break;
       case IR_KEYCODE_RIGHT: command = 'R'; break;
     };
@@ -287,7 +288,7 @@ void IR_control()
   else if (ir.timeout(200)) // ждём таймаут от последнего кода и стоп
   {
     old = IR_KEYCODE_OK;
-    commandInterpretator('S');
+    commandInterpretator('s');
   }
 }
 
