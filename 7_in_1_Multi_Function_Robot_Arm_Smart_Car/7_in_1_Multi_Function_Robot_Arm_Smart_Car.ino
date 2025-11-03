@@ -174,12 +174,7 @@ void gamepadControl(const GamepadData &package)
   int rz = -axisX;
 
   rz /= 1.5;
-  if (!(package.buttons & GAMEPAD_BUTTON_M3))
-  {
-    vx /= 2;
-    rz /= 2;
-  }
-  if ((package.buttons & GAMEPAD_BUTTON_M4))
+  if (!(package.buttons & GAMEPAD_BUTTON_M4))
   {
     vx /= 2;
     rz /= 2;
@@ -197,12 +192,7 @@ void gamepadControl(const GamepadData &package)
     int r_arm = -axisRY/2;
     int r_claw = axisT;
 
-    if (!(package.buttons & GAMEPAD_BUTTON_M3))
-    {
-      r_base /= 2;
-      r_arm /= 2;
-    }
-    if ((package.buttons & GAMEPAD_BUTTON_M4))
+    if (!(package.buttons & GAMEPAD_BUTTON_M4))
     {
       r_base /= 2;
       r_arm /= 2;
@@ -429,9 +419,9 @@ void displayInit()
   display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
   display.items[LCD_COMMAND] = new LcdChar(4, 0);
 
-  display.items[LCD_A1] = new LcdInt(7,  0, 4);
-  display.items[LCD_A2] = new LcdInt(11, 0, 4);
-  display.items[LCD_A3] = new LcdInt(15, 0, 4);
+  display.items[LCD_A1] = new LcdInt(8,  0, 4);
+  display.items[LCD_A2] = new LcdInt(12, 0, 4);
+  display.items[LCD_A3] = new LcdInt(16, 0, 4);
 
   display.items[LCD_MEMORY] = new LcdFmt(7, 3, 4, "M:%-2u");
 }
