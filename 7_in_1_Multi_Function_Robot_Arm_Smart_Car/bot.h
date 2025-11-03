@@ -18,7 +18,7 @@ public:
 
     uint8_t distanceSensor = 0;
 
-    bool enableSensors = false;
+    bool enableSensors = true;
 
     Chassis chassis;
     Hand hand;
