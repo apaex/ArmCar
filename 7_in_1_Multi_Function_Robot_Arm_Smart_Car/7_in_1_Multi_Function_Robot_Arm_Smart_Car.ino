@@ -165,6 +165,11 @@ void auto_do()
 
 void gamepadControl(const GamepadData &package)
 {
+  static Program selectable_program = PRG_NONE;
+  static uint16_t buttons = 0;
+  static uint8_t miscButtons = 0;
+  static uint8_t dpad = 0;
+
   int axisX = (abs(package.axisX) >= GAMEPAD_DEAD_ZONE_X) ? map(package.axisX, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255) : 0;
   int axisY = (abs(package.axisY) >= GAMEPAD_DEAD_ZONE_Y) ? map(package.axisY, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255) : 0;
   int axisRX = (abs(package.axisRX) >= GAMEPAD_DEAD_ZONE_RX) ? map(package.axisRX, GAMEPAD_RX_MIN, GAMEPAD_RX_MAX, -255, 255) : 0;
@@ -184,7 +189,6 @@ void gamepadControl(const GamepadData &package)
   bot.chassis.setVelocities(vx, rz, true);
 
 
-
   if (package.buttons & GAMEPAD_BUTTON_R)
     commandInterpretator('x');
   else if (program != PRG_MEMORY_ACTION)
@@ -202,11 +206,6 @@ void gamepadControl(const GamepadData &package)
     bot.hand.setVelocities(r_base, r_arm, r_claw);
   }
 
-  static Program selectable_program = 0;
-
-  static uint16_t buttons = 0;
-  static uint8_t miscButtons = 0;
-  static uint8_t dpad = 0;
 
   if (~buttons & package.buttons & GAMEPAD_BUTTON_A)
     commandInterpretator('m');
@@ -217,6 +216,7 @@ void gamepadControl(const GamepadData &package)
     else
       commandInterpretator('a');
   }
+
   if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_SELECT)
   {
     if (selectable_program >= PRG_AVOIDANCE && selectable_program < PRG_LINE_TRACKING)
@@ -233,7 +233,6 @@ void gamepadControl(const GamepadData &package)
 
     display.items[LCD_SELECTABLE_PROGRAM]->enable(true);
     display.items[LCD_SELECTABLE_PROGRAM]->set(map[selectable_program - PRG_AVOIDANCE]);
-    //display.items[LCD_SELECTABLE_PROGRAM]->set(selectable_program);
 
     commandInterpretator('S');
   }
@@ -244,6 +243,7 @@ void gamepadControl(const GamepadData &package)
       commandInterpretator('S');
     else
     {
+      //startProgram(selectable_program); пока через команды
       switch (selectable_program)
       {
       case PRG_AVOIDANCE: commandInterpretator('A'); break;
@@ -251,7 +251,6 @@ void gamepadControl(const GamepadData &package)
       case PRG_ANTIDROP: commandInterpretator('D'); break;
       case PRG_LINE_TRACKING: commandInterpretator('T'); break;
       }
-      //startProgram(selectable_program); пока через команды
     }
   }
 
@@ -265,26 +264,7 @@ void gamepadControl(const GamepadData &package)
 
 void startProgram(Program _program)
 {
-  if (_program == program)
-    return;
-
   program = _program;
-  DebugWrite(debugState(program));
-
-  switch (program)
-  {
-    case PRG_MOVING_FORWARD:  bot.chassis.moveForward(chassis_speed);  break;
-    case PRG_MOVING_BACKWARD: bot.chassis.moveBackward(chassis_speed); break;
-    case PRG_TURNING_LEFT:    bot.chassis.rotateRight(chassis_speed);  break;
-    case PRG_TURNING_RIGHT:   bot.chassis.rotateLeft(chassis_speed);   break;
-
-    case PRG_CLAW_OPENING:        bot.hand.clawOpen(120);       break;
-    case PRG_CLAW_CLOSING:        bot.hand.clawClose(120);      break;
-    case PRG_ARM_RISING:          bot.hand.armRise(60);        break;
-    case PRG_ARM_DESCENDING:      bot.hand.armDescend(60);     break;
-    case PRG_BASE_TURNING_LEFT:   bot.hand.baseTurnLeft(80);   break;
-    case PRG_BASE_TURNING_RIGHT:  bot.hand.baseTurnRight(80);  break;
-  }
 }
 
 void enableSensors(bool en)
@@ -318,12 +298,12 @@ void commandInterpretator(char cmd)
 
     switch (cmd)
     {
-      case 'F': startProgram(PRG_MOVING_FORWARD);       break;
-      case 'B': startProgram(PRG_MOVING_BACKWARD);      break;
-      case 'L': startProgram(PRG_TURNING_LEFT);         break;
-      case 'R': startProgram(PRG_TURNING_RIGHT);        break;
+      case 'F': startProgram(PRG_MOVING_FORWARD);   bot.chassis.moveForward(chassis_speed);   break;
+      case 'B': startProgram(PRG_MOVING_BACKWARD);  bot.chassis.moveBackward(chassis_speed);  break;
+      case 'L': startProgram(PRG_TURNING_LEFT);     bot.chassis.rotateRight(chassis_speed);   break;
+      case 'R': startProgram(PRG_TURNING_RIGHT);    bot.chassis.rotateLeft(chassis_speed);    break;
       case 'G':
-      case 'S': startProgram(PRG_NONE); bot.chassis.stop(); break;
+      case 'S': startProgram(PRG_NONE);             bot.chassis.stop();                       break;
 
       case 'X': chassis_speed = SPEED_LOW;      break;
       case 'Y': chassis_speed = SPEED_MEDIUM;   break;
@@ -335,15 +315,15 @@ void commandInterpretator(char cmd)
 
       case '1': enableSensors(!bot.enableSensors);  break;
       case '2': enableServos(!bot.hand.attached());  break;
-
-      case 'o': startProgram(PRG_CLAW_OPENING);         break;
-      case 'c': startProgram(PRG_CLAW_CLOSING);         break;
-      case 'u': startProgram(PRG_ARM_DESCENDING);       break;
-      case 'd': startProgram(PRG_ARM_RISING);           break;
-      case 'l': startProgram(PRG_BASE_TURNING_LEFT);    break;
-      case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   break;
       case 'x': bot.hand.moveToDefault(); break;
-      case 's': startProgram(PRG_NONE); bot.hand.stop(); break;
+
+      case 'o': startProgram(PRG_CLAW_OPENING);         bot.hand.clawOpen(120);     break;
+      case 'c': startProgram(PRG_CLAW_CLOSING);         bot.hand.clawClose(120);    break;
+      case 'u': startProgram(PRG_ARM_DESCENDING);       bot.hand.armDescend(60);    break;
+      case 'd': startProgram(PRG_ARM_RISING);           bot.hand.armRise(60);       break;
+      case 'l': startProgram(PRG_BASE_TURNING_LEFT);    bot.hand.baseTurnLeft(80);  break;
+      case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   bot.hand.baseTurnRight(80); break;
+      case 's': startProgram(PRG_NONE);                 bot.hand.stop();            break;
 
       case 'm':
         if (programMayBeRewrite)
