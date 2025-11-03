@@ -426,12 +426,12 @@ void UART_control()
 void displayInit()
 {
   display.items[LCD_FPS] = new LcdInt(0, 3, 6);
-  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdBool(15, 2, '^', 'o');
-  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdBool(16, 2, '^', 'o');
-  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdBool(17, 2, '^', 'o');
-  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdBool(14, 2, '<', 'o');
-  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdBool(18, 2, '>', 'o');
-  display.items[LCD_DISTANCE_SENSOR] = new LcdInt(15, 3, 3);
+  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdBool(16, 2, '^', 'o');
+  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdBool(17, 2, '^', 'o');
+  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdBool(18, 2, '^', 'o');
+  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdBool(15, 2, '<', 'o');
+  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdBool(19, 2, '>', 'o');
+  display.items[LCD_DISTANCE_SENSOR] = new LcdInt(16, 3, 3);
   display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
   display.items[LCD_COMMAND] = new LcdChar(4, 0);
 
