@@ -249,6 +249,15 @@ void enableSensors(bool en)
   display.items[LCD_DISTANCE_SENSOR]->enable(en);
 }
 
+void enableServos(bool en)
+{
+  !en ? bot.hand.detach() : bot.hand.attach();
+
+  display.items[LCD_A1]->enable(en);
+  display.items[LCD_A2]->enable(en);
+  display.items[LCD_A3]->enable(en);
+}
+
 void commandInterpretator(char cmd)
 {
     static uint8_t counter = 0;
@@ -273,9 +282,9 @@ void commandInterpretator(char cmd)
       case 'D': startProgram(PRG_ANTIDROP);       break;
       case 'W': startProgram(PRG_FOLLOWING);      break;
       case 'T': startProgram(PRG_LINE_TRACKING);  break;
-      
+
       case '1': enableSensors(!bot.enableSensors);  break;
-      case '2': bot.hand.attached() ? bot.hand.detach() : bot.hand.attach();  break;
+      case '2': enableServos(!bot.hand.attached());  break;
 
       case 'o': startProgram(PRG_CLAW_OPENING);         break;
       case 'c': startProgram(PRG_CLAW_CLOSING);         break;
