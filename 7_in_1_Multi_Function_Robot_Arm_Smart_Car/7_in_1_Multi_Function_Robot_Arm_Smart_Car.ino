@@ -57,6 +57,9 @@ enum
   LCD_DISTANCE_SENSOR,
   LCD_COMMAND_COUNTER,
   LCD_COMMAND,
+  LCD_A1,
+  LCD_A2,
+  LCD_A3,
   _LCD_COUNT,
 };
 
@@ -420,6 +423,11 @@ void setup()
   display.items[LCD_DISTANCE_SENSOR] = new LcdInt(15, 3, 3);
   display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
   display.items[LCD_COMMAND] = new LcdChar(5, 0);
+
+  display.items[LCD_A1] = new LcdInt(7,  0, 4);
+  display.items[LCD_A2] = new LcdInt(11, 0, 4);
+  display.items[LCD_A3] = new LcdInt(15, 0, 4);
+
 }
 
 
@@ -451,6 +459,9 @@ void loop()
     display.items[LCD_BUMPER_SENSOR_RIGHT]->set(bot.bumperSensorRight);
     display.items[LCD_DISTANCE_SENSOR]->set(bot.distanceSensor);
   }
+  display.items[LCD_A1]->set(MKS2DEG(DESCALE(bot.hand.current_pos[0])));
+  display.items[LCD_A2]->set(MKS2DEG(DESCALE(bot.hand.current_pos[1])));
+  display.items[LCD_A3]->set(MKS2DEG(DESCALE(bot.hand.current_pos[2])));
 
   display.update();
 
