@@ -427,7 +427,7 @@ void displayInit()
   display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdBool(18, 2, '>', 'o');
   display.items[LCD_DISTANCE_SENSOR] = new LcdInt(15, 3, 3);
   display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
-  display.items[LCD_COMMAND] = new LcdChar(5, 0);
+  display.items[LCD_COMMAND] = new LcdChar(4, 0);
 
   display.items[LCD_A1] = new LcdInt(7,  0, 4);
   display.items[LCD_A2] = new LcdInt(11, 0, 4);
