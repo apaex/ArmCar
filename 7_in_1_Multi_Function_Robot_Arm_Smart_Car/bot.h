@@ -18,6 +18,8 @@ public:
 
     uint8_t distanceSensor = 0;
 
+    bool enableSensors = false;
+
     Chassis chassis;
     Hand hand;
 
@@ -52,7 +54,7 @@ public:
 
     void readSensors()
     {
-        //if (chassis.isMoving())
+        if (enableSensors)
         {
             readTrackerSensors();
             readBumperSensors();

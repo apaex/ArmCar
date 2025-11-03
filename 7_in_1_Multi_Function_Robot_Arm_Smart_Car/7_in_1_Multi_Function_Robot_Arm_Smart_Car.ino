@@ -233,6 +233,18 @@ void startProgram(Program _program)
   }
 }
 
+void enableSensors(bool en)
+{
+  bot.enableSensors = en;
+
+  display.items[LCD_TRACKING_SENSOR_LEFT]->enable(en);
+  display.items[LCD_TRACKING_SENSOR_CENTER]->enable(en);
+  display.items[LCD_TRACKING_SENSOR_RIGHT]->enable(en);
+  display.items[LCD_BUMPER_SENSOR_LEFT]->enable(en);
+  display.items[LCD_BUMPER_SENSOR_RIGHT]->enable(en);
+  display.items[LCD_DISTANCE_SENSOR]->enable(en);
+}
+
 void commandInterpretator(char cmd)
 {
     static uint8_t counter = 0;
@@ -257,6 +269,9 @@ void commandInterpretator(char cmd)
       case 'D': startProgram(PRG_ANTIDROP);       break;
       case 'W': startProgram(PRG_FOLLOWING);      break;
       case 'T': startProgram(PRG_LINE_TRACKING);  break;
+      
+      case '1': enableSensors(!bot.enableSensors);  break;
+      case '2': bot.hand.attached() ? bot.hand.detach() : bot.hand.attach();  break;
 
       case 'o': startProgram(PRG_CLAW_OPENING);         break;
       case 'c': startProgram(PRG_CLAW_CLOSING);         break;
@@ -427,12 +442,15 @@ void loop()
   }
 
   display.items[LCD_FPS]->set(fps);
-  display.items[LCD_TRACKING_SENSOR_LEFT]->set(bot.trackingSensorLeft);
-  display.items[LCD_TRACKING_SENSOR_CENTER]->set(bot.trackingSensorCenter);
-  display.items[LCD_TRACKING_SENSOR_RIGHT]->set(bot.trackingSensorRight);
-  display.items[LCD_BUMPER_SENSOR_LEFT]->set(bot.bumperSensorLeft);
-  display.items[LCD_BUMPER_SENSOR_RIGHT]->set(bot.bumperSensorRight);
-  display.items[LCD_DISTANCE_SENSOR]->set(bot.distanceSensor);
+  if (bot.enableSensors)
+  {
+    display.items[LCD_TRACKING_SENSOR_LEFT]->set(bot.trackingSensorLeft);
+    display.items[LCD_TRACKING_SENSOR_CENTER]->set(bot.trackingSensorCenter);
+    display.items[LCD_TRACKING_SENSOR_RIGHT]->set(bot.trackingSensorRight);
+    display.items[LCD_BUMPER_SENSOR_LEFT]->set(bot.bumperSensorLeft);
+    display.items[LCD_BUMPER_SENSOR_RIGHT]->set(bot.bumperSensorRight);
+    display.items[LCD_DISTANCE_SENSOR]->set(bot.distanceSensor);
+  }
 
   display.update();
 

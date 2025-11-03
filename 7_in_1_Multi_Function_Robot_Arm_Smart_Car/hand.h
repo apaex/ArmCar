@@ -97,6 +97,11 @@ public:
             servos[i].detach();
     }
 
+    bool attached()
+    {
+        return servos[0].attached();
+    }
+
     void baseVelocity(int speed)   { setVelocity(SERVO_BASE, speed); }
     void armVelocity(int speed)    { setVelocity(SERVO_ARM, speed); }
     void clawVelocity(int speed)   { setVelocity(SERVO_CLAW, speed); }
