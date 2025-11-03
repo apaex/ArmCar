@@ -9,6 +9,7 @@
 #include "bot.h"
 #include "debug.h"
 #include "lcd.h"
+#include "lcdDebug.h"
 #include "ir.h"
 
 LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
@@ -42,6 +43,42 @@ HandPosition mem[ACTIONS_COUNT];
 int nActions = 0;
 int currentAction = -1;
 bool programMayBeRewrite = true;
+
+
+enum
+{
+  LCD_FPS,
+
+  LCD_TRACKING_SENSOR_LEFT,
+  LCD_TRACKING_SENSOR_CENTER,
+  LCD_TRACKING_SENSOR_RIGHT,
+  LCD_BUMPER_SENSOR_LEFT,
+  LCD_BUMPER_SENSOR_RIGHT,
+  LCD_DISTANCE_SENSOR,
+  LCD_COMMAND_COUNTER,
+  LCD_COMMAND,
+  _LCD_COUNT,
+};
+
+LcdItem* lcdItems[_LCD_COUNT];
+Lcd display(lcdItems, _LCD_COUNT);
+
+uint32_t fps = 0;
+
+void calcFps()
+{
+  static uint32_t nFrames = 0;
+  static uint32_t tmr = millis();
+  uint32_t now = millis();
+
+  if (now - tmr > 1000)
+  {
+      fps = nFrames * 1000 / (now - tmr);
+      tmr = now;
+      nFrames = 0;
+  }
+  ++nFrames;
+}
 
 void storePosition()
 {
@@ -193,16 +230,15 @@ void startProgram(Program _program)
     case PRG_ARM_DESCENDING:      bot.hand.armDescend();     break;
     case PRG_BASE_TURNING_LEFT:   bot.hand.baseTurnLeft();   break;
     case PRG_BASE_TURNING_RIGHT:  bot.hand.baseTurnRight();  break;
-
   }
 }
 
 void commandInterpretator(char cmd)
 {
-    static int counter = 0;
+    static uint8_t counter = 0;
     counter++;
-    lcd_printAt(0, 0, counter);
-    lcd_printAt(5, 0, cmd);
+    display.items[LCD_COMMAND_COUNTER]->set(counter);
+    display.items[LCD_COMMAND]->set(cmd);
     DebugWrite("Command", cmd);
 
     switch (cmd)
@@ -284,11 +320,13 @@ void IR_control()
   }
   else if (ir.timeout(200)) // ждём таймаут от последнего кода и стоп
   {
+    commandInterpretator(bot.chassis.isMoving() ? 'S' : 's');
     old = IR_KEYCODE_OK;
-    commandInterpretator('s');
-    commandInterpretator('S');
   }
 }
+
+int packetSizeErrorCounter = 0;
+int packetCrcErrorCounter = 0;
 
 void UART_control()
 {
@@ -304,6 +342,7 @@ void UART_control()
 
     if (res != sizeof(package))
     {
+      ++packetSizeErrorCounter;
       DebugWrite("ERROR: size of data package=", res);
       lcdSizeError();
       return;
@@ -314,6 +353,7 @@ void UART_control()
     int8_t crc2 = calcCRC8((byte*)&package, sizeof(package));
     if (crc != crc2)
     {
+      ++packetCrcErrorCounter;
       DebugWrite("ERROR: crc of data package=", crc);
       lcdCrcError();
       return;
@@ -355,11 +395,22 @@ void setup()
   bot.init();
 
   attachInterrupt(digitalPinToInterrupt(PIN_IR), irIsr, FALLING);
+
+  display.items[LCD_FPS] = new LcdInt(0, 3, 6);
+  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdBool(15, 1, '^', 'o');
+  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdBool(16, 1, '^', 'o');
+  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdBool(17, 1, '^', 'o');
+  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdBool(14, 2, '<', 'o');
+  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdBool(18, 2, '>', 'o');
+  display.items[LCD_DISTANCE_SENSOR] = new LcdInt(15, 3, 3);
+  display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
+  display.items[LCD_COMMAND] = new LcdChar(5, 0);
 }
+
 
 void loop()
 {
-  lcdShowFps();
+  calcFps();
 
   IR_control();
   UART_control();
@@ -374,6 +425,16 @@ void loop()
     case PRG_FOLLOWING:           Following_Function();       break;
     case PRG_LINE_TRACKING:       Line_tracking_Function();   break;
   }
+
+  display.items[LCD_FPS]->set(fps);
+  display.items[LCD_TRACKING_SENSOR_LEFT]->set(bot.trackingSensorLeft);
+  display.items[LCD_TRACKING_SENSOR_CENTER]->set(bot.trackingSensorCenter);
+  display.items[LCD_TRACKING_SENSOR_RIGHT]->set(bot.trackingSensorRight);
+  display.items[LCD_BUMPER_SENSOR_LEFT]->set(bot.bumperSensorLeft);
+  display.items[LCD_BUMPER_SENSOR_RIGHT]->set(bot.bumperSensorRight);
+  display.items[LCD_DISTANCE_SENSOR]->set(bot.distanceSensor);
+
+  display.update();
 
   bot.tick();
 }

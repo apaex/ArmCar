@@ -4,113 +4,198 @@
 
 extern LiquidCrystal_I2C lcd;
 
-template <class T>
-void lcd_printAt(uint8_t col, uint8_t row, T param)
-{
-    lcd.setCursor(col, row);
-    lcd.print(param);
-}
+class LcdItem {
+public:
+  LcdItem(byte x_, byte y_, byte w_, byte h_ = 1) : x(x_), y(y_), w(w_), h(h_), updateNeeded(true), enabled(true) {}
 
-template <>
-void lcd_printAt<uint8_t>(uint8_t col, uint8_t row, uint8_t param)
-{
-    lcd.setCursor(col, row);
-    lcd.print(param, 16);
-}
+  ~LcdItem() { delete p; }
 
-
-void lcdPrintError(const char* message)
-{
-  lcd.setCursor(0,0);
-  lcd.print(message);
-}
-
-void lcdSizeError()
-{
-  static int count = 0;
-  ++count;
-  lcd.setCursor(0,1);
-  printf(lcd, "Size error: %3d", count);
-}
-
-void lcdCrcError()
-{
-  static int count = 0;
-  ++count;
-  lcd.setCursor(0,2);
-  printf(lcd, "CRC error:  %3d", count);
-}
-
-
-void lcdPacketCount()
-{
-  static int count = 0;
-  ++count;
-  lcd.setCursor(0,0);
-  printf(lcd, "Count:  %3d", count);
-}
-
-void lcdGamepadData(const GamepadData &package)
-{
-  lcd.setCursor(0,3);
-  printf(lcd, "%3d %3d %3d %3d %3d %3d %3d %3d", package.index, package.axisX, package.axisY, package.axisRX, package.axisRY, package.brake, package.throttle, package.buttons);
-}
-
-template<class T>
-void lcdDebugWrite(const char *st, T v) {
-}
-
-template<>
-void lcdDebugWrite<int>(const char *st, int v) {
-
-  lcd.setCursor(0,3);
-  printf(lcd, "%s %3d     ", st, v);
-}
-
-template<>
-void lcdDebugWrite<uint16_t>(const char *st, uint16_t v) {
-
-  lcd.setCursor(0,3);
-  printf(lcd, "%s %3d     ", st, v);
-}
-
-template<>
-void lcdDebugWrite<uint32_t>(const char *st, uint32_t v) {
-
-  lcd.setCursor(0,3);
-  printf(lcd, "%s %3lu     ", st, v);
-}
-
-void lcdShowFps()
-{
-  static uint32_t nFrames = 0;
-  static uint32_t tmr = millis();
-  uint32_t now = millis();
-
-  if (now - tmr > 1000)
+  template<class T>
+  void set(T value)
   {
-      uint32_t fps = nFrames * 1000 / (now - tmr);
-      tmr = now;
-      nFrames = 0;
-      lcdDebugWrite("ips", fps);
+    if (!sz)
+    {
+      sz = sizeof(T);
+      p = new byte[sz];
+    }
+    else if (sz != sizeof(T))
+      return;
+
+    if (*(T*)p != value)
+    {
+      *(T*)p = value;
+      updateNeeded = true;
+    }
   }
-  ++nFrames;
-}
 
-void lcdShowSensors(bool trackingSensorLeft, bool trackingSensorCenter, bool trackingSensorRight, uint8_t distanceSensor, bool bumperSensorLeft, bool bumperSensorRight)
+
+  void set(const char* value)
+  {
+    if (!sz)
+    {
+      sz = w+1;
+      p = new byte[sz];
+    }
+
+    if (strcmp((char *)p, value) == 0)
+    {
+      strcpy((char *)p, value);
+      updateNeeded = true;
+    }
+  }
+
+  template<class T>
+  T get()
+  {
+    if (sz == sizeof(T))
+      return *(T*)p;
+  }
+
+  void enable(bool b)
+  {
+    if (b == enabled)
+      return;
+    enabled = b;
+    updateNeeded = true;
+  }
+
+  virtual void draw() = 0;
+
+  void clear(char ch = ' ')
+  {
+    for (byte i = x; i < x + w; ++i)
+      for (byte j = y; j < y + h; ++j)
+      {
+        lcd.setCursor(i, j);
+        lcd.print(ch);
+      }
+  }
+
+  void update(bool force = false)
+  {
+    if (updateNeeded || force)
+      if (enabled && sz)
+        draw();
+      else
+        clear();
+    updateNeeded = false;
+  }
+
+protected:
+  byte x:6;
+  byte y:2;
+  byte w:6;
+  byte h:2;
+
+  void *p = 0;
+  size_t sz = 0;
+
+private:
+  bool updateNeeded:1;
+  bool enabled:1;
+};
+
+
+class LcdBool : public LcdItem
 {
-/*
-  static uint32_t tmr = 0;
-  if (millis() - tmr < 100)
-    return;
-  tmr = millis();
-*/
+public:
+  LcdBool(byte x_, byte y_, char ch_on_, char ch_off_) : LcdItem(x_, y_, 1, 1), ch_on(ch_on_), ch_off(ch_off_) {}
 
-  lcd_printAt(15, 1, trackingSensorLeft ? '^' : 'o');
-  lcd_printAt(16, 1, trackingSensorCenter ? '^' : 'o');
-  lcd_printAt(17, 1, trackingSensorRight ? '^' : 'o');
-  lcd_printAt(14, 2, bumperSensorLeft ? '<' : 'o');
-  lcd_printAt(18, 2, bumperSensorRight ? '>' : 'o');
-  lcd_printAt(15, 3, "   ");
-  lcd_printAt(15, 3, distanceSensor ? distanceSensor : 000);
-}
+  virtual void draw()
+  {
+    lcd.setCursor(x, y);
+    lcd.print((*(bool*)p) ? ch_on : ch_off);
+  }
+
+private:
+  char ch_on = '^';
+  char ch_off = 'o';
+};
+
+
+class LcdInt : public LcdItem
+{
+public:
+  LcdInt(byte x_, byte y_, byte w_) : LcdItem(x_, y_, w_, 1) {}
+
+  virtual void draw()
+  {
+    char buf[w+1];
+    char fmt[] = "%0u\0";
+    fmt[1] = w + '0';
+    if (sz == 4)
+    {
+      fmt[2] = 'l';
+      fmt[3] = 'u';
+    }
+    switch (sz)
+    {
+    case 1: snprintf(buf, w+1, fmt, *(uint8_t*)p); break;
+    case 2: snprintf(buf, w+1, fmt, *(uint16_t*)p); break;
+    case 4: snprintf(buf, w+1, fmt, *(uint32_t*)p); break;
+    };
+
+    lcd.setCursor(x, y);
+    lcd.print(buf);
+  }
+};
+
+class LcdFmt : public LcdItem
+{
+public:
+  LcdFmt(byte x_, byte y_, byte w_, const char* fmt_ = 0) : LcdItem(x_, y_, w_, 1), fmt(fmt_) {}
+
+
+  virtual void draw()
+  {
+    char buf[w+1];
+    snprintf(buf, w+1, fmt, *(uint8_t*)p);
+
+    lcd.setCursor(x, y);
+    lcd.print(buf);
+  }
+
+  const char* fmt = 0;
+};
+
+class LcdChar : public LcdItem
+{
+public:
+  LcdChar(byte x_, byte y_) : LcdItem(x_, y_, 1, 1) {}
+
+  virtual void draw()
+  {
+    lcd.setCursor(x, y);
+    lcd.print(*(char*)p);
+  }
+};
+
+class LcdStr : public LcdItem
+{
+public:
+  LcdStr(byte x_, byte y_, byte w_) : LcdItem(x_, y_, w_, 1) {}
+
+  virtual void draw()
+  {
+    lcd.setCursor(x, y);
+    lcd.print(*(char*)p);
+  }
+};
+
+class Lcd
+{
+public:
+  LcdItem** items;
+  int count;
+
+  Lcd(LcdItem* items_[], int count_): items(items_), count(count_)
+  {
+  }
+
+  void update(bool force = false)
+  {
+    EVERY(100);
+    for (int i = 0; i < count; ++i)
+      items[i]->update(force);
+  }
+};

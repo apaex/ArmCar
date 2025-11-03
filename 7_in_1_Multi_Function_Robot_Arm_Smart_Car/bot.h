@@ -5,7 +5,6 @@
 #include "hand.h"
 #include "chassis.h"
 #include "debug.h"
-#include "lcd.h"
 
 class Bot
 {
@@ -55,29 +54,9 @@ public:
     {
         //if (chassis.isMoving())
         {
-            bool trackingSensorLeft_old = trackingSensorLeft;
-            bool trackingSensorCenter_old = trackingSensorCenter;
-            bool trackingSensorRight_old = trackingSensorRight;
-            bool bumperSensorLeft_old = bumperSensorLeft;
-            bool bumperSensorRight_old = bumperSensorRight;
-            uint8_t distanceSensor_old = distanceSensor;
-
             readTrackerSensors();
             readBumperSensors();
             measureDistance();
-
-            if (
-                trackingSensorLeft_old != trackingSensorLeft ||
-                trackingSensorCenter_old != trackingSensorCenter ||
-                trackingSensorRight_old != trackingSensorRight ||
-                bumperSensorLeft_old != bumperSensorLeft ||
-                bumperSensorRight_old != bumperSensorRight ||
-                abs(distanceSensor_old - distanceSensor) > 1)
-
-                lcdShowSensors(trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
-
-                //SerialPrintf("Tracking: %d%d%d, Distance: %d, Bumper: %d%d\n", trackingSensorLeft, trackingSensorCenter, trackingSensorRight, distanceSensor, bumperSensorLeft, bumperSensorRight);
-            ;
         }
     }
 
