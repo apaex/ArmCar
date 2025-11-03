@@ -60,6 +60,7 @@ enum
   LCD_A1,
   LCD_A2,
   LCD_A3,
+
   _LCD_COUNT,
 };
 
@@ -383,6 +384,42 @@ void UART_control()
     commandInterpretator(ch);
 }
 
+void displayInit()
+{
+  display.items[LCD_FPS] = new LcdInt(0, 3, 6);
+  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdBool(15, 1, '^', 'o');
+  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdBool(16, 1, '^', 'o');
+  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdBool(17, 1, '^', 'o');
+  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdBool(14, 2, '<', 'o');
+  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdBool(18, 2, '>', 'o');
+  display.items[LCD_DISTANCE_SENSOR] = new LcdInt(15, 3, 3);
+  display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
+  display.items[LCD_COMMAND] = new LcdChar(5, 0);
+
+  display.items[LCD_A1] = new LcdInt(7,  0, 4);
+  display.items[LCD_A2] = new LcdInt(11, 0, 4);
+  display.items[LCD_A3] = new LcdInt(15, 0, 4);
+}
+
+void displayUpdate()
+{
+  display.items[LCD_FPS]->set(fps);
+  if (bot.enableSensors)
+  {
+    display.items[LCD_TRACKING_SENSOR_LEFT]->set(bot.trackingSensorLeft);
+    display.items[LCD_TRACKING_SENSOR_CENTER]->set(bot.trackingSensorCenter);
+    display.items[LCD_TRACKING_SENSOR_RIGHT]->set(bot.trackingSensorRight);
+    display.items[LCD_BUMPER_SENSOR_LEFT]->set(bot.bumperSensorLeft);
+    display.items[LCD_BUMPER_SENSOR_RIGHT]->set(bot.bumperSensorRight);
+    display.items[LCD_DISTANCE_SENSOR]->set(bot.distanceSensor);
+  }
+  display.items[LCD_A1]->set(MKS2DEG(DESCALE(bot.hand.current_pos[0])));
+  display.items[LCD_A2]->set(MKS2DEG(DESCALE(bot.hand.current_pos[1])));
+  display.items[LCD_A3]->set(MKS2DEG(DESCALE(bot.hand.current_pos[2])));
+
+  display.update();
+}
+
 void irIsr() {
     ir.tick();
 }
@@ -414,20 +451,7 @@ void setup()
 
   attachInterrupt(digitalPinToInterrupt(PIN_IR), irIsr, FALLING);
 
-  display.items[LCD_FPS] = new LcdInt(0, 3, 6);
-  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdBool(15, 1, '^', 'o');
-  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdBool(16, 1, '^', 'o');
-  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdBool(17, 1, '^', 'o');
-  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdBool(14, 2, '<', 'o');
-  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdBool(18, 2, '>', 'o');
-  display.items[LCD_DISTANCE_SENSOR] = new LcdInt(15, 3, 3);
-  display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
-  display.items[LCD_COMMAND] = new LcdChar(5, 0);
-
-  display.items[LCD_A1] = new LcdInt(7,  0, 4);
-  display.items[LCD_A2] = new LcdInt(11, 0, 4);
-  display.items[LCD_A3] = new LcdInt(15, 0, 4);
-
+  displayInit();
 }
 
 
@@ -449,21 +473,7 @@ void loop()
     case PRG_LINE_TRACKING:       Line_tracking_Function();   break;
   }
 
-  display.items[LCD_FPS]->set(fps);
-  if (bot.enableSensors)
-  {
-    display.items[LCD_TRACKING_SENSOR_LEFT]->set(bot.trackingSensorLeft);
-    display.items[LCD_TRACKING_SENSOR_CENTER]->set(bot.trackingSensorCenter);
-    display.items[LCD_TRACKING_SENSOR_RIGHT]->set(bot.trackingSensorRight);
-    display.items[LCD_BUMPER_SENSOR_LEFT]->set(bot.bumperSensorLeft);
-    display.items[LCD_BUMPER_SENSOR_RIGHT]->set(bot.bumperSensorRight);
-    display.items[LCD_DISTANCE_SENSOR]->set(bot.distanceSensor);
-  }
-  display.items[LCD_A1]->set(MKS2DEG(DESCALE(bot.hand.current_pos[0])));
-  display.items[LCD_A2]->set(MKS2DEG(DESCALE(bot.hand.current_pos[1])));
-  display.items[LCD_A3]->set(MKS2DEG(DESCALE(bot.hand.current_pos[2])));
-
-  display.update();
+  displayUpdate();
 
   bot.tick();
 }
