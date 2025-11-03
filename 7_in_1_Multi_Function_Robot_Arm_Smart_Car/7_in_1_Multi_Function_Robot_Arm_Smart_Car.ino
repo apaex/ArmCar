@@ -186,7 +186,7 @@ void gamepadControl(const GamepadData &package)
 
   if (package.buttons & GAMEPAD_BUTTON_R)
     commandInterpretator('x');
-  else
+  else if (program != PRG_MEMORY_ACTION)
   {
     int r_base = -axisRX/2;
     int r_arm = -axisRY/2;
