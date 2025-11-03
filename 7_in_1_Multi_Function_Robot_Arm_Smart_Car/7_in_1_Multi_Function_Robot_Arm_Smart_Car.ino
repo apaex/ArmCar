@@ -49,7 +49,7 @@ void storePosition()
     mem[nActions++] = bot.hand.current_pos;
 }
 
-void Line_tracking_Function()
+void Line_tracking_Function()  //ходить по линии
 {
   if (bot.trackingSensorLeft && !bot.trackingSensorCenter && bot.trackingSensorRight)
     bot.chassis.moveForward(120);
@@ -64,15 +64,12 @@ void Line_tracking_Function()
     bot.chassis.stop();
 }
 
-void Anti_drop_Function()
+void Anti_drop_Function() //не падать со стола
 {
   if (bot.trackingSensorLeft && bot.trackingSensorCenter && bot.trackingSensorRight)
     bot.chassis.moveForward(60);
   else
   {
-    //push(MOVE_BACKWARD, 60, 200);
-    //push(ROTATE_LEFT, 60, 500);
-
     bot.chassis.moveBackward(60);
     delay(600);
     bot.chassis.rotateLeft(60);
@@ -80,7 +77,7 @@ void Anti_drop_Function()
   }
 }
 
-void Following_Function()
+void Following_Function() //преследование
 {
   if (bot.distanceSensor < 15)
     bot.chassis.moveBackward(80);
@@ -94,7 +91,7 @@ void Following_Function()
     bot.chassis.stop();
 }
 
-void Avoidance_Function()
+void Avoidance_Function() //уклонение
 {
   if (bot.distanceSensor <= 25)
   {
@@ -197,7 +194,6 @@ void startProgram(Program _program)
     case PRG_BASE_TURNING_LEFT:   bot.hand.baseTurnLeft();   break;
     case PRG_BASE_TURNING_RIGHT:  bot.hand.baseTurnRight();  break;
 
-    case PRG_NONE:            bot.chassis.stop(); bot.hand.stop();  break;
   }
 }
 
@@ -215,6 +211,16 @@ void commandInterpretator(char cmd)
       case 'B': startProgram(PRG_MOVING_BACKWARD);      break;
       case 'L': startProgram(PRG_TURNING_LEFT);         break;
       case 'R': startProgram(PRG_TURNING_RIGHT);        break;
+      case 'G':
+      case 'S': startProgram(PRG_NONE); bot.chassis.stop(); break;
+
+      case 'X': speed = SPEED_LOW;      break;
+      case 'Y': speed = SPEED_MEDIUM;   break;
+      case 'Z': speed = SPEED_HIGH;     break;
+      case 'A': startProgram(PRG_AVOIDANCE);      break;
+      case 'D': startProgram(PRG_ANTIDROP);       break;
+      case 'W': startProgram(PRG_FOLLOWING);      break;
+      case 'T': startProgram(PRG_LINE_TRACKING);  break;
 
       case 'o': startProgram(PRG_CLAW_OPENING);         break;
       case 'c': startProgram(PRG_CLAW_CLOSING);         break;
@@ -223,16 +229,13 @@ void commandInterpretator(char cmd)
       case 'l': startProgram(PRG_BASE_TURNING_LEFT);    break;
       case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   break;
       case 'x': bot.hand.moveToDefault(); break;
-
-      case 's':
-      case 'G':
-      case 'S': startProgram(PRG_NONE);                 break;
+      case 's': startProgram(PRG_NONE); bot.hand.stop(); break;
 
       case 'm':
         if (programMayBeRewrite)
           nActions = 0;
-        storePosition();
         programMayBeRewrite = false;
+        storePosition();
         break;
       case 'a':
         programMayBeRewrite = true;
@@ -240,13 +243,7 @@ void commandInterpretator(char cmd)
         if (nActions)
           startProgram(PRG_MEMORY_ACTION);
         break;
-      case 'X': speed = SPEED_LOW;      break;
-      case 'Y': speed = SPEED_MEDIUM;   break;
-      case 'Z': speed = SPEED_HIGH;     break;
-      case 'A': startProgram(PRG_AVOIDANCE);      break;
-      case 'D': startProgram(PRG_ANTIDROP);       break;
-      case 'W': startProgram(PRG_FOLLOWING);      break;
-      case 'T': startProgram(PRG_LINE_TRACKING);  break;
+
     }
 }
 
@@ -289,6 +286,7 @@ void IR_control()
   {
     old = IR_KEYCODE_OK;
     commandInterpretator('s');
+    commandInterpretator('S');
   }
 }
 
@@ -312,7 +310,7 @@ void UART_control()
     }
     int8_t crc = -1;
     res = Serial.readBytes((char*)&crc, 1);
-
+#if CHECK_GAMEPAD_CRC == 1
     int8_t crc2 = calcCRC8((byte*)&package, sizeof(package));
     if (crc != crc2)
     {
@@ -320,7 +318,7 @@ void UART_control()
       lcdCrcError();
       return;
     }
-
+#endif
     gamepadControl(package);
   }
   else

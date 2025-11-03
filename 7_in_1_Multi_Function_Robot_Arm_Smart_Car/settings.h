@@ -72,6 +72,7 @@
 #define DISPLAY_NROW        4            // размер дисплея: высота
 #define DISPLAY_ADDRESS     0x27         // I2C адрес дисплея (0x27 для PCF8574T, 0x3F для PCF8574AT)
 
+#define CHECK_GAMEPAD_CRC   0
 
 
 #define EVERY(A) ({\
