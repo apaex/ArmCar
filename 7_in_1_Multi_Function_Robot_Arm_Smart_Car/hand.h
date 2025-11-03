@@ -150,13 +150,20 @@ public:
     }
 
 
-
+/*
     void baseTurnLeft()   { setTarget(SERVO_BASE, servosMeta[SERVO_BASE].max);  }
     void baseTurnRight()  { setTarget(SERVO_BASE, servosMeta[SERVO_BASE].min);  }
     void armRise()        { setTarget(SERVO_ARM, servosMeta[SERVO_ARM].min);    }
     void armDescend()     { setTarget(SERVO_ARM, servosMeta[SERVO_ARM].max);    }
     void clawOpen()       { setTarget(SERVO_CLAW, servosMeta[SERVO_CLAW].min);  }
     void clawClose()      { setTarget(SERVO_CLAW, servosMeta[SERVO_CLAW].max);  }
+*/
+    void baseTurnLeft()   { setVelocity(SERVO_BASE, SERVO_DEFAULT_VELOCITY);  }
+    void baseTurnRight()  { setVelocity(SERVO_BASE, -SERVO_DEFAULT_VELOCITY);  }
+    void armRise()        { setVelocity(SERVO_ARM, -SERVO_DEFAULT_VELOCITY);    }
+    void armDescend()     { setVelocity(SERVO_ARM, SERVO_DEFAULT_VELOCITY);    }
+    void clawOpen()       { setVelocity(SERVO_CLAW, -SERVO_DEFAULT_VELOCITY);  }
+    void clawClose()      { setVelocity(SERVO_CLAW, SERVO_DEFAULT_VELOCITY);  }
 
 
 
