@@ -131,8 +131,8 @@ public:
     void baseTurnRight(int speed = SERVO_DEFAULT_VELOCITY)  { setVelocity(SERVO_BASE, -speed); }
     void armRise(int speed = SERVO_DEFAULT_VELOCITY)        { setVelocity(SERVO_ARM, -speed);  }
     void armDescend(int speed = SERVO_DEFAULT_VELOCITY)     { setVelocity(SERVO_ARM, speed);   }
-    void clawOpen(int speed = SERVO_DEFAULT_VELOCITY)       { setVelocity(SERVO_CLAW, -speed); }
-    void clawClose(int speed = SERVO_DEFAULT_VELOCITY)      { setVelocity(SERVO_CLAW, speed);  }
+    void clawOpen(int speed = SERVO_DEFAULT_VELOCITY)       { setVelocity(SERVO_CLAW, speed); }
+    void clawClose(int speed = SERVO_DEFAULT_VELOCITY)      { setVelocity(SERVO_CLAW, -speed);  }
 
     void stop()
     {
