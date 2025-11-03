@@ -102,27 +102,11 @@ public:
         return servos[0].attached();
     }
 
-    void baseVelocity(int speed)   { setVelocity(SERVO_BASE, speed); }
-    void armVelocity(int speed)    { setVelocity(SERVO_ARM, speed); }
-    void clawVelocity(int speed)   { setVelocity(SERVO_CLAW, speed); }
-
-    void setVelocities(int r_base, int r_arm, int r_claw)
-    {
-        baseVelocity(r_base);
-        armVelocity(r_arm);
-        clawVelocity(r_claw);
-    }
-
-
-    void baseAngle(int angle)      { setTarget(SERVO_BASE, SCALE(angle)); }
-    void armAngle(int angle)       { setTarget(SERVO_ARM, SCALE(angle)); }
-    void clawAngle(int angle)      { setTarget(SERVO_CLAW, SCALE(angle)); }
-
     void setAngles(int a_base, int a_arm, int a_claw)
     {
-        baseAngle(a_base);
-        armAngle(a_arm);
-        clawAngle(a_claw);
+        setTarget(SERVO_BASE, SCALE(a_base));
+        setTarget(SERVO_ARM, SCALE(a_arm));
+        setTarget(SERVO_CLAW, SCALE(a_claw));
     }
 
     void moveTo(HandPosition position, bool instantly = false)
@@ -143,27 +127,25 @@ public:
             applyNow();
     }
 
+    void baseTurnLeft(int speed = SERVO_DEFAULT_VELOCITY)   { setVelocity(SERVO_BASE, speed);  }
+    void baseTurnRight(int speed = SERVO_DEFAULT_VELOCITY)  { setVelocity(SERVO_BASE, -speed); }
+    void armRise(int speed = SERVO_DEFAULT_VELOCITY)        { setVelocity(SERVO_ARM, -speed);  }
+    void armDescend(int speed = SERVO_DEFAULT_VELOCITY)     { setVelocity(SERVO_ARM, speed);   }
+    void clawOpen(int speed = SERVO_DEFAULT_VELOCITY)       { setVelocity(SERVO_CLAW, -speed); }
+    void clawClose(int speed = SERVO_DEFAULT_VELOCITY)      { setVelocity(SERVO_CLAW, speed);  }
+
     void stop()
     {
         for (byte i=0; i<N_SERVOS; ++i)
-            setTarget(i, current_pos[i]);
+            setVelocity(i, 0);
     }
 
-
-/*
-    void baseTurnLeft()   { setTarget(SERVO_BASE, servosMeta[SERVO_BASE].max);  }
-    void baseTurnRight()  { setTarget(SERVO_BASE, servosMeta[SERVO_BASE].min);  }
-    void armRise()        { setTarget(SERVO_ARM, servosMeta[SERVO_ARM].min);    }
-    void armDescend()     { setTarget(SERVO_ARM, servosMeta[SERVO_ARM].max);    }
-    void clawOpen()       { setTarget(SERVO_CLAW, servosMeta[SERVO_CLAW].min);  }
-    void clawClose()      { setTarget(SERVO_CLAW, servosMeta[SERVO_CLAW].max);  }
-*/
-    void baseTurnLeft()   { setVelocity(SERVO_BASE, SERVO_DEFAULT_VELOCITY);  }
-    void baseTurnRight()  { setVelocity(SERVO_BASE, -SERVO_DEFAULT_VELOCITY);  }
-    void armRise()        { setVelocity(SERVO_ARM, -SERVO_DEFAULT_VELOCITY);    }
-    void armDescend()     { setVelocity(SERVO_ARM, SERVO_DEFAULT_VELOCITY);    }
-    void clawOpen()       { setVelocity(SERVO_CLAW, -SERVO_DEFAULT_VELOCITY);  }
-    void clawClose()      { setVelocity(SERVO_CLAW, SERVO_DEFAULT_VELOCITY);  }
+    void setVelocities(int r_base, int r_arm, int r_claw)
+    {
+        setVelocity(SERVO_BASE, r_base);
+        setVelocity(SERVO_ARM, r_arm);
+        setVelocity(SERVO_CLAW, r_claw);
+    }
 
 
 
