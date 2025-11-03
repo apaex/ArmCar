@@ -17,7 +17,7 @@ LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
 NecDecoder ir;
 Bot bot;
 
-int speed = SPEED_MEDIUM;
+int chassis_speed = SPEED_MEDIUM;
 
 enum Program
 {
@@ -247,17 +247,17 @@ void startProgram(Program _program)
 
   switch (program)
   {
-    case PRG_MOVING_FORWARD:  bot.chassis.moveForward(speed);  break;
-    case PRG_MOVING_BACKWARD: bot.chassis.moveBackward(speed); break;
-    case PRG_TURNING_LEFT:    bot.chassis.rotateRight(speed);  break;
-    case PRG_TURNING_RIGHT:   bot.chassis.rotateLeft(speed);   break;
+    case PRG_MOVING_FORWARD:  bot.chassis.moveForward(chassis_speed);  break;
+    case PRG_MOVING_BACKWARD: bot.chassis.moveBackward(chassis_speed); break;
+    case PRG_TURNING_LEFT:    bot.chassis.rotateRight(chassis_speed);  break;
+    case PRG_TURNING_RIGHT:   bot.chassis.rotateLeft(chassis_speed);   break;
 
-    case PRG_CLAW_OPENING:        bot.hand.clawOpen();       break;
-    case PRG_CLAW_CLOSING:        bot.hand.clawClose();      break;
-    case PRG_ARM_RISING:          bot.hand.armRise();        break;
-    case PRG_ARM_DESCENDING:      bot.hand.armDescend();     break;
-    case PRG_BASE_TURNING_LEFT:   bot.hand.baseTurnLeft();   break;
-    case PRG_BASE_TURNING_RIGHT:  bot.hand.baseTurnRight();  break;
+    case PRG_CLAW_OPENING:        bot.hand.clawOpen(120);       break;
+    case PRG_CLAW_CLOSING:        bot.hand.clawClose(120);      break;
+    case PRG_ARM_RISING:          bot.hand.armRise(60);        break;
+    case PRG_ARM_DESCENDING:      bot.hand.armDescend(60);     break;
+    case PRG_BASE_TURNING_LEFT:   bot.hand.baseTurnLeft(80);   break;
+    case PRG_BASE_TURNING_RIGHT:  bot.hand.baseTurnRight(80);  break;
   }
 }
 
@@ -299,9 +299,9 @@ void commandInterpretator(char cmd)
       case 'G':
       case 'S': startProgram(PRG_NONE); bot.chassis.stop(); break;
 
-      case 'X': speed = SPEED_LOW;      break;
-      case 'Y': speed = SPEED_MEDIUM;   break;
-      case 'Z': speed = SPEED_HIGH;     break;
+      case 'X': chassis_speed = SPEED_LOW;      break;
+      case 'Y': chassis_speed = SPEED_MEDIUM;   break;
+      case 'Z': chassis_speed = SPEED_HIGH;     break;
       case 'A': startProgram(PRG_AVOIDANCE);      break;
       case 'D': startProgram(PRG_ANTIDROP);       break;
       case 'W': startProgram(PRG_FOLLOWING);      break;
