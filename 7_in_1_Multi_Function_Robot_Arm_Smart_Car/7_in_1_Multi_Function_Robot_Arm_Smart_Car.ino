@@ -61,6 +61,7 @@ enum
   LCD_A2,
   LCD_A3,
   LCD_MEMORY,
+  LCD_SELECTABLE_PROGRAM,
 
   _LCD_COUNT,
 };
@@ -201,7 +202,7 @@ void gamepadControl(const GamepadData &package)
     bot.hand.setVelocities(r_base, r_arm, r_claw);
   }
 
-  static byte selectable_program = 0;
+  static Program selectable_program = 0;
 
   static uint16_t buttons = 0;
   static uint8_t miscButtons = 0;
@@ -217,7 +218,42 @@ void gamepadControl(const GamepadData &package)
       commandInterpretator('a');
   }
   if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_SELECT)
-    commandInterpretator('3');
+  {
+    if (selectable_program >= PRG_AVOIDANCE && selectable_program < PRG_LINE_TRACKING)
+      selectable_program = Program((int)selectable_program + 1);
+    else
+      selectable_program = PRG_AVOIDANCE;
+
+    static const char* map[] = {
+    "AVOIDANCE",
+    "FOLLOWING",
+    "ANTIDROP",
+    "LINE_TRACKING",
+    };
+
+    display.items[LCD_SELECTABLE_PROGRAM]->enable(true);
+    display.items[LCD_SELECTABLE_PROGRAM]->set(map[selectable_program - PRG_AVOIDANCE]);
+    //display.items[LCD_SELECTABLE_PROGRAM]->set(selectable_program);
+
+    commandInterpretator('S');
+  }
+  else if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_START)
+  {
+    display.items[LCD_SELECTABLE_PROGRAM]->enable(false);
+    if (program == selectable_program)
+      commandInterpretator('S');
+    else
+    {
+      switch (selectable_program)
+      {
+      case PRG_AVOIDANCE: commandInterpretator('A'); break;
+      case PRG_FOLLOWING: commandInterpretator('W'); break;
+      case PRG_ANTIDROP: commandInterpretator('D'); break;
+      case PRG_LINE_TRACKING: commandInterpretator('T'); break;
+      }
+      //startProgram(selectable_program); пока через команды
+    }
+  }
 
   buttons = package.buttons;
   miscButtons = package.miscButtons;
@@ -424,6 +460,7 @@ void displayInit()
   display.items[LCD_A3] = new LcdInt(16, 0, 4);
 
   display.items[LCD_MEMORY] = new LcdFmt(7, 3, 4, "M:%-2u");
+  display.items[LCD_SELECTABLE_PROGRAM] = new LcdStr(0, 1, 13);
 }
 
 void displayUpdate()

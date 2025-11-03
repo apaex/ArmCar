@@ -28,22 +28,6 @@ public:
     }
   }
 
-
-  void set(const char* value)
-  {
-    if (!sz)
-    {
-      sz = w+1;
-      p = new byte[sz];
-    }
-
-    if (strcmp((char *)p, value) == 0)
-    {
-      strcpy((char *)p, value);
-      updateNeeded = true;
-    }
-  }
-
   template<class T>
   T get()
   {
@@ -177,8 +161,12 @@ public:
 
   virtual void draw()
   {
+    char buf[w+1];
+    snprintf(buf, w+1, "%-13s", *(const char**)p);
+
     lcd.setCursor(x, y);
-    lcd.print(*(char*)p);
+    lcd.print(buf);
+
   }
 };
 
