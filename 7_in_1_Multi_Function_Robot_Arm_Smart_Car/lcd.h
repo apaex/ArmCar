@@ -4,11 +4,11 @@
 
 extern LiquidCrystal_I2C lcd;
 
-class LcdItem {
+class LcdItemBase {
 public:
-  LcdItem(byte x_, byte y_, byte w_, byte h_ = 1) : x(x_), y(y_), w(w_), h(h_), updateNeeded(true), enabled(true) {}
+  LcdItemBase(byte x_, byte y_, byte w_, const char* fmt_) : x(x_), y(y_), w(w_), fmt(fmt_), updateNeeded(true), enabled(true) {}
 
-  ~LcdItem() { delete p; }
+  ~LcdItemBase() { delete p; }
 
   template<class T>
   void set(T value)
@@ -48,11 +48,10 @@ public:
   void clear(char ch = ' ')
   {
     for (byte i = x; i < x + w; ++i)
-      for (byte j = y; j < y + h; ++j)
-      {
-        lcd.setCursor(i, j);
-        lcd.print(ch);
-      }
+    {
+      lcd.setCursor(i, y);
+      lcd.print(ch);
+    }
   }
 
   void update(bool force = false)
@@ -69,10 +68,11 @@ protected:
   byte x:6;
   byte y:2;
   byte w:6;
-  byte h:2;
 
   void *p = 0;
   size_t sz = 0;
+
+  const char* fmt = 0;
 
 private:
   bool updateNeeded:1;
@@ -80,103 +80,45 @@ private:
 };
 
 
-class LcdBool : public LcdItem
+template <class T>
+class LcdItem : public LcdItemBase
 {
 public:
-  LcdBool(byte x_, byte y_, char ch_on_, char ch_off_) : LcdItem(x_, y_, 1, 1), ch_on(ch_on_), ch_off(ch_off_) {}
-
-  virtual void draw()
-  {
-    lcd.setCursor(x, y);
-    lcd.print((*(bool*)p) ? ch_on : ch_off);
-  }
-
-private:
-  char ch_on = '^';
-  char ch_off = 'o';
-};
-
-
-class LcdInt : public LcdItem
-{
-public:
-  LcdInt(byte x_, byte y_, byte w_) : LcdItem(x_, y_, w_, 1) {}
+  using LcdItemBase::LcdItemBase;
 
   virtual void draw()
   {
     char buf[w+1];
-    char fmt[] = "%0u\0";
-    fmt[1] = w + '0';
-    if (sz == 4)
-    {
-      fmt[2] = 'l';
-      fmt[3] = 'u';
-    }
-    switch (sz)
-    {
-    case 1: snprintf(buf, w+1, fmt, *(uint8_t*)p); break;
-    case 2: snprintf(buf, w+1, fmt, *(uint16_t*)p); break;
-    case 4: snprintf(buf, w+1, fmt, *(uint32_t*)p); break;
-    };
+    snprintf(buf, w+1, fmt, *(T*)p);
 
     lcd.setCursor(x, y);
     lcd.print(buf);
   }
 };
 
-class LcdFmt : public LcdItem
+template <>
+class LcdItem<bool> : public LcdItemBase
 {
 public:
-  LcdFmt(byte x_, byte y_, byte w_, const char* fmt_ = 0) : LcdItem(x_, y_, w_, 1), fmt(fmt_) {}
-
-
-  virtual void draw()
-  {
-    char buf[w+1];
-    snprintf(buf, w+1, fmt, *(uint8_t*)p);
-
-    lcd.setCursor(x, y);
-    lcd.print(buf);
-  }
-
-  const char* fmt = 0;
-};
-
-class LcdChar : public LcdItem
-{
-public:
-  LcdChar(byte x_, byte y_) : LcdItem(x_, y_, 1, 1) {}
+  using LcdItemBase::LcdItemBase;
 
   virtual void draw()
   {
     lcd.setCursor(x, y);
-    lcd.print(*(char*)p);
+    lcd.print(fmt[*(bool*)p]);
   }
 };
 
-class LcdStr : public LcdItem
-{
-public:
-  LcdStr(byte x_, byte y_, byte w_) : LcdItem(x_, y_, w_, 1) {}
 
-  virtual void draw()
-  {
-    char buf[w+1];
-    snprintf(buf, w+1, "%-13s", *(const char**)p);
 
-    lcd.setCursor(x, y);
-    lcd.print(buf);
-
-  }
-};
 
 class Lcd
 {
 public:
-  LcdItem** items;
+  LcdItemBase** items;
   int count;
 
-  Lcd(LcdItem* items_[], int count_): items(items_), count(count_)
+  Lcd(LcdItemBase* items_[], int count_): items(items_), count(count_)
   {
   }
 

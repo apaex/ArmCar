@@ -66,7 +66,7 @@ enum
   _LCD_COUNT,
 };
 
-LcdItem* lcdItems[_LCD_COUNT];
+LcdItemBase* lcdItems[_LCD_COUNT];
 Lcd display(lcdItems, _LCD_COUNT);
 
 uint32_t fps = 0;
@@ -425,22 +425,22 @@ void UART_control()
 
 void displayInit()
 {
-  display.items[LCD_FPS] = new LcdInt(0, 3, 6);
-  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdBool(16, 2, '^', 'o');
-  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdBool(17, 2, '^', 'o');
-  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdBool(18, 2, '^', 'o');
-  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdBool(15, 2, '<', 'o');
-  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdBool(19, 2, '>', 'o');
-  display.items[LCD_DISTANCE_SENSOR] = new LcdInt(16, 3, 3);
-  display.items[LCD_COMMAND_COUNTER] = new LcdInt(0, 0, 3);
-  display.items[LCD_COMMAND] = new LcdChar(4, 0);
+  display.items[LCD_FPS] = new LcdItem<uint32_t>((byte)0, (byte)3, (byte)6, "%6lu");
+  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdItem<bool>(16, 2, 1, "o^");
+  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdItem<bool>(17, 2, 1, "o^");
+  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdItem<bool>(18, 2, 1, "o^");
+  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdItem<bool>(15, 2, 1, "o<");
+  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdItem<bool>(19, 2, 1, "o>");
+  display.items[LCD_DISTANCE_SENSOR] = new LcdItem<uint8_t>(16, 3, 3, "%3u");
+  display.items[LCD_COMMAND_COUNTER] = new LcdItem<uint8_t>(0, 0, 3, "%3u");
+  display.items[LCD_COMMAND] = new LcdItem<char>(4, 0, 1, "%c");
 
-  display.items[LCD_A1] = new LcdInt(8,  0, 4);
-  display.items[LCD_A2] = new LcdInt(12, 0, 4);
-  display.items[LCD_A3] = new LcdInt(16, 0, 4);
+  display.items[LCD_A1] = new LcdItem<int16_t>(8,  0, 4, "%4d");
+  display.items[LCD_A2] = new LcdItem<int16_t>(12, 0, 4, "%4d");
+  display.items[LCD_A3] = new LcdItem<int16_t>(16, 0, 4, "%4d");
 
-  display.items[LCD_MEMORY] = new LcdFmt(7, 3, 4, "M:%-2u");
-  display.items[LCD_SELECTABLE_PROGRAM] = new LcdStr(0, 1, 13);
+  display.items[LCD_MEMORY] = new LcdItem<const char *>(7, 3, 4, "M:%-2u");
+  display.items[LCD_SELECTABLE_PROGRAM] = new LcdItem<const char *>(0, 1, 13, "%-13s");
 }
 
 void displayUpdate()
