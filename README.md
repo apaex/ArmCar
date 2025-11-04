@@ -1,6 +1,7 @@
 # LAFVIN Smart Robot Arm Car
 Альтернативная прошивка для робота [LAFVIN Mechanical 4WD Robot Arm Car Kit for Arduino Robot Car Robot Arm Programmable STEM Toys/Support Android](https://lafvintech.com/products/lafvin-mechanical-4wd-robot-arm-car-kit-for-arduino-robot-car-robot-arm-programmable-stem-toys-support-android-1)
 
+## Функционал
 Все функции оригинальной прошивки сохранены, а также есть полная совместимость с оригинальным железом.
 
 * Прошивка полностью написана заново, имеет намного более качественное управление роботом
@@ -8,6 +9,7 @@
 * Поддерживается ЖК-дисплей
 * Поддерживается геймпад
 
+## Сборка
 Сборка прошивки, в отличие от оригинальной, требует установки некоторого количества библиотек. 
 * Servo by Michael Margolis, Arduino Version 1.1.2 
 * LiquidCrystal I2C by Frank de Brabander Version 1.1.2 
