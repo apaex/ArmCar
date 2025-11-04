@@ -191,73 +191,6 @@ void startProgram()
   }
 }
 
-
-void gamepadControl(const GamepadData &package)
-{
-  static uint16_t buttons = 0;
-  static uint8_t miscButtons = 0;
-  static uint8_t dpad = 0;
-
-  int axisX = (abs(package.axisX) >= GAMEPAD_DEAD_ZONE_X) ? map(package.axisX, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255) : 0;
-  int axisY = (abs(package.axisY) >= GAMEPAD_DEAD_ZONE_Y) ? map(package.axisY, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255) : 0;
-  int axisRX = (abs(package.axisRX) >= GAMEPAD_DEAD_ZONE_RX) ? map(package.axisRX, GAMEPAD_RX_MIN, GAMEPAD_RX_MAX, -255, 255) : 0;
-  int axisRY = (abs(package.axisRY) >= GAMEPAD_DEAD_ZONE_RY) ? map(package.axisRY, GAMEPAD_RY_MIN, GAMEPAD_RY_MAX, -255, 255) : 0;
-  int axisT = map((int16_t)package.throttle - (int16_t)package.brake, GAMEPAD_T_MIN, GAMEPAD_T_MAX, -255, 255);
-
-  int vx = -axisY;
-  int rz = -axisX;
-
-  rz /= 1.5;
-  if (!(package.buttons & GAMEPAD_BUTTON_M4))
-  {
-    vx /= 2;
-    rz /= 2;
-  }
-
-  bot.chassis.setVelocities(vx, rz, true);
-
-
-  if (package.buttons & GAMEPAD_BUTTON_R)
-    commandInterpretator('x');
-  else if (program != PRG_MEMORY_ACTION)
-  {
-    int r_base = -axisRX/2;
-    int r_arm = -axisRY/2;
-    int r_claw = axisT;
-
-    if (!(package.buttons & GAMEPAD_BUTTON_M4))
-    {
-      r_base /= 2;
-      r_arm /= 2;
-    }
-
-    bot.hand.setVelocities(r_base, r_arm, r_claw);
-  }
-
-
-  if (~buttons & package.buttons & GAMEPAD_BUTTON_A)
-    commandInterpretator('m');
-  else if (~buttons & package.buttons & GAMEPAD_BUTTON_B)
-  {
-    if (program == PRG_MEMORY_ACTION)
-      commandInterpretator('s');
-    else
-      commandInterpretator('a');
-  }
-
-  if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_SELECT)
-    selectProgram();
-  else if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_START)
-    startProgram();
-
-  buttons = package.buttons;
-  miscButtons = package.miscButtons;
-  dpad = package.dpad;
-
-}
-
-
-
 void setProgram(Program _program)
 {
   program = _program;
@@ -333,8 +266,70 @@ void commandInterpretator(char cmd)
         if (nActions)
           setProgram(PRG_MEMORY_ACTION);
         break;
-
     }
+}
+
+void gamepadControl(const GamepadData &package)
+{
+  static uint16_t buttons = 0;
+  static uint8_t miscButtons = 0;
+  static uint8_t dpad = 0;
+
+  int axisX = (abs(package.axisX) >= GAMEPAD_DEAD_ZONE_X) ? map(package.axisX, GAMEPAD_X_MIN, GAMEPAD_X_MAX, -255, 255) : 0;
+  int axisY = (abs(package.axisY) >= GAMEPAD_DEAD_ZONE_Y) ? map(package.axisY, GAMEPAD_Y_MIN, GAMEPAD_Y_MAX, -255, 255) : 0;
+  int axisRX = (abs(package.axisRX) >= GAMEPAD_DEAD_ZONE_RX) ? map(package.axisRX, GAMEPAD_RX_MIN, GAMEPAD_RX_MAX, -255, 255) : 0;
+  int axisRY = (abs(package.axisRY) >= GAMEPAD_DEAD_ZONE_RY) ? map(package.axisRY, GAMEPAD_RY_MIN, GAMEPAD_RY_MAX, -255, 255) : 0;
+  int axisT = map((int16_t)package.throttle - (int16_t)package.brake, GAMEPAD_T_MIN, GAMEPAD_T_MAX, -255, 255);
+
+  int vx = -axisY;
+  int rz = -axisX;
+
+  rz /= 1.5;
+  if (!(package.buttons & GAMEPAD_BUTTON_M4))
+  {
+    vx /= 2;
+    rz /= 2;
+  }
+
+  bot.chassis.setVelocities(vx, rz, true);
+
+
+  if (package.buttons & GAMEPAD_BUTTON_R)
+    commandInterpretator('x');
+  else if (program != PRG_MEMORY_ACTION)
+  {
+    int r_base = -axisRX/2;
+    int r_arm = -axisRY/2;
+    int r_claw = axisT;
+
+    if (!(package.buttons & GAMEPAD_BUTTON_M4))
+    {
+      r_base /= 2;
+      r_arm /= 2;
+    }
+
+    bot.hand.setVelocities(r_base, r_arm, r_claw);
+  }
+
+
+  if (~buttons & package.buttons & GAMEPAD_BUTTON_A)
+    commandInterpretator('m');
+  else if (~buttons & package.buttons & GAMEPAD_BUTTON_B)
+  {
+    if (program == PRG_MEMORY_ACTION)
+      commandInterpretator('s');
+    else
+      commandInterpretator('a');
+  }
+
+  if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_SELECT)
+    selectProgram();
+  else if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_START)
+    startProgram();
+
+  buttons = package.buttons;
+  miscButtons = package.miscButtons;
+  dpad = package.dpad;
 }
 
 void IR_control()
@@ -348,30 +343,28 @@ void IR_control()
     if (old == code)
       return;
     old = code;
+    stop = 0;
 
-    char command = 0;
     switch (code)
     {
-      case IR_KEYCODE_1: command = 'm'; stop = 's'; break;
-      case IR_KEYCODE_2: command = 'u'; stop = 's'; break;
-      case IR_KEYCODE_3: command = 'a'; stop = 's'; break;
-      case IR_KEYCODE_4: command = 'l'; stop = 's'; break;
-      case IR_KEYCODE_5: command = 'x'; stop = 's'; break;
-      case IR_KEYCODE_6: command = 'r'; stop = 's'; break;
-      case IR_KEYCODE_7: command = 'o'; stop = 's'; break;
-      case IR_KEYCODE_8: command = 'd'; stop = 's'; break;
-      case IR_KEYCODE_9: command = 'c'; stop = 's'; break;
-      //case IR_KEYCODE_0: command = ''; break;
-      case IR_KEYCODE_STAR: selectProgram(); stop = 0; break;
-      case IR_KEYCODE_POUND: startProgram(); stop = 0; break;
-      case IR_KEYCODE_UP: command = 'F'; stop = 'S'; break;
-      case IR_KEYCODE_DOWN: command = 'B'; stop = 'S'; break;
-      case IR_KEYCODE_OK: command = 's'; stop = 'S'; break;
-      case IR_KEYCODE_LEFT: command = 'L'; stop = 'S'; break;
-      case IR_KEYCODE_RIGHT: command = 'R'; stop = 'S'; break;
+      case IR_KEYCODE_1:      commandInterpretator('m'); stop = 's'; break;
+      case IR_KEYCODE_2:      commandInterpretator('u'); stop = 's'; break;
+      case IR_KEYCODE_3:      commandInterpretator('a'); stop = 's'; break;
+      case IR_KEYCODE_4:      commandInterpretator('l'); stop = 's'; break;
+      case IR_KEYCODE_5:      commandInterpretator('x'); stop = 's'; break;
+      case IR_KEYCODE_6:      commandInterpretator('r'); stop = 's'; break;
+      case IR_KEYCODE_7:      commandInterpretator('o'); stop = 's'; break;
+      case IR_KEYCODE_8:      commandInterpretator('d'); stop = 's'; break;
+      case IR_KEYCODE_9:      commandInterpretator('c'); stop = 's'; break;
+      case IR_KEYCODE_0:      break;
+      case IR_KEYCODE_STAR:   selectProgram(); break;
+      case IR_KEYCODE_POUND:  startProgram(); break;
+      case IR_KEYCODE_UP:     commandInterpretator('F'); stop = 'S'; break;
+      case IR_KEYCODE_DOWN:   commandInterpretator('B'); stop = 'S'; break;
+      case IR_KEYCODE_OK:     commandInterpretator('s'); break;
+      case IR_KEYCODE_LEFT:   commandInterpretator('L'); stop = 'S'; break;
+      case IR_KEYCODE_RIGHT:  commandInterpretator('R'); stop = 'S'; break;
     };
-    if (command)
-      commandInterpretator(command);
   }
   else if (ir.timeout(100)) // ждём таймаут от последнего кода и стоп
   {
