@@ -38,7 +38,6 @@ bool programMayBeRewrite = true;
 enum
 {
   LCD_FPS,
-
   LCD_TRACKING_SENSOR_LEFT,
   LCD_TRACKING_SENSOR_CENTER,
   LCD_TRACKING_SENSOR_RIGHT,
@@ -52,7 +51,6 @@ enum
   LCD_A3,
   LCD_MEMORY,
   LCD_SELECTABLE_PROGRAM,
-
   _LCD_COUNT,
 };
 
