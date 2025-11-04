@@ -455,10 +455,12 @@ void displayUpdate()
     display.items[LCD_BUMPER_SENSOR_RIGHT]->set(bot.bumperSensorRight);
     display.items[LCD_DISTANCE_SENSOR]->set(bot.distanceSensor);
   }
-  display.items[LCD_A1]->set(MKS2DEG(DESCALE(bot.hand.current_pos[0])));
-  display.items[LCD_A2]->set(MKS2DEG(DESCALE(bot.hand.current_pos[1])));
-  display.items[LCD_A3]->set(MKS2DEG(DESCALE(bot.hand.current_pos[2])));
-
+  if (bot.hand.attached())
+  {
+    display.items[LCD_A1]->set(MKS2DEG(DESCALE(bot.hand.current_pos[0])));
+    display.items[LCD_A2]->set(MKS2DEG(DESCALE(bot.hand.current_pos[1])));
+    display.items[LCD_A3]->set(MKS2DEG(DESCALE(bot.hand.current_pos[2])));
+  }
   display.items[LCD_MEMORY]->set(nActions);
 
   display.update();
