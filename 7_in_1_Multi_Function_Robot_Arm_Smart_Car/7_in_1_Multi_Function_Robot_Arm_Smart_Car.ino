@@ -244,7 +244,7 @@ void commandInterpretator(char cmd)
 
       case '1': enableSensors(!bot.enableSensors);  break;
       case '2': enableServos(!bot.hand.attached());  break;
-      case 'x': bot.hand.moveToDefault(); break;
+      case 'x': setProgram(PRG_NONE); bot.hand.moveToDefault(); break;
 
       case 'o': setProgram(PRG_NONE); bot.hand.clawOpen(120);     break;
       case 'c': setProgram(PRG_NONE); bot.hand.clawClose(120);    break;
@@ -315,12 +315,7 @@ void gamepadControl(const GamepadData &package)
   if (~buttons & package.buttons & GAMEPAD_BUTTON_A)
     commandInterpretator('m');
   else if (~buttons & package.buttons & GAMEPAD_BUTTON_B)
-  {
-    if (program == PRG_MEMORY_ACTION)
-      commandInterpretator('s');
-    else
-      commandInterpretator('a');
-  }
+    commandInterpretator((program == PRG_MEMORY_ACTION) ? 's' : 'a');
 
   if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_SELECT)
     selectProgram();
@@ -334,7 +329,7 @@ void gamepadControl(const GamepadData &package)
 
 void IR_control()
 {
-  static uint8_t old = IR_KEYCODE_OK;
+  static uint8_t old = 0;
   static char stop = 0;
 
   if (ir.available(true))
@@ -358,23 +353,21 @@ void IR_control()
       case IR_KEYCODE_8:      commandInterpretator('d'); stop = 's'; break;
       case IR_KEYCODE_7:      commandInterpretator('o'); stop = 's'; break;
       case IR_KEYCODE_9:      commandInterpretator('c'); stop = 's'; break;
+      case IR_KEYCODE_OK:     commandInterpretator('s'); break;
+      case IR_KEYCODE_5:      commandInterpretator('x'); break;
 
       case IR_KEYCODE_STAR:   selectProgram(); break;
       case IR_KEYCODE_POUND:  startProgram(); break;
-
-      case IR_KEYCODE_OK:     commandInterpretator('s'); break;
-      case IR_KEYCODE_5:      commandInterpretator('x'); break;
-      case IR_KEYCODE_0:      break;
-
       case IR_KEYCODE_1:      commandInterpretator('m'); break;
-      case IR_KEYCODE_3:      commandInterpretator('a'); break;
+      case IR_KEYCODE_3:      commandInterpretator((program == PRG_MEMORY_ACTION) ? 's' : 'a'); break;
+      case IR_KEYCODE_0:      break;
     };
   }
   else if (ir.timeout(100)) // ждём таймаут от последнего кода и стоп
   {
     if (stop)
       commandInterpretator(stop);
-    old = IR_KEYCODE_OK;
+    old = 0;
   }
 }
 
