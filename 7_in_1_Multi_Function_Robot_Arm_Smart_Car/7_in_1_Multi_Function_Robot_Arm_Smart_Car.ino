@@ -22,16 +22,6 @@ int chassis_speed = SPEED_MEDIUM;
 enum Program
 {
   PRG_NONE,
-  PRG_TURNING_LEFT,
-  PRG_TURNING_RIGHT,
-  PRG_MOVING_FORWARD,
-  PRG_MOVING_BACKWARD,
-  PRG_CLAW_CLOSING,
-  PRG_CLAW_OPENING,
-  PRG_ARM_RISING,
-  PRG_ARM_DESCENDING,
-  PRG_BASE_TURNING_LEFT,
-  PRG_BASE_TURNING_RIGHT,
   PRG_MEMORY_ACTION,
   PRG_AVOIDANCE,
   PRG_FOLLOWING,
@@ -150,7 +140,6 @@ void Avoidance_Function() //уклонение
     bot.chassis.moveForward(70);
 }
 
-
 void auto_do()
 {
   if (!bot.hand.isReady())
@@ -162,10 +151,49 @@ void auto_do()
   bot.hand.moveTo(mem[currentAction]);
 }
 
+static Program selectable_program = PRG_NONE;
+
+void selectProgram()
+{
+  if (selectable_program >= PRG_AVOIDANCE && selectable_program < PRG_LINE_TRACKING)
+    selectable_program = Program((int)selectable_program + 1);
+  else
+    selectable_program = PRG_AVOIDANCE;
+
+  static const char* map[] = {
+    "AVOIDANCE",
+    "FOLLOWING",
+    "ANTIDROP",
+    "LINE_TRACKING",
+  };
+
+  display.items[LCD_SELECTABLE_PROGRAM]->enable(true);
+  display.items[LCD_SELECTABLE_PROGRAM]->set(map[selectable_program - PRG_AVOIDANCE]);
+
+  commandInterpretator('S');
+}
+
+void startProgram()
+{
+  display.items[LCD_SELECTABLE_PROGRAM]->enable(false);
+  if (program == selectable_program)
+    commandInterpretator('S');
+  else
+  {
+    //startProgram(selectable_program); пока через команды
+    switch (selectable_program)
+    {
+    case PRG_AVOIDANCE: commandInterpretator('A'); break;
+    case PRG_FOLLOWING: commandInterpretator('W'); break;
+    case PRG_ANTIDROP: commandInterpretator('D'); break;
+    case PRG_LINE_TRACKING: commandInterpretator('T'); break;
+    }
+  }
+}
+
 
 void gamepadControl(const GamepadData &package)
 {
-  static Program selectable_program = PRG_NONE;
   static uint16_t buttons = 0;
   static uint8_t miscButtons = 0;
   static uint8_t dpad = 0;
@@ -218,41 +246,9 @@ void gamepadControl(const GamepadData &package)
   }
 
   if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_SELECT)
-  {
-    if (selectable_program >= PRG_AVOIDANCE && selectable_program < PRG_LINE_TRACKING)
-      selectable_program = Program((int)selectable_program + 1);
-    else
-      selectable_program = PRG_AVOIDANCE;
-
-    static const char* map[] = {
-    "AVOIDANCE",
-    "FOLLOWING",
-    "ANTIDROP",
-    "LINE_TRACKING",
-    };
-
-    display.items[LCD_SELECTABLE_PROGRAM]->enable(true);
-    display.items[LCD_SELECTABLE_PROGRAM]->set(map[selectable_program - PRG_AVOIDANCE]);
-
-    commandInterpretator('S');
-  }
+    selectProgram();
   else if (~miscButtons & package.miscButtons & GAMEPAD_BUTTON_MISC_START)
-  {
-    display.items[LCD_SELECTABLE_PROGRAM]->enable(false);
-    if (program == selectable_program)
-      commandInterpretator('S');
-    else
-    {
-      //startProgram(selectable_program); пока через команды
-      switch (selectable_program)
-      {
-      case PRG_AVOIDANCE: commandInterpretator('A'); break;
-      case PRG_FOLLOWING: commandInterpretator('W'); break;
-      case PRG_ANTIDROP: commandInterpretator('D'); break;
-      case PRG_LINE_TRACKING: commandInterpretator('T'); break;
-      }
-    }
-  }
+    startProgram();
 
   buttons = package.buttons;
   miscButtons = package.miscButtons;
@@ -262,7 +258,7 @@ void gamepadControl(const GamepadData &package)
 
 
 
-void startProgram(Program _program)
+void setProgram(Program _program)
 {
   program = _program;
 }
@@ -298,32 +294,32 @@ void commandInterpretator(char cmd)
 
     switch (cmd)
     {
-      case 'F': startProgram(PRG_MOVING_FORWARD);   bot.chassis.moveForward(chassis_speed);   break;
-      case 'B': startProgram(PRG_MOVING_BACKWARD);  bot.chassis.moveBackward(chassis_speed);  break;
-      case 'L': startProgram(PRG_TURNING_LEFT);     bot.chassis.rotateRight(chassis_speed);   break;
-      case 'R': startProgram(PRG_TURNING_RIGHT);    bot.chassis.rotateLeft(chassis_speed);    break;
+      case 'F': setProgram(PRG_NONE); bot.chassis.moveForward(chassis_speed);   break;
+      case 'B': setProgram(PRG_NONE); bot.chassis.moveBackward(chassis_speed);  break;
+      case 'L': setProgram(PRG_NONE); bot.chassis.rotateRight(chassis_speed);   break;
+      case 'R': setProgram(PRG_NONE); bot.chassis.rotateLeft(chassis_speed);    break;
       case 'G':
-      case 'S': startProgram(PRG_NONE);             bot.chassis.stop();                       break;
+      case 'S': setProgram(PRG_NONE); bot.chassis.stop();                       break;
 
       case 'X': chassis_speed = SPEED_LOW;      break;
       case 'Y': chassis_speed = SPEED_MEDIUM;   break;
       case 'Z': chassis_speed = SPEED_HIGH;     break;
-      case 'A': startProgram(PRG_AVOIDANCE);      break;
-      case 'D': startProgram(PRG_ANTIDROP);       break;
-      case 'W': startProgram(PRG_FOLLOWING);      break;
-      case 'T': startProgram(PRG_LINE_TRACKING);  break;
+      case 'A': setProgram(PRG_AVOIDANCE);      break;
+      case 'D': setProgram(PRG_ANTIDROP);       break;
+      case 'W': setProgram(PRG_FOLLOWING);      break;
+      case 'T': setProgram(PRG_LINE_TRACKING);  break;
 
       case '1': enableSensors(!bot.enableSensors);  break;
       case '2': enableServos(!bot.hand.attached());  break;
       case 'x': bot.hand.moveToDefault(); break;
 
-      case 'o': startProgram(PRG_CLAW_OPENING);         bot.hand.clawOpen(120);     break;
-      case 'c': startProgram(PRG_CLAW_CLOSING);         bot.hand.clawClose(120);    break;
-      case 'u': startProgram(PRG_ARM_DESCENDING);       bot.hand.armDescend(60);    break;
-      case 'd': startProgram(PRG_ARM_RISING);           bot.hand.armRise(60);       break;
-      case 'l': startProgram(PRG_BASE_TURNING_LEFT);    bot.hand.baseTurnLeft(80);  break;
-      case 'r': startProgram(PRG_BASE_TURNING_RIGHT);   bot.hand.baseTurnRight(80); break;
-      case 's': startProgram(PRG_NONE);                 bot.hand.stop();            break;
+      case 'o': setProgram(PRG_NONE); bot.hand.clawOpen(120);     break;
+      case 'c': setProgram(PRG_NONE); bot.hand.clawClose(120);    break;
+      case 'u': setProgram(PRG_NONE); bot.hand.armDescend(60);    break;
+      case 'd': setProgram(PRG_NONE); bot.hand.armRise(60);       break;
+      case 'l': setProgram(PRG_NONE); bot.hand.baseTurnLeft(80);  break;
+      case 'r': setProgram(PRG_NONE); bot.hand.baseTurnRight(80); break;
+      case 's': setProgram(PRG_NONE); bot.hand.stop();            break;
 
       case 'm':
         if (programMayBeRewrite)
@@ -335,7 +331,7 @@ void commandInterpretator(char cmd)
         programMayBeRewrite = true;
         currentAction = 0;
         if (nActions)
-          startProgram(PRG_MEMORY_ACTION);
+          setProgram(PRG_MEMORY_ACTION);
         break;
 
     }
@@ -344,6 +340,7 @@ void commandInterpretator(char cmd)
 void IR_control()
 {
   static uint8_t old = IR_KEYCODE_OK;
+  static char stop = 0;
 
   if (ir.available(true))
   {
@@ -355,30 +352,31 @@ void IR_control()
     char command = 0;
     switch (code)
     {
-      //case IR_KEYCODE_1: command = ''; break;
-      case IR_KEYCODE_2: command = 'u'; break;
-      //case IR_KEYCODE_3: command = ''; break;
-      case IR_KEYCODE_4: command = 'l'; break;
-      case IR_KEYCODE_5: command = 'x'; break;
-      case IR_KEYCODE_6: command = 'r'; break;
-      case IR_KEYCODE_7: command = 'o'; break;
-      case IR_KEYCODE_8: command = 'd'; break;
-      case IR_KEYCODE_9: command = 'c'; break;
+      case IR_KEYCODE_1: command = 'm'; stop = 's'; break;
+      case IR_KEYCODE_2: command = 'u'; stop = 's'; break;
+      case IR_KEYCODE_3: command = 'a'; stop = 's'; break;
+      case IR_KEYCODE_4: command = 'l'; stop = 's'; break;
+      case IR_KEYCODE_5: command = 'x'; stop = 's'; break;
+      case IR_KEYCODE_6: command = 'r'; stop = 's'; break;
+      case IR_KEYCODE_7: command = 'o'; stop = 's'; break;
+      case IR_KEYCODE_8: command = 'd'; stop = 's'; break;
+      case IR_KEYCODE_9: command = 'c'; stop = 's'; break;
       //case IR_KEYCODE_0: command = ''; break;
-      //case IR_KEYCODE_STAR: command = ''; break;
-      //case IR_KEYCODE_POUND: command = ''; break;
-      case IR_KEYCODE_UP: command = 'F'; break;
-      case IR_KEYCODE_DOWN: command = 'B'; break;
-      case IR_KEYCODE_OK: command = 's'; break;
-      case IR_KEYCODE_LEFT: command = 'L'; break;
-      case IR_KEYCODE_RIGHT: command = 'R'; break;
+      case IR_KEYCODE_STAR: selectProgram(); stop = 0; break;
+      case IR_KEYCODE_POUND: startProgram(); stop = 0; break;
+      case IR_KEYCODE_UP: command = 'F'; stop = 'S'; break;
+      case IR_KEYCODE_DOWN: command = 'B'; stop = 'S'; break;
+      case IR_KEYCODE_OK: command = 's'; stop = 'S'; break;
+      case IR_KEYCODE_LEFT: command = 'L'; stop = 'S'; break;
+      case IR_KEYCODE_RIGHT: command = 'R'; stop = 'S'; break;
     };
     if (command)
       commandInterpretator(command);
   }
-  else if (ir.timeout(200)) // ждём таймаут от последнего кода и стоп
+  else if (ir.timeout(100)) // ждём таймаут от последнего кода и стоп
   {
-    commandInterpretator(bot.chassis.isMoving() ? 'S' : 's');
+    if (stop)
+      commandInterpretator(stop);
     old = IR_KEYCODE_OK;
   }
 }
