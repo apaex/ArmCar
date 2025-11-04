@@ -347,23 +347,27 @@ void IR_control()
 
     switch (code)
     {
-      case IR_KEYCODE_1:      commandInterpretator('m'); stop = 's'; break;
-      case IR_KEYCODE_2:      commandInterpretator('u'); stop = 's'; break;
-      case IR_KEYCODE_3:      commandInterpretator('a'); stop = 's'; break;
-      case IR_KEYCODE_4:      commandInterpretator('l'); stop = 's'; break;
-      case IR_KEYCODE_5:      commandInterpretator('x'); stop = 's'; break;
-      case IR_KEYCODE_6:      commandInterpretator('r'); stop = 's'; break;
-      case IR_KEYCODE_7:      commandInterpretator('o'); stop = 's'; break;
-      case IR_KEYCODE_8:      commandInterpretator('d'); stop = 's'; break;
-      case IR_KEYCODE_9:      commandInterpretator('c'); stop = 's'; break;
-      case IR_KEYCODE_0:      break;
-      case IR_KEYCODE_STAR:   selectProgram(); break;
-      case IR_KEYCODE_POUND:  startProgram(); break;
       case IR_KEYCODE_UP:     commandInterpretator('F'); stop = 'S'; break;
       case IR_KEYCODE_DOWN:   commandInterpretator('B'); stop = 'S'; break;
-      case IR_KEYCODE_OK:     commandInterpretator('s'); break;
       case IR_KEYCODE_LEFT:   commandInterpretator('L'); stop = 'S'; break;
       case IR_KEYCODE_RIGHT:  commandInterpretator('R'); stop = 'S'; break;
+
+      case IR_KEYCODE_4:      commandInterpretator('l'); stop = 's'; break;
+      case IR_KEYCODE_6:      commandInterpretator('r'); stop = 's'; break;
+      case IR_KEYCODE_2:      commandInterpretator('u'); stop = 's'; break;
+      case IR_KEYCODE_8:      commandInterpretator('d'); stop = 's'; break;
+      case IR_KEYCODE_7:      commandInterpretator('o'); stop = 's'; break;
+      case IR_KEYCODE_9:      commandInterpretator('c'); stop = 's'; break;
+
+      case IR_KEYCODE_STAR:   selectProgram(); break;
+      case IR_KEYCODE_POUND:  startProgram(); break;
+
+      case IR_KEYCODE_OK:     commandInterpretator('s'); break;
+      case IR_KEYCODE_5:      commandInterpretator('x'); break;
+      case IR_KEYCODE_0:      break;
+
+      case IR_KEYCODE_1:      commandInterpretator('m'); break;
+      case IR_KEYCODE_3:      commandInterpretator('a'); break;
     };
   }
   else if (ir.timeout(100)) // ждём таймаут от последнего кода и стоп
