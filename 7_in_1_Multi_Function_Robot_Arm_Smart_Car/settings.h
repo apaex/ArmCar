@@ -1,6 +1,7 @@
 #define DEBUG 0
 #define DEBUG_TIME_PRINT 0
 
+#if defined(ARDUINO_ARCH_AVR)
 
 #define PIN_SERVO_CLAW 9
 #define PIN_SERVO_ARM 10
@@ -22,6 +23,31 @@
 
 #define PIN_ULTRASOIC_TRIG 12
 #define PIN_ULTRASOIC_ECHO 13
+
+#elif defined(ARDUINO_ARCH_ESP32)
+
+#define PIN_SERVO_CLAW 9
+#define PIN_SERVO_ARM 10
+#define PIN_SERVO_BASE 11
+
+#define PIN_IR 3
+
+#define PIN_TRACKER_LEFT 7
+#define PIN_TRACKER_CENTER 8
+#define PIN_TRACKER_RIGHT 1
+
+#define PIN_BUMPER_LEFT A3
+#define PIN_BUMPER_RIGHT A0
+
+#define PIN_MOTOR_LEFT_DIRECTION 2
+#define PIN_MOTOR_LEFT_PWM 5
+#define PIN_MOTOR_RIGHT_DIRECTION 4
+#define PIN_MOTOR_RIGHT_PWM 6
+
+#define PIN_ULTRASOIC_TRIG 12
+#define PIN_ULTRASOIC_ECHO 13
+
+#endif
 
 
 
