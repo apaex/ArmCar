@@ -282,11 +282,13 @@ void gamepadControl(const GamepadData &package)
   int vx = -axisY;
   int rz = -axisX;
 
-  rz /= 1.5;
-  if (!(package.buttons & GAMEPAD_BUTTON_M4))
+  vx /= 2;
+  rz /= 3;
+
+  if ((package.buttons & GAMEPAD_BUTTON_M4))
   {
-    vx /= 2;
-    rz /= 2;
+    vx *= 2;
+    rz *= 2;
   }
 
   bot.chassis.setVelocities(vx, rz, true);
@@ -296,14 +298,17 @@ void gamepadControl(const GamepadData &package)
     commandInterpretator('x');
   else if (program != PRG_MEMORY_ACTION)
   {
-    int r_base = -axisRX/2;
-    int r_arm = -axisRY/2;
+    int r_base = -axisRX;
+    int r_arm = -axisRY;
     int r_claw = axisT;
 
-    if (!(package.buttons & GAMEPAD_BUTTON_M4))
+    r_base /= 1.5;
+    r_arm /= 2;
+
+    if ((package.buttons & GAMEPAD_BUTTON_M4))
     {
-      r_base /= 2;
-      r_arm /= 2;
+      r_base *= 2;
+      r_arm *= 2;
     }
 
     bot.hand.setVelocities(r_base, r_arm, r_claw);
