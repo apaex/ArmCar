@@ -95,6 +95,22 @@ void Line_tracking_Function()  //ходить по линии
     bot.chassis.stop();
 }
 
+void delay_(unsigned long ms)
+{
+  unsigned long start = millis();
+  while (millis() - start < ms)
+  {
+    calcFps();
+
+    IR_control();
+    UART_control();
+
+    bot.readSensors();
+    displayUpdate();
+    bot.tick();
+  }
+}
+
 void Anti_drop_Function() //не падать со стола
 {
   if (bot.trackingSensorLeft && bot.trackingSensorCenter && bot.trackingSensorRight)
@@ -102,9 +118,9 @@ void Anti_drop_Function() //не падать со стола
   else
   {
     bot.chassis.moveBackward(60);
-    delay(600);
+    delay_(600);
     bot.chassis.rotateLeft(60);
-    delay(500);
+    delay_(500);
   }
 }
 
@@ -127,12 +143,12 @@ void Avoidance_Function() //уклонение
   if (bot.distanceSensor <= 25)
   {
     bot.chassis.stop();
-    delay(100);
+    delay_(100);
     if (bot.distanceSensor <= 15)
       bot.chassis.moveBackward(100);
     else
       bot.chassis.rotateLeft(100);
-    delay(600);
+    delay_(600);
   }
   else
     bot.chassis.moveForward(70);
