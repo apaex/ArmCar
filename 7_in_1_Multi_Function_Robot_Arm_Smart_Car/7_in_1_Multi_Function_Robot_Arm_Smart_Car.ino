@@ -82,16 +82,16 @@ void storePosition()
 
 void Line_tracking_Function()  //ходить по линии
 {
-  if (bot.trackingSensorLeft && !bot.trackingSensorCenter && bot.trackingSensorRight)
+  if (bot.trackingSensorLeft && !bot.trackingSensorCenter && bot.trackingSensorRight)             // ░ ▓ ░
     bot.chassis.moveForward(120);
 
-  else if (!bot.trackingSensorLeft && bot.trackingSensorRight)
-    bot.chassis.rotateLeft(!bot.trackingSensorCenter ? 80 : 120);
+  else if (!bot.trackingSensorLeft && bot.trackingSensorRight)                                    // ▓ * ░
+    bot.chassis.rotateLeft(bot.trackingSensorCenter ? 120 : 80);
 
-  else if (bot.trackingSensorLeft && !bot.trackingSensorRight)
-    bot.chassis.rotateRight(!bot.trackingSensorCenter ? 80 : 120);
+  else if (bot.trackingSensorLeft && !bot.trackingSensorRight)                                    // ░ * ▓
+    bot.chassis.rotateRight(bot.trackingSensorCenter ? 120 : 80);
 
-  else if (!bot.trackingSensorLeft && !bot.trackingSensorCenter && !bot.trackingSensorRight)
+  else if (!bot.trackingSensorLeft && !bot.trackingSensorCenter && !bot.trackingSensorRight)      // ▓ ▓ ▓
     bot.chassis.stop();
 }
 
@@ -370,8 +370,8 @@ void IR_control()
       case IR_KEYCODE_6:      commandInterpretator('r'); stop = 's'; break;
       case IR_KEYCODE_2:      commandInterpretator('u'); stop = 's'; break;
       case IR_KEYCODE_8:      commandInterpretator('d'); stop = 's'; break;
-      case IR_KEYCODE_7:      commandInterpretator('o'); stop = 's'; break;
-      case IR_KEYCODE_9:      commandInterpretator('c'); stop = 's'; break;
+      case IR_KEYCODE_7:      commandInterpretator('c'); stop = 's'; break;
+      case IR_KEYCODE_9:      commandInterpretator('o'); stop = 's'; break;
       case IR_KEYCODE_OK:     commandInterpretator('s'); break;
       case IR_KEYCODE_5:      commandInterpretator('x'); break;
 
@@ -433,11 +433,11 @@ void UART_control()
 void displayInit()
 {
   display.items[LCD_FPS] = new LcdItem<uint32_t>((byte)0, (byte)3, (byte)6, "%6lu");
-  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdItem<bool>(16, 2, 1, "o^");
-  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdItem<bool>(17, 2, 1, "o^");
-  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdItem<bool>(18, 2, 1, "o^");
-  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdItem<bool>(15, 2, 1, "o<");
-  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdItem<bool>(19, 2, 1, "o>");
+  display.items[LCD_TRACKING_SENSOR_LEFT] = new LcdItem<bool>(16, 2, 1, ".-");
+  display.items[LCD_TRACKING_SENSOR_CENTER] = new LcdItem<bool>(17, 2, 1, ".-");
+  display.items[LCD_TRACKING_SENSOR_RIGHT] = new LcdItem<bool>(18, 2, 1, ".-");
+  display.items[LCD_BUMPER_SENSOR_LEFT] = new LcdItem<bool>(15, 2, 1, "o[");
+  display.items[LCD_BUMPER_SENSOR_RIGHT] = new LcdItem<bool>(19, 2, 1, "o]");
   display.items[LCD_DISTANCE_SENSOR] = new LcdItem<uint8_t>(16, 3, 3, "%3u");
   display.items[LCD_COMMAND_COUNTER] = new LcdItem<uint8_t>(0, 0, 3, "%3u");
   display.items[LCD_COMMAND] = new LcdItem<char>(4, 0, 1, "%c");
