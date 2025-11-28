@@ -97,21 +97,3 @@ void lcdShowFps()
   }
   ++nFrames;
 }
-
-void lcdShowSensors(bool trackingSensorLeft, bool trackingSensorCenter, bool trackingSensorRight, uint8_t distanceSensor, bool bumperSensorLeft, bool bumperSensorRight)
-{
-/*
-  static uint32_t tmr = 0;
-  if (millis() - tmr < 100)
-    return;
-  tmr = millis();
-*/
-
-  lcd_printAt(15, 1, trackingSensorLeft ? '^' : 'o');
-  lcd_printAt(16, 1, trackingSensorCenter ? '^' : 'o');
-  lcd_printAt(17, 1, trackingSensorRight ? '^' : 'o');
-  lcd_printAt(14, 2, bumperSensorLeft ? '<' : 'o');
-  lcd_printAt(18, 2, bumperSensorRight ? '>' : 'o');
-  lcd_printAt(15, 3, "   ");
-  lcd_printAt(15, 3, distanceSensor ? distanceSensor : 000);
-}
