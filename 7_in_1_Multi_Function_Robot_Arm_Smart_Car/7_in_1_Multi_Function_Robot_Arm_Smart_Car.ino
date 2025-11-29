@@ -83,13 +83,13 @@ void storePosition()
 void Line_tracking_Function()  //ходить по линии
 {
   if (bot.trackingSensorLeft && !bot.trackingSensorCenter && bot.trackingSensorRight)             // ░ ▓ ░
-    bot.chassis.moveForward(120);
+    bot.chassis.moveForward(SPEED_LINE_TRACKING);
 
   else if (!bot.trackingSensorLeft && bot.trackingSensorRight)                                    // ▓ * ░
-    bot.chassis.rotateLeft(bot.trackingSensorCenter ? 120 : 80);
+    bot.chassis.rotateLeft(bot.trackingSensorCenter ? SPEED_LINE_TRACKING :  SPEED_LINE_TRACKING*2/3);
 
   else if (bot.trackingSensorLeft && !bot.trackingSensorRight)                                    // ░ * ▓
-    bot.chassis.rotateRight(bot.trackingSensorCenter ? 120 : 80);
+    bot.chassis.rotateRight(bot.trackingSensorCenter ? SPEED_LINE_TRACKING : SPEED_LINE_TRACKING*2/3);
 
   else if (!bot.trackingSensorLeft && !bot.trackingSensorCenter && !bot.trackingSensorRight)      // ▓ ▓ ▓
     bot.chassis.stop();
@@ -243,8 +243,8 @@ void commandInterpretator(char cmd)
     {
       case 'F': setProgram(PRG_NONE); bot.chassis.moveForward(chassis_speed);   break;
       case 'B': setProgram(PRG_NONE); bot.chassis.moveBackward(chassis_speed);  break;
-      case 'L': setProgram(PRG_NONE); bot.chassis.rotateRight(chassis_speed);   break;
-      case 'R': setProgram(PRG_NONE); bot.chassis.rotateLeft(chassis_speed);    break;
+      case 'L': setProgram(PRG_NONE); bot.chassis.rotateLeft(chassis_speed);    break;
+      case 'R': setProgram(PRG_NONE); bot.chassis.rotateRight(chassis_speed);   break;
       case 'G':
       case 'S': setProgram(PRG_NONE); bot.chassis.stop();                       break;
 

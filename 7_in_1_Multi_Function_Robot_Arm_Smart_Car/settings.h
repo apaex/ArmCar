@@ -73,6 +73,7 @@
 #define SPEED_LOW 40
 #define SPEED_MEDIUM 120
 #define SPEED_HIGH 255
+#define SPEED_LINE_TRACKING 120
 
 #define ACTIONS_COUNT 20
 

@@ -74,8 +74,8 @@ public:
 
     void moveForward(int speed)  { setVelocities(speed, 0); }
     void moveBackward(int speed) { setVelocities(-speed, 0); }
-    void rotateLeft(int speed)   { setVelocities(0, -speed); }
-    void rotateRight(int speed)  { setVelocities(0, speed); }
+    void rotateLeft(int speed)   { setVelocities(0, speed); }
+    void rotateRight(int speed)  { setVelocities(0, -speed); }
     void stop()                  { setMotorSpeeds(0, 0); }
 
     void tick()
