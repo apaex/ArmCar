@@ -10,7 +10,7 @@
 * Поддерживается геймпад
 
 ## Сборка
-Сборка прошивки, в отличие от оригинальной, требует установки некоторого количества библиотек.
+Сборка прошивки требует установки некоторого количества библиотек.
 * Servo by Michael Margolis Version 1.3.0
 * LiquidCrystal I2C by Frank de Brabander Version 1.1.2
 * CRC by Rob Tillaart Version 1.0.3
