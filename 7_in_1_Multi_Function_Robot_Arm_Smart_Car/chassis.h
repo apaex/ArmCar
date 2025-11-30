@@ -41,15 +41,15 @@ public:
         motorL.setMinDuty(MOTOR_MIN_DUTY);
         motorR.setMinDuty(MOTOR_MIN_DUTY);
 
-        motorL.smoothMode(false);
-        motorR.smoothMode(false);
-
         // плавность скорости моторов
         motorL.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
         motorR.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
+
+        motorL.smoothMode(false);
+        motorR.smoothMode(false);
     }
 
-    void setMotorSpeeds(int dutyL, int dutyR, bool instantly = false)
+    void setMotorSpeeds(int dutyL, int dutyR, bool smooth = false)
     {
         dutyL = constrain(dutyL, -255, 255);
         dutyR = constrain(dutyR, -255, 255);
@@ -57,19 +57,19 @@ public:
         setState(dutyL, dutyR);
 
         //DebugWrite("dl-dr", _dutyL, _dutyR);
-        motorL.smoothMode(!instantly);
-        motorR.smoothMode(!instantly);
+        motorL.smoothMode(smooth);
+        motorR.smoothMode(smooth);
         motorL.setSpeed(-dutyL);
         motorR.setSpeed(dutyR);
     }
 
-    void setVelocities(int vx, int rz, bool instantly = false)
+    void setVelocities(int vx, int rz, bool smooth = false)
     {
         // танковая схема
         int dutyL = vx - rz;
         int dutyR = vx + rz;
 
-        return setMotorSpeeds(dutyL, dutyR, instantly);
+        return setMotorSpeeds(dutyL, dutyR, smooth);
     }
 
     void moveForward(int speed)  { setVelocities(speed, 0); }

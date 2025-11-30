@@ -307,7 +307,7 @@ void gamepadControl(const GamepadData &package)
     rz *= 2;
   }
 
-  bot.chassis.setVelocities(vx, rz, true);
+  bot.chassis.setVelocities(vx, rz);
 
 
   if (package.buttons & GAMEPAD_BUTTON_R)
