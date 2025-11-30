@@ -299,7 +299,7 @@ void gamepadControl(const GamepadData &package)
   int rz = -axisX;
 
   vx /= 2;
-  rz /= 3;
+  rz /= 4;
 
   if ((package.buttons & GAMEPAD_BUTTON_M4))
   {
