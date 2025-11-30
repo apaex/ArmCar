@@ -6,8 +6,8 @@
 //#define CAMERA_MODEL_WROVER_KIT
 //#define CAMERA_MODEL_M5STACK_PSRAM
 #define CAMERA_MODEL_AI_THINKER
-const char* ssid1 = "ESP32-CAM Robot";
-const char* password1 = "";
+const char* ssid = "F-12";
+const char* password = "Actitrade2015";
 
 extern void robot_stop();
 extern void robot_setup();
@@ -112,34 +112,23 @@ void setup() {
   sensor_t * s = esp_camera_sensor_get();
   s->set_framesize(s, FRAMESIZE_CIF);
 
-  // WiFi.begin(ssid, password);
+  WiFi.begin(ssid, password);
 
-  // while (WiFi.status() != WL_CONNECTED) {
-  //   delay(500);
-  //   Serial.print(".");
-  // }
-  // Serial.println("");
-  // Serial.println("WiFi connected");
+  while (WiFi.status() != WL_CONNECTED) {
+     delay(500);
+     Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
 
-  // startCameraServer();
-
-  // Serial.print("Camera Ready! Use 'http://");
-  // Serial.print(WiFi.localIP());
-  // WiFiAddr = WiFi.localIP().toString();
-  // Serial.println("' to connect");
-  
-  WiFi.softAP(ssid1, password1);
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(myIP);
+  startCameraServer();
 
   Serial.print("Camera Ready! Use 'http://");
-  Serial.print(WiFi.softAPIP());
-  WiFiAddr = WiFi.softAPIP().toString();
+  Serial.print(WiFi.localIP());
+  WiFiAddr = WiFi.localIP().toString();
   Serial.println("' to connect");
-  startCameraServer();
-  digitalWrite(33,LOW);
 
+  digitalWrite(33,LOW);
 }
 
 void loop() 
