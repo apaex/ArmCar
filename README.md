@@ -10,16 +10,14 @@
 * Поддерживается геймпад
 
 ## Сборка
-Сборка прошивки, в отличие от оригинальной, требует установки некоторого количества библиотек. 
-* Servo by Michael Margolis Version 1.1.2 
-* LiquidCrystal I2C by Frank de Brabander Version 1.1.2 
-* CRC by Rob Tillaart Version 1.0.3 
-* NecDecoder by AlexGyver Version 3.0.2 
-* GyverMotor by AlexGyver Version 4.1.1 
-* GyverIO by AlexGyver Version 1.3.11 
-* GyverPing by AlexGyver Version 1.0.1 
+Сборка прошивки, в отличие от оригинальной, требует установки некоторого количества библиотек.
+* Servo by Michael Margolis Version 1.3.0
+* LiquidCrystal I2C by Frank de Brabander Version 1.1.2
+* CRC by Rob Tillaart Version 1.0.3
+* NecDecoder by AlexGyver Version 3.0.3
+* GyverMotor by AlexGyver Version 4.2.0
+* GyverIO by AlexGyver Version 1.3.13
+* GyverPing by AlexGyver Version 1.0.1
 
 Обратите внимание на версии библиотек. Если программа не собирается или не работает с другой версией - установите указанные, на которых тестировалась работа.
-  
-TODO:
-* Пока не работают программы антидроп, преследование и убегание
+
