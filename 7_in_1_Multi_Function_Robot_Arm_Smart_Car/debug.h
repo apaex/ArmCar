@@ -2,31 +2,6 @@
 
 #include "printf.h"
 
-const char* debugState(int state)
-{
-  const static char* states[] =
-  {
-    "NONE",
-    "STATE_TURNING_LEFT",
-    "STATE_TURNING_RIGHT",
-    "STATE_MOVING_FORWARD",
-    "STATE_MOVING_BACKWARD",
-    "STATE_CLAW_CLOSING",
-    "STATE_CLAW_OPENING",
-    "STATE_ARM_RISING",
-    "STATE_ARM_DESCENDING",
-    "STATE_BASE_TURNING_LEFT",
-    "STATE_BASE_TURNING_RIGHT",
-    "MEMORY_ACTION",
-    "PROGRAM_AVOIDANCE",
-    "PROGRAM_FOLLOWING",
-    "PROGRAM_ANTIDROP",
-    "PROGRAM_LINE_TRACKING",
-  };
-
-  return states[state];
-}
-
 #ifdef DEBUG
 
 #include <HardwareSerial.h>

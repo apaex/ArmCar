@@ -51,7 +51,7 @@
 
 
 
-#define MOTOR_SMOOTH_SPEED 100      // плавность скорости моторов
+#define MOTOR_SMOOTH_SPEED 100     // плавность скорости моторов
 #define MOTOR_MIN_DUTY 30          // мин. сигнал, при котором мотор начинает вращение
 
 #define GAMEPAD_RX_MIN -508        //LEFT-RIGHT
@@ -85,7 +85,7 @@
 #define SERVO_BASE_MAX 180
 #define SERVO_ARM_MIN 30    //верх
 #define SERVO_ARM_MAX 175   //низ
-#define SERVO_CLAW_MIN 120   // открыто
+#define SERVO_CLAW_MIN 120  // открыто
 #define SERVO_CLAW_MAX 173  // закрыто
 
 #define SERVO_SCALE_FACTOR 3                                // ((2400-544) << 3)/255 = 58 шагов на самой быстрой скорости [шаг 3 градуса]
