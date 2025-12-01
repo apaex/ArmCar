@@ -1,6 +1,7 @@
 #include <CRC.h>
 #define NEC_SKIP_REPEATS 0
 #include <NecDecoder.h>
+#include <Beeper.h>
 #include "settings.h"
 #include "hand.h"
 #include "chassis.h"
@@ -13,6 +14,7 @@
 #include "ir.h"
 
 LiquidCrystal_I2C lcd(DISPLAY_ADDRESS, DISPLAY_NCOL, DISPLAY_NROW);
+Beeper buz(PIN_BEEPER);
 
 NecDecoder ir;
 Bot bot;
@@ -524,6 +526,9 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(PIN_IR), irIsr, FALLING);
 
   displayInit();
+
+  buz.useTone(true);
+  tone(PIN_BEEPER, 1000, 100);
 }
 
 
@@ -548,10 +553,14 @@ void loop()
   if (program == PRG_NONE && bot.chassis.getState() == MOVING_FORWARD)  // ручное движение
   {
     if (bot.bumperSensorLeft || bot.bumperSensorRight || bot.distanceSensor < 5)  // проверка бамперов
+    {
+      buz.beep(1000, 3, 100, 100);
       bot.chassis.stop();
+    }
   }
 
   displayUpdate();
 
+  buz.tick();
   bot.tick();
 }

@@ -24,6 +24,8 @@
 #define PIN_ULTRASOIC_TRIG 12
 #define PIN_ULTRASOIC_ECHO 13
 
+#define PIN_BEEPER A2
+
 #elif defined(ARDUINO_ARCH_ESP32)
 
 #define PIN_SERVO_CLAW 9
