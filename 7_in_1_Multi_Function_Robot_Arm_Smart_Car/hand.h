@@ -49,6 +49,12 @@ struct HandPosition
     HandPosition()
     {}
 
+    HandPosition(const int angles_[])
+    {
+        for (byte i=0; i<N_SERVOS; ++i)
+            angles[i] = angles_[i];
+    }
+
     HandPosition(const HandPosition& src)
     {
         for (byte i=0; i<N_SERVOS; ++i)

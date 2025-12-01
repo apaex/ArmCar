@@ -527,6 +527,16 @@ void setup()
 
   displayInit();
 
+  int skill[4][N_SERVOS] = {
+    {SCALE(90), SCALE(30), SCALE(120)},
+    {SCALE(90), SCALE(120), SCALE(120)},
+    {SCALE(90), SCALE(120), SCALE(170)},
+    {SCALE(90), SCALE(50), SCALE(170)}
+  };
+
+  for (int i=0; i<4; ++i)
+    mem[nActions++] = HandPosition(skill[i]);
+
   buz.useTone(true);
   tone(PIN_BEEPER, 1000, 100);
 }
