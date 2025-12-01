@@ -40,7 +40,7 @@ public:
 
     void measureDistance()
     {
-        EVERY(300);
+        EVERY(100);
 
         sonar.ping();
         distanceSensor = sonar.getRaw() / 10;
