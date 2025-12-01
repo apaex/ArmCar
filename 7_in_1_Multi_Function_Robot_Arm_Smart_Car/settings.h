@@ -82,7 +82,7 @@
 #define ACTIONS_COUNT 20
 
 #define SERVO_BASE_DEF 90
-#define SERVO_ARM_DEF 50
+#define SERVO_ARM_DEF 30
 #define SERVO_CLAW_DEF 120
 
 #define SERVO_BASE_MIN 0
