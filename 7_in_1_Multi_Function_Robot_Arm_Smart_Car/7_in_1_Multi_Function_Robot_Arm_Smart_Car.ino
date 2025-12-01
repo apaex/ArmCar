@@ -545,6 +545,12 @@ void loop()
     case PRG_LINE_TRACKING:       Line_tracking_Function();   break;
   }
 
+  if (program == PRG_NONE && bot.chassis.getState() == MOVING_FORWARD)  // ручное движение
+  {
+    if (bot.bumperSensorLeft || bot.bumperSensorRight || bot.distanceSensor < 5)  // проверка бамперов
+      bot.chassis.stop();
+  }
+
   displayUpdate();
 
   bot.tick();
