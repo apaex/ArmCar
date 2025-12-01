@@ -80,7 +80,7 @@ public:
     void moveBackward(int speed, uint16_t accel = 0) { setVelocities(-speed, 0, accel); }
     void rotateLeft(int speed, uint16_t accel = 0)   { setVelocities(0, speed, accel); }
     void rotateRight(int speed, uint16_t accel = 0)  { setVelocities(0, -speed, accel); }
-    void stop()                  { setMotorSpeeds(0, 0); }
+    void stop(uint16_t accel = 0)                    { setMotorSpeeds(0, 0, accel); }
 
     void tick()
     {

@@ -85,13 +85,13 @@ void storePosition()
 void Line_tracking_Function()  //ходить по линии
 {
   if (bot.trackingSensorLeft && !bot.trackingSensorCenter && bot.trackingSensorRight)             // ░ ▓ ░
-    bot.chassis.moveForward(SPEED_LINE_TRACKING);
+    bot.chassis.moveForward(TRACKING_SPEED);
 
   else if (!bot.trackingSensorLeft && bot.trackingSensorRight)                                    // ▓ * ░
-    bot.chassis.rotateLeft(bot.trackingSensorCenter ? SPEED_LINE_TRACKING :  SPEED_LINE_TRACKING*2/3);
+    bot.chassis.rotateLeft(bot.trackingSensorCenter ? TRACKING_SPEED :  TRACKING_SPEED*2/3);
 
   else if (bot.trackingSensorLeft && !bot.trackingSensorRight)                                    // ░ * ▓
-    bot.chassis.rotateRight(bot.trackingSensorCenter ? SPEED_LINE_TRACKING : SPEED_LINE_TRACKING*2/3);
+    bot.chassis.rotateRight(bot.trackingSensorCenter ? TRACKING_SPEED : TRACKING_SPEED*2/3);
 
   else if (!bot.trackingSensorLeft && !bot.trackingSensorCenter && !bot.trackingSensorRight)      // ▓ ▓ ▓
     bot.chassis.stop();
@@ -116,12 +116,12 @@ void delay_(unsigned long ms)
 void Anti_drop_Function() //не падать со стола
 {
   if (bot.trackingSensorLeft && bot.trackingSensorCenter && bot.trackingSensorRight)
-    bot.chassis.moveForward(60);
+    bot.chassis.moveForward(ANTIDROP_SPEED, ANTIDROP_ACCEL);
   else
   {
-    bot.chassis.moveBackward(60);
+    bot.chassis.moveBackward(ANTIDROP_SPEED);
     delay_(600);
-    bot.chassis.rotateLeft(60);
+    bot.chassis.rotateLeft(ANTIDROP_SPEED, ANTIDROP_ACCEL);
     delay_(500);
   }
 }
@@ -129,15 +129,15 @@ void Anti_drop_Function() //не падать со стола
 void Following_Function() //преследование
 {
   if (bot.distanceSensor < 15)
-    bot.chassis.moveBackward(SPEED_FOLLOWING * 0.8, ACCEL_FOLLOWING);
+    bot.chassis.moveBackward(FOLLOWING_SPEED * 0.8, FOLLOWING_ACCEL);
   else if (bot.distanceSensor <= 20)
-    bot.chassis.stop();
+    bot.chassis.stop(FOLLOWING_ACCEL);
   else if (bot.distanceSensor <= 25)
-    bot.chassis.moveForward(SPEED_FOLLOWING * 0.8, ACCEL_FOLLOWING);
+    bot.chassis.moveForward(FOLLOWING_SPEED * 0.8, FOLLOWING_ACCEL);
   else if (bot.distanceSensor <= 30)
-    bot.chassis.moveForward(SPEED_FOLLOWING, ACCEL_FOLLOWING);
+    bot.chassis.moveForward(FOLLOWING_SPEED, FOLLOWING_ACCEL);
   else
-    bot.chassis.stop();
+    bot.chassis.stop(FOLLOWING_ACCEL);
 }
 
 void Avoidance_Function() //объезд препятствий
@@ -146,7 +146,7 @@ void Avoidance_Function() //объезд препятствий
   {
     //bot.chassis.stop(); ???
     //delay_(100);
-    bot.chassis.moveBackward(SPEED_AVOIDANCE * 0.7);
+    bot.chassis.moveBackward(AVOIDANCE_SPEED * 0.7);
     //delay_(60); ???
   }
   else if (bot.distanceSensor <= 15)  // отворачиваем
@@ -164,15 +164,15 @@ void Avoidance_Function() //объезд препятствий
 
     switch (rot)
     {
-    case -1: bot.chassis.rotateLeft(SPEED_AVOIDANCE * 0.7); break;
-    case  1: bot.chassis.rotateRight(SPEED_AVOIDANCE * 0.7); break;
-    case  0: bot.chassis.moveBackward(SPEED_AVOIDANCE * 0.7); break;
+    case -1: bot.chassis.rotateLeft(AVOIDANCE_SPEED * 0.7); break;
+    case  1: bot.chassis.rotateRight(AVOIDANCE_SPEED * 0.7); break;
+    case  0: bot.chassis.moveBackward(AVOIDANCE_SPEED * 0.7); break;
     }
 
     delay_(600);
   }
   else
-    bot.chassis.moveForward(SPEED_AVOIDANCE);
+    bot.chassis.moveForward(AVOIDANCE_SPEED);
 }
 
 void auto_do()

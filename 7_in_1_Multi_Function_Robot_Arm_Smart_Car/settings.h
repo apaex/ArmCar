@@ -74,10 +74,12 @@
 #define SPEED_LOW 40
 #define SPEED_MEDIUM 120
 #define SPEED_HIGH 255
-#define SPEED_LINE_TRACKING 120
-#define SPEED_AVOIDANCE 70
-#define SPEED_FOLLOWING 100
-#define ACCEL_FOLLOWING 100     // плавность скорости моторов
+#define TRACKING_SPEED 120
+#define AVOIDANCE_SPEED 70
+#define FOLLOWING_SPEED 100
+#define FOLLOWING_ACCEL 100     // плавность скорости моторов
+#define ANTIDROP_SPEED 60
+#define ANTIDROP_ACCEL 100     // плавность скорости моторов
 
 #define ACTIONS_COUNT 20
 
