@@ -42,14 +42,11 @@ public:
         motorR.setMinDuty(MOTOR_MIN_DUTY);
 
         // плавность скорости моторов
-        motorL.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
-        motorR.setSmoothSpeed(MOTOR_SMOOTH_SPEED);
-
         motorL.smoothMode(false);
         motorR.smoothMode(false);
     }
 
-    void setMotorSpeeds(int dutyL, int dutyR, bool smooth = false)
+    void setMotorSpeeds(int dutyL, int dutyR, uint16_t accel = 0)
     {
         dutyL = constrain(dutyL, -255, 255);
         dutyR = constrain(dutyR, -255, 255);
@@ -57,25 +54,32 @@ public:
         setState(dutyL, dutyR);
 
         //DebugWrite("dl-dr", _dutyL, _dutyR);
-        motorL.smoothMode(smooth);
-        motorR.smoothMode(smooth);
+
+        if (accel)
+        {
+            motorL.setSmoothSpeed(accel);
+            motorR.setSmoothSpeed(accel);
+        }
+        motorL.smoothMode(accel);
+        motorR.smoothMode(accel);
+
         motorL.setSpeed(-dutyL);
         motorR.setSpeed(dutyR);
     }
 
-    void setVelocities(int vx, int rz, bool smooth = false)
+    void setVelocities(int vx, int rz, uint16_t accel = 0)
     {
         // танковая схема
         int dutyL = vx - rz;
         int dutyR = vx + rz;
 
-        return setMotorSpeeds(dutyL, dutyR, smooth);
+        return setMotorSpeeds(dutyL, dutyR, accel);
     }
 
-    void moveForward(int speed)  { setVelocities(speed, 0); }
-    void moveBackward(int speed) { setVelocities(-speed, 0); }
-    void rotateLeft(int speed)   { setVelocities(0, speed); }
-    void rotateRight(int speed)  { setVelocities(0, -speed); }
+    void moveForward(int speed, uint16_t accel = 0)  { setVelocities(speed, 0, accel); }
+    void moveBackward(int speed, uint16_t accel = 0) { setVelocities(-speed, 0, accel); }
+    void rotateLeft(int speed, uint16_t accel = 0)   { setVelocities(0, speed, accel); }
+    void rotateRight(int speed, uint16_t accel = 0)  { setVelocities(0, -speed, accel); }
     void stop()                  { setMotorSpeeds(0, 0); }
 
     void tick()

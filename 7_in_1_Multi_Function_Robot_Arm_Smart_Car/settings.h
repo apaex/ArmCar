@@ -53,7 +53,6 @@
 
 
 
-#define MOTOR_SMOOTH_SPEED 100     // плавность скорости моторов
 #define MOTOR_MIN_DUTY 30          // мин. сигнал, при котором мотор начинает вращение
 
 #define GAMEPAD_RX_MIN -508        //LEFT-RIGHT
@@ -78,6 +77,7 @@
 #define SPEED_LINE_TRACKING 120
 #define SPEED_AVOIDANCE 70
 #define SPEED_FOLLOWING 100
+#define ACCEL_FOLLOWING 100     // плавность скорости моторов
 
 #define ACTIONS_COUNT 20
 

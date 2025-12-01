@@ -129,13 +129,13 @@ void Anti_drop_Function() //не падать со стола
 void Following_Function() //преследование
 {
   if (bot.distanceSensor < 15)
-    bot.chassis.moveBackward(SPEED_FOLLOWING * 0.8);
+    bot.chassis.moveBackward(SPEED_FOLLOWING * 0.8, ACCEL_FOLLOWING);
   else if (bot.distanceSensor <= 20)
     bot.chassis.stop();
   else if (bot.distanceSensor <= 25)
-    bot.chassis.moveForward(SPEED_FOLLOWING * 0.8);
+    bot.chassis.moveForward(SPEED_FOLLOWING * 0.8, ACCEL_FOLLOWING);
   else if (bot.distanceSensor <= 30)
-    bot.chassis.moveForward(SPEED_FOLLOWING);
+    bot.chassis.moveForward(SPEED_FOLLOWING, ACCEL_FOLLOWING);
   else
     bot.chassis.stop();
 }
