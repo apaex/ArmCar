@@ -17,6 +17,7 @@
 * GyverMotor by AlexGyver Version 4.2.0
 * GyverIO by AlexGyver Version 1.3.13
 * GyverPing by AlexGyver Version 1.0.1
+* GyverBeeper by AlexGyver Version 1.1.0
 
 Обратите внимание на версии библиотек. Если программа не собирается или не работает с другой версией - установите указанные, на которых тестировалась работа.
 
