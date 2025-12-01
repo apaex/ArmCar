@@ -290,6 +290,8 @@ void commandInterpretator(char cmd)
       case 's': setProgram(PRG_NONE); bot.hand.stop();            break;
 
       case 'm':
+        setProgram(PRG_NONE);
+        bot.hand.stop();
         if (programMayBeRewrite)
           nActions = 0;
         programMayBeRewrite = false;
