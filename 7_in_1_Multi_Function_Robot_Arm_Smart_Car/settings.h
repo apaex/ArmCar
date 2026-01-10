@@ -76,6 +76,7 @@
 #define SPEED_HIGH 255
 #define TRACKING_SPEED 120
 #define AVOIDANCE_SPEED 70
+#define AVOIDANCE_ACCEL 100
 #define FOLLOWING_SPEED 100
 #define FOLLOWING_ACCEL 100     // плавность скорости моторов
 #define ANTIDROP_SPEED 60

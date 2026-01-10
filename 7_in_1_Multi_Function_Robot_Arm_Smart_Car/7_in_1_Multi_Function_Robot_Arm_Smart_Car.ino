@@ -142,14 +142,14 @@ void Following_Function() //преследование
 
 void Avoidance_Function() //объезд препятствий
 {
-  if (bot.distanceSensor <= 7)  // отъезжаем
+  if (bot.distanceSensor <= 7 || (bot.bumperSensorLeft && bot.bumperSensorRight))  // отъезжаем
   {
     //bot.chassis.stop(); ???
     //delay_(100);
     bot.chassis.moveBackward(AVOIDANCE_SPEED * 0.7);
     //delay_(60); ???
   }
-  else if (bot.distanceSensor <= 15)  // отворачиваем
+  else if (bot.distanceSensor <= 15 || bot.bumperSensorLeft || bot.bumperSensorRight)  // отворачиваем
   {
     //bot.chassis.stop(); ???
     //delay_(100);
@@ -172,7 +172,7 @@ void Avoidance_Function() //объезд препятствий
     delay_(600);
   }
   else
-    bot.chassis.moveForward(AVOIDANCE_SPEED);
+    bot.chassis.moveForward(AVOIDANCE_SPEED, AVOIDANCE_ACCEL);
 }
 
 void auto_do()
